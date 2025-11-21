@@ -14,6 +14,31 @@ Thumbs.db
 *.code-workspace
 
 # ===========================
+# VISUAL STUDIO FILES
+# ===========================
+.vs/                         # Visual Studio workspace folder
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Ll]og/
+[Tt]est[Rr]esult*/
+
+# Other VS caches
+*.pch
+*.pdb
+*.ipch
+
+# ===========================
 # DATABASE / LOG FILES
 # ===========================
 *.log
@@ -27,8 +52,7 @@ Thumbs.db
 *.env
 
 # ===========================
-# PYTHON / NODE / OTHER BUILD FILES
-# (in case someone accidentally opens or uses tools)
+# NODE / PYTHON / OTHER (future-proof)
 # ===========================
 node_modules/
 __pycache__/
