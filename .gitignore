@@ -1,0 +1,42 @@
+# ===========================
+# OS / SYSTEM FILES
+# ===========================
+.DS_Store
+Thumbs.db
+
+# ===========================
+# VSCODE & EDITOR FILES
+# ===========================
+.vscode/*
+!.vscode/settings.json       # allow shared minimal settings file
+
+.idea/
+*.code-workspace
+
+# ===========================
+# DATABASE / LOG FILES
+# ===========================
+*.log
+*.bak
+*.tmp
+
+# ===========================
+# ENV FILES (if needed later)
+# ===========================
+.env
+*.env
+
+# ===========================
+# PYTHON / NODE / OTHER BUILD FILES
+# (in case someone accidentally opens or uses tools)
+# ===========================
+node_modules/
+__pycache__/
+dist/
+
+# ===========================
+# DELIVERABLES SAFEGUARD
+# (do NOT ignore final deliverables)
+# ===========================
+# deliverables/*
+# !deliverables/.gitkeep
