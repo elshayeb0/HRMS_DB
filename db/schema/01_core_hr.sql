@@ -136,3 +136,12 @@ CREATE TABLE LineManager (
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
 );
 GO
+
+CREATE TABLE Employee_Skill (
+    employee_id INT,
+    skill_id INT,
+    proficiency_level VARCHAR(50),
+    PRIMARY KEY (employee_id, skill_id),
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
+    FOREIGN KEY (skill_id) REFERENCES Skill(skill_id)
+);
