@@ -17,12 +17,28 @@ Thumbs.db
 # VISUAL STUDIO FILES
 # ===========================
 .vs/                         # Visual Studio workspace folder
+.vs/*
+.vs/**
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# Build results
+# Visual Studio solution/workspace extras
+*.sln
+*.slnx
+*.vsconfig
+*.v22.suo
+
+# VS workspace SQLite and metadata caches
+.vs/*.sqlite
+.vs/**/*.sqlite
+.vs/**/*.json
+.vs/**/*.v18
+
+# ===========================
+# BUILD RESULTS
+# ===========================
 [Bb]in/
 [Oo]bj/
 [Dd]ebug/
@@ -33,10 +49,13 @@ x86/
 [Ll]og/
 [Tt]est[Rr]esult*/
 
-# Other VS caches
+# ===========================
+# OTHER VS CACHES
+# ===========================
 *.pch
 *.pdb
 *.ipch
+
 
 # ===========================
 # DATABASE / LOG FILES
