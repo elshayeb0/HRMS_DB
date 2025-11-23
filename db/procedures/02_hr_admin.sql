@@ -15,7 +15,7 @@ CREATE PROCEDURE CreateContract
     @EmployeeID INT,
     @Type VARCHAR(50),
     @StartDate DATE,
-    @EndDate DATE, 
+    @EndDate DATE,
 AS
 BEGIN
 
@@ -30,7 +30,7 @@ BEGIN
     SET contract_id = SCOPE_IDENTITY()
     WHERE employee_id = @EmployeeID;
 
-    SELECT 'Contract created successfully for Employee ID: ' + CAST(@EmployeeID AS VARCHAR) + 
+    SELECT 'Contract created successfully for Employee ID: ' + CAST(@EmployeeID AS VARCHAR) +
        '. Contract ID: ' + CAST(SCOPE_IDENTITY() AS VARCHAR) AS Message;
 
 END;
@@ -48,13 +48,13 @@ BEGIN
     SET end_date = @NewEndDate
     WHERE contract_id = @ContractID;
 
-    SELECT 'Contract ID ' + CAST(@ContractID AS VARCHAR) + 
+    SELECT 'Contract ID ' + CAST(@ContractID AS VARCHAR) +
        ' renewed successfully until ' + CAST(@NewEndDate AS VARCHAR) AS Message;
 
 END;
 GO
 
--- 3: 
+-- 3:
 
 CREATE PROCEDURE ApproveLeaveRequest
     @LeaveRequestID INT,
@@ -67,7 +67,7 @@ BEGIN
     SET status = @Status
     WHERE request_id = @LeaveRequestID;
 
-    SELECT 'Leave request ID ' + CAST(@LeaveRequestID AS VARCHAR) + 
+    SELECT 'Leave request ID ' + CAST(@LeaveRequestID AS VARCHAR) +
        ' has been ' + @Status + ' by approver ID ' + CAST(@ApproverID AS VARCHAR) AS Message;
 
 END;
@@ -88,8 +88,8 @@ BEGIN
     INSERT INTO Mission (employee_id, manager_id, destination, start_date, end_date, status)
     VALUES (@EmployeeID, @ManagerID, @Destination, @StartDate, @EndDate, 'Assigned');
 
-    SELECT 'Mission assigned successfully to Employee ID: ' + CAST(@EmployeeID AS VARCHAR) + 
-       ' for destination: ' + @Destination + 
+    SELECT 'Mission assigned successfully to Employee ID: ' + CAST(@EmployeeID AS VARCHAR) +
+       ' for destination: ' + @Destination +
        ' (Mission ID: ' + CAST(SCOPE_IDENTITY() AS VARCHAR) + ')' AS Message;
 
 END;
@@ -99,7 +99,7 @@ GO
 
 CREATE PROCEDURE ReviewReimbursement
     @ClaimID INT,
-    @ApproverID INT,       
+    @ApproverID INT,
     @Decision VARCHAR(20)
 AS
 BEGIN
@@ -109,7 +109,7 @@ BEGIN
     SET current_status = @Decision
     WHERE reimbursement_id = @ClaimID;
 
-    SELECT 'Reimbursement claim ID ' + CAST(@ClaimID AS VARCHAR) + 
+    SELECT 'Reimbursement claim ID ' + CAST(@ClaimID AS VARCHAR) +
        ' has been ' + @Decision + ' by approver ID ' + CAST(@ApproverID AS VARCHAR) AS Message;
 
 END;
@@ -122,7 +122,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
+    SELECT
         c.contract_id,
         e.employee_id,
         e.full_name AS employee_name,
@@ -145,7 +145,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
+    SELECT
         employee_id,
         full_name AS employee_name,
         email,
@@ -177,7 +177,7 @@ BEGIN
 
 END;
 GO
- 
+
  -- 9: check again
 CREATE PROCEDURE GetExpiringContracts
     @DaysBefore INT
@@ -185,7 +185,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
+    SELECT
         contract_id,
         type,
         start_date,
@@ -211,7 +211,7 @@ BEGIN
     SET department_head_id = @ManagerID
     WHERE department_id = @DepartmentID;
 
-    SELECT 'Manager ID ' + CAST(@ManagerID AS VARCHAR) + 
+    SELECT 'Manager ID ' + CAST(@ManagerID AS VARCHAR) +
        ' assigned as head of Department ID ' + CAST(@DepartmentID AS VARCHAR) AS Message;
 
 END;
@@ -255,7 +255,7 @@ BEGIN
     SET NOCOUNT ON;
 
     UPDATE Employee
-    SET 
+    SET
         first_name = ISNULL(@FirstName, first_name),
         last_name = ISNULL(@LastName, last_name),
         full_name = ISNULL(@FirstName, first_name) + ' ' + ISNULL(@LastName, last_name),
@@ -274,7 +274,7 @@ END;
 GO
 
 
---13: 
+--13:
 
 CREATE PROCEDURE SetProfileCompleteness
     @EmployeeID INT,
@@ -287,7 +287,7 @@ BEGIN
     SET profile_completion = @CompletenessPercentage
     WHERE employee_id = @EmployeeID;
 
-    SELECT 'Profile completeness updated to ' + CAST(@CompletenessPercentage AS VARCHAR) + 
+    SELECT 'Profile completeness updated to ' + CAST(@CompletenessPercentage AS VARCHAR) +
            '% for Employee ID: ' + CAST(@EmployeeID AS VARCHAR) AS Message;
 END;
 GO
@@ -355,9 +355,9 @@ BEGIN
     INSERT INTO ShiftAssignment (employee_id, shift_id, start_date, end_date, status)
     VALUES (@EmployeeID, @ShiftCycle, @StartDate, @EndDate, 'Assigned');
 
-    SELECT 'Employee ID ' + CAST(@EmployeeID AS VARCHAR) + 
-           ' assigned to shift cycle ' + @ShiftCycle + 
-           ' from ' + CAST(@StartDate AS VARCHAR) + 
+    SELECT 'Employee ID ' + CAST(@EmployeeID AS VARCHAR) +
+           ' assigned to shift cycle ' + @ShiftCycle +
+           ' from ' + CAST(@StartDate AS VARCHAR) +
            ' to ' + CAST(@EndDate AS VARCHAR) AS Message;
 END;
 GO
@@ -376,8 +376,8 @@ BEGIN
     -- Insert a notification directly with fixed message content
     INSERT INTO Notification (message_content, urgency, notification_type)
     VALUES (
-        'Shift Assignment ID ' + CAST(@ShiftAssignmentID AS VARCHAR) + 
-        ' for Employee ID ' + CAST(@EmployeeID AS VARCHAR) + 
+        'Shift Assignment ID ' + CAST(@ShiftAssignmentID AS VARCHAR) +
+        ' for Employee ID ' + CAST(@EmployeeID AS VARCHAR) +
         ' is nearing expiry on ' + CAST(@ExpiryDate AS VARCHAR),
         'High',
         'ShiftExpiry'
@@ -392,7 +392,7 @@ BEGIN
         'Pending'
     );
 
-    SELECT 'Notification created for Employee ID ' + CAST(@EmployeeID AS VARCHAR) + 
+    SELECT 'Notification created for Employee ID ' + CAST(@EmployeeID AS VARCHAR) +
            ' for Shift Assignment ID ' + CAST(@ShiftAssignmentID AS VARCHAR) AS Message;
 END;
 GO
@@ -450,9 +450,9 @@ BEGIN
     SET approval_limit = @MaxHours;  -- Using MaxHours as the upper limit
 
     -- Confirmation message
-    SELECT 'Permission limits set successfully. Min hours: ' 
-           + CAST(@MinHours AS VARCHAR(5)) 
-           + ', Max hours: ' 
+    SELECT 'Permission limits set successfully. Min hours: '
+           + CAST(@MinHours AS VARCHAR(5))
+           + ', Max hours: '
            + CAST(@MaxHours AS VARCHAR(5)) AS Message;
 END
 GO
@@ -467,14 +467,14 @@ BEGIN
 
     -- Update pending requests to escalate to their manager
     UPDATE LeaveRequest
-    SET employee_id = (SELECT manager_id 
-                       FROM Employee 
+    SET employee_id = (SELECT manager_id
+                       FROM Employee
                        WHERE employee_id = LeaveRequest.employee_id)
     WHERE status = 'Pending'
       AND approval_timing <= @Deadline;
 
     -- Confirmation message
-    SELECT 'Pending requests escalated to higher managers as of ' 
+    SELECT 'Pending requests escalated to higher managers as of '
            + CAST(@Deadline AS VARCHAR(30)) AS Message;
 END;
 GO
@@ -494,14 +494,14 @@ BEGIN
     VALUES (@EmployeeID, @VacationPackageID);
 
     -- Confirmation message
-    SELECT 'Vacation package ID ' + CAST(@VacationPackageID AS VARCHAR) + 
+    SELECT 'Vacation package ID ' + CAST(@VacationPackageID AS VARCHAR) +
            ' linked to Employee ID ' + CAST(@EmployeeID AS VARCHAR) AS Message;
 END;
 GO
 
 
 
---25: 
+--25:
 CREATE PROCEDURE ConfigureLeavePolicies
 AS
 BEGIN
@@ -685,7 +685,7 @@ END;
 GO
 
 
---35:   
+--35:
 CREATE PROCEDURE AdjustLeaveBalance
     @EmployeeID INT,
     @LeaveType VARCHAR(50),
@@ -702,7 +702,7 @@ BEGIN
 END;
 GO
 
-    --36:   
+    --36:
     CREATE PROCEDURE ManageLeaveRoles
     @RoleID INT,
     @Permission VARCHAR(100)
@@ -719,7 +719,7 @@ BEGIN
 END;
 GO
 
- --37:  
+ --37:
  CREATE PROCEDURE FinalizeLeaveRequest
     @LeaveRequestID INT
 AS
@@ -764,7 +764,7 @@ BEGIN
     SELECT 'Leave requests processed successfully.' AS Message;
 END;
 GO
- 
+
  --40:
  CREATE PROCEDURE VerifyMedicalLeave
     @LeaveRequestID INT,
@@ -787,7 +787,7 @@ AS
 BEGIN
     -- Example: add approved leave duration to LeaveEntitlement
     UPDATE LeaveEntitlement
-    SET entitlement = entitlement + 
+    SET entitlement = entitlement +
         (SELECT duration FROM LeaveRequest WHERE request_id = @LeaveRequestID AND status = 'Approved')
     WHERE employee_id = (SELECT employee_id FROM LeaveRequest WHERE request_id = @LeaveRequestID)
       AND leave_type_id = (SELECT leave_id FROM LeaveRequest WHERE request_id = @LeaveRequestID);
