@@ -12,14 +12,14 @@
 USE HRMS_DB;
 GO
 
-INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status, location)
+INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status, location, allowance_amount)
 VALUES 
-('Morning Shift', 'Regular', '08:00', '16:00', 60, '2024-01-15', 'Active', 'Main Office - Building A'),
-('Evening Shift', 'Regular', '16:00', '00:00', 60, '2024-01-15', 'Active', 'Main Office - Building A'),
-('Night Shift', 'Regular', '00:00', '08:00', 60, '2024-01-16', 'Active', 'Main Office - Building B'),
-('Day Shift', 'Weekend', '09:00', '17:00', 30, '2024-01-20', 'Active', 'Branch Office - Downtown'),
-('Flexible Shift', 'Flexible', '10:00', '18:00', 60, '2024-01-22', 'Active', 'Remote Work'),
-('On-Call Shift', 'On-Call', '08:00', '20:00', 120, '2024-01-25', 'Active', 'Field Service - Zone 3');
+    ('Morning Shift', 'Regular', '08:00:00', '16:00:00', 60, '2024-01-15', 'Active', 'Main Office', 0.00),
+    ('Evening Shift', 'Regular', '16:00:00', '00:00:00', 60, '2024-01-15', 'Active', 'Main Office', 50.00),
+    ('Night Shift', 'Overnight', '00:00:00', '08:00:00', 60, '2024-01-15', 'Active', 'Main Office', 100.00),
+    ('Weekend Shift', 'Weekend', '09:00:00', '17:00:00', 60, '2024-01-20', 'Active', 'Branch Office', 75.00),
+    ('Holiday Shift', 'Holiday', '08:00:00', '16:00:00', 60, '2024-12-25', 'Active', 'Main Office', 150.00);
+
 
 INSERT INTO ShiftAssignment (employee_id, shift_id, start_date, end_date, status) VALUES
 (1, 1, '2024-11-01', NULL, 'Active'),

@@ -22,7 +22,8 @@ CREATE TABLE ShiftSchedule (
     break_duration INT,
     shift_date DATE,
     status VARCHAR(80),
-    location VARCHAR(200)
+    location VARCHAR(200),
+    allowance_amount DECIMAL(10,2) DEFAULT 0
 );
 GO
 

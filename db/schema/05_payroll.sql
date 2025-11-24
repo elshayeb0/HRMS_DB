@@ -119,6 +119,7 @@ CREATE TABLE BonusPolicy (
     policy_id INT PRIMARY KEY,
     bonus_type VARCHAR(60),
     eligibility_criteria VARCHAR(MAX),
+    amount DECIMAL(10,2),
     FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
 );
 GO

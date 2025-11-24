@@ -40,8 +40,14 @@ INSERT INTO OvertimePolicy (policy_id, weekday_rate_multiplier, weekend_rate_mul
 INSERT INTO LatenessPolicy (policy_id, grace_period_mins, deduction_rate) VALUES
 (2, 15, 0.50);
 
-INSERT INTO BonusPolicy (policy_id, bonus_type, eligibility_criteria) VALUES
-(3, 'Performance', 'Employees with rating 4 or above, minimum 6 months tenure');
+INSERT INTO BonusPolicy (policy_id, bonus_type, eligibility_criteria, amount)
+VALUES 
+    (1, 'Performance Bonus', 'Employees with performance rating above 4.0', 5000.00),
+    (2, 'Annual Bonus', 'All full-time employees with 1+ year service', 3000.00),
+    (3, 'Project Completion Bonus', 'Team members who complete projects on time', 2500.00),
+    (4, 'Referral Bonus', 'Employees who refer successful hires', 1000.00),
+    (5, 'Holiday Bonus', 'All active employees during holiday season', 1500.00);
+
 
 INSERT INTO DeductionPolicy (policy_id, deduction_reason, calculation_mode) VALUES
 (4, 'Unauthorized Absence', 'Per day rate');
