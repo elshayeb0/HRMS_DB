@@ -1,5 +1,6 @@
 -- =============================================
 -- File: 03_payroll_officer.sql
+-- Author: Ahmed Dakroury
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As a Payroll Officer" user stories
@@ -15,7 +16,7 @@ CREATE PROCEDURE GeneratePayroll
     @EndDate DATE
 AS
 BEGIN
-    SELECT 
+    SELECT
         payroll_id,
         employee_id,
         taxes,
@@ -53,8 +54,8 @@ CREATE PROCEDURE CalculateNetSalary
     @PayrollID INT
 AS
 BEGIN
-    SELECT 
-        ISNULL(base_amount,0) + ISNULL(adjustments,0) + ISNULL(contributions,0) - ISNULL(taxes,0) 
+    SELECT
+        ISNULL(base_amount,0) + ISNULL(adjustments,0) + ISNULL(contributions,0) - ISNULL(taxes,0)
         AS NetSalary
     FROM Payroll
     WHERE payroll_id = @PayrollID;
@@ -79,7 +80,7 @@ CREATE PROCEDURE GetMonthlyPayrollSummary
     @Year INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         SUM(ISNULL(net_salary,0)) AS TotalSalaryExpenditure
     FROM Payroll
     WHERE MONTH(period_end) = @Month
@@ -151,7 +152,7 @@ CREATE PROCEDURE GetPayrollByDepartment
     @Year INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         d.department_id,
         d.department_name,
         SUM(ISNULL(p.net_salary,0)) AS TotalPayroll
@@ -176,7 +177,7 @@ BEGIN
     JOIN Attendance a ON e.employee_id = a.employee_id
     LEFT JOIN AttendanceLog al ON a.attendance_id = al.attendance_id
     WHERE pp.payroll_period_id = @PayrollPeriodID
-      AND a.exit_time IS NULL; 
+      AND a.exit_time IS NULL;
 END;
 GO
 
@@ -185,24 +186,24 @@ CREATE PROCEDURE SyncAttendanceToPayroll
     @SyncDate DATE
 AS
 BEGIN
-    
+
     INSERT INTO Payroll (employee_id, period_start, period_end, base_amount, adjustments, contributions, taxes, actual_pay, net_salary, payment_date)
-    SELECT 
+    SELECT
         a.employee_id,
         CAST(@SyncDate AS DATE),
         CAST(@SyncDate AS DATE),
-        0,  
-        0,  
-        0,  
-        0,  
-        0,  
-        0,  
-        GETDATE()  
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        GETDATE()
     FROM Attendance a
     WHERE CAST(a.entry_time AS DATE) = @SyncDate
       AND NOT EXISTS (
-          SELECT 1 FROM Payroll p 
-          WHERE p.employee_id = a.employee_id 
+          SELECT 1 FROM Payroll p
+          WHERE p.employee_id = a.employee_id
             AND p.period_start = CAST(@SyncDate AS DATE)
       );
 
@@ -216,17 +217,17 @@ CREATE PROCEDURE SyncApprovedPermissionsToPayroll
 AS
 BEGIN
     INSERT INTO Payroll (employee_id, period_start, period_end, base_amount, adjustments, contributions, taxes, actual_pay, net_salary, payment_date)
-    SELECT 
+    SELECT
         e.employee_id,
         pp.start_date,
         pp.end_date,
-        0,  
-        0,  
-        0,  
-        0,  
-        0,  
-        0,  
-        GETDATE()  
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        GETDATE()
     FROM Employee e
     JOIN PayrollPeriod pp ON pp.payroll_id = e.employee_id
     JOIN ApprovalWorkflow aw ON aw.workflow_id = pp.payroll_id
@@ -372,7 +373,7 @@ CREATE PROCEDURE UpdateInsuranceBrackets
 AS
 BEGIN
     UPDATE Insurance
-    SET 
+    SET
         contribution_rate = @EmployeeContribution + @EmployerContribution,
         coverage = 'Salary bracket'
     WHERE insurance_id = @BracketID;
@@ -433,8 +434,8 @@ AS
 BEGIN
     UPDATE Employee
     SET salary_type_id = (
-        SELECT salary_type_id 
-        FROM SalaryType 
+        SELECT salary_type_id
+        FROM SalaryType
         WHERE type = @PayType
     )
     WHERE employee_id = @EmployeeID;
@@ -566,7 +567,7 @@ BEGIN
         SET net_salary = @NewValue
         WHERE payroll_id = @PayrollRunID
           AND employee_id = @EmployeeID;
- 
+
     INSERT INTO Payroll_Log (payroll_id, actor, change_date, modification_type)
     VALUES (@PayrollRunID, @ModifiedBy, GETDATE(), 'Modified ' + @FieldName);
 

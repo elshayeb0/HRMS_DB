@@ -1,5 +1,6 @@
 -- =============================================
 -- File: 01_system_admin.sql
+-- Author: Hazem Ahmed
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As a System Admin" user stories
@@ -9,19 +10,19 @@
 
 USE HRMS_DB;
 GO
- 
+
  -- 1;
 
 CREATE PROCEDURE ViewEmployeeInfo
     @EmployeeID INT
 AS
 BEGIN
-    SELECT * 
+    SELECT *
     FROM Employee
     WHERE employee_id = @EmployeeID;
 END;
 GO
- 
+
  -- 2;
 
 
@@ -88,7 +89,7 @@ BEGIN
         phone = @Phone,
         address = @Address
     WHERE employee_id = @EmployeeID;
-    
+
     PRINT 'Employee information updated';
 END;
 GO
@@ -112,16 +113,16 @@ GO
 CREATE PROCEDURE GetDepartmentEmployeeStats
 AS
 BEGIN
-    SELECT 
+    SELECT
         department_name AS Department,
         COUNT(employee_id) AS NumberOfEmployees
-    FROM 
+    FROM
         Employee
-    JOIN 
+    JOIN
         Department ON Employee.department_id = Department.department_id
-    GROUP BY 
+    GROUP BY
         department_name
-    ORDER BY 
+    ORDER BY
         NumberOfEmployees DESC;
 END
 GO
@@ -167,18 +168,18 @@ BEGIN
     -- Insert notification
     INSERT INTO Notification (message_content, urgency, notification_type)
     VALUES (@Message, 'High', 'Structure Change');
-    
+
     DECLARE @NotificationID INT = SCOPE_IDENTITY();
-    
+
     -- Send to all affected employees at once
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
-    SELECT 
+    SELECT
         CAST(value AS INT),
         @NotificationID,
         'Sent',
         GETDATE()
     FROM STRING_SPLIT(@AffectedEmployees, ',');
-    
+
     SELECT 'Notification sent to all affected employees' AS Message;
 END
 GO
@@ -188,7 +189,7 @@ GO
 CREATE PROCEDURE ViewOrgHierarchy
 AS
 BEGIN
-    SELECT 
+    SELECT
         e.employee_id AS 'Employee ID',
         e.full_name AS 'Employee Name',
         m.full_name AS 'Manager Name',
@@ -364,10 +365,10 @@ AS
 BEGIN
     DECLARE @Reason VARCHAR(600);
     SET @Reason = 'Changed from ' + CONVERT(VARCHAR(30), @OldValue, 120) + ' to ' + CONVERT(VARCHAR(30), @NewValue, 120);
-    
+
     INSERT INTO AttendanceLog (attendance_id, actor, timestamp, reason)
     VALUES (@AttendanceID, @EditedBy, @EditTimestamp, @Reason);
-    
+
     SELECT 'Attendance edit logged successfully' AS Message;
 END
 GO
@@ -382,7 +383,7 @@ AS
 BEGIN
     INSERT INTO Employee_Exception (employee_id, exception_id)
     VALUES (@EmployeeID, @HolidayID);
-    
+
     SELECT 'Holiday override applied successfully' AS ConfirmationMessage;
 END
 GO
@@ -396,19 +397,19 @@ CREATE PROCEDURE ManageUserAccounts
 AS
 BEGIN
     DECLARE @RoleID INT;
-    
+
     SELECT @RoleID = role_id
     FROM Role
     WHERE role_name = @Role;
-    
+
     IF @Action = 'ADD'
         INSERT INTO Employee_Role (employee_id, role_id, assigned_date)
         VALUES (@UserID, @RoleID, GETDATE());
-    
+
     IF @Action = 'REMOVE'
         DELETE FROM Employee_Role
         WHERE employee_id = @UserID AND role_id = @RoleID;
-    
+
     SELECT 'User account managed successfully' AS ConfirmationMessage;
 END
 GO

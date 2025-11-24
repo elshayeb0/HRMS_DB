@@ -1,5 +1,6 @@
 -- =============================================
 -- File: 04_line_manager.sql
+-- Author: Ziad Elshayeb
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As a Line Manager" user stories

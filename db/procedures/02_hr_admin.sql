@@ -1,5 +1,6 @@
 -- =============================================
 -- File: 02_hr_admin.sql
+-- Author: Yassin Amr Zaki
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As an HR Admin" user stories

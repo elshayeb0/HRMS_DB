@@ -1,5 +1,6 @@
 -- =============================================
 -- File: 05_employee.sql
+-- Author: Ahmed Saadallah
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As an Employee" user stories
@@ -24,11 +25,11 @@ CREATE PROCEDURE SubmitLeaveRequest
 AS
 BEGIN
     SET NOCOUNT ON;
-    
+
     -- Insert leave request with calculated duration
     INSERT INTO LeaveRequest (employee_id, leave_id, justification, duration, approval_timing, status)
     VALUES (@EmployeeID, @LeaveTypeID, @Reason, DATEDIFF(DAY, @StartDate, @EndDate) + 1, GETDATE(), 'Pending');
-    
+
     -- Confirmation message
     PRINT 'Leave request submitted successfully.';
 END;
@@ -43,7 +44,7 @@ CREATE PROCEDURE GetLeaveBalance
 AS
 BEGIN
     -- Get all leave entitlements for this employee
-    SELECT 
+    SELECT
         l.leave_type AS 'Leave Type',
         le.entitlement AS 'Remaining Days'
     FROM LeaveEntitlement le
@@ -64,7 +65,7 @@ AS
 BEGIN
     INSERT INTO Attendance (employee_id, shift_id, entry_time, exit_time)
     VALUES (@EmployeeID, @ShiftID, @EntryTime, @ExitTime);
-    
+
     SELECT 'Attendance recorded successfully' AS ConfirmationMessage;
 END;
 GO
@@ -80,7 +81,7 @@ AS
 BEGIN
     INSERT INTO Reimbursement (employee_id, type, claim_type, current_status)
     VALUES (@EmployeeID, @ExpenseType, @ExpenseType, 'Pending');
-    
+
     SELECT 'Reimbursement request submitted successfully' AS ConfirmationMessage;
 END;
 GO
@@ -95,14 +96,14 @@ CREATE PROCEDURE AddEmployeeSkill
 AS
 BEGIN
     DECLARE @SkillID INT;
-    
-    SELECT @SkillID = skill_id 
-    FROM Skill 
+
+    SELECT @SkillID = skill_id
+    FROM Skill
     WHERE skill_name = @SkillName;
-    
+
     INSERT INTO Employee_Skill (employee_id, skill_id)
     VALUES (@EmployeeID, @SkillID);
-    
+
     SELECT 'Skill added successfully' AS ConfirmationMessage;
 END;
 GO
@@ -115,16 +116,16 @@ CREATE PROCEDURE ViewAssignedShifts
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         ss.shift_date,
         ss.start_time,
         ss.end_time,
         ss.location
-    FROM 
+    FROM
         ShiftAssignment sa
-    INNER JOIN 
+    INNER JOIN
         ShiftSchedule ss ON sa.shift_id = ss.shift_id
-    WHERE 
+    WHERE
         sa.employee_id = @EmployeeID;
 END;
 GO
@@ -137,17 +138,17 @@ CREATE PROCEDURE ViewMyContracts
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         c.contract_id,
         c.type,
         c.start_date,
         c.end_date,
         c.current_state
-    FROM 
+    FROM
         Contract c
-    INNER JOIN 
+    INNER JOIN
         Employee e ON c.contract_id = e.contract_id
-    WHERE 
+    WHERE
         e.employee_id = @EmployeeID;
 END;
 GO
@@ -158,7 +159,7 @@ CREATE PROCEDURE ViewMyPayroll
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         payroll_id,
         period_start,
         period_end,
@@ -168,9 +169,9 @@ BEGIN
         taxes,
         net_salary,
         payment_date
-    FROM 
+    FROM
         Payroll
-    WHERE 
+    WHERE
         employee_id = @EmployeeID;
 END;
 GO
@@ -187,7 +188,7 @@ BEGIN
     SET phone = @Phone,
         address = @Address
     WHERE employee_id = @EmployeeID;
-    
+
     SELECT 'Contact details updated successfully' AS ConfirmationMessage;
 END;
 GO
@@ -198,15 +199,15 @@ CREATE PROCEDURE ViewMyMissions
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         mission_id,
         destination,
         start_date,
         end_date,
         status
-    FROM 
+    FROM
         Mission
-    WHERE 
+    WHERE
         employee_id = @EmployeeID;
 END;
 GO
@@ -217,7 +218,7 @@ CREATE PROCEDURE ViewEmployeeProfile
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         e.employee_id,
         e.first_name,
         e.last_name,
@@ -229,13 +230,13 @@ BEGIN
         e.employment_status,
         d.department_name,
         p.position_title
-    FROM 
+    FROM
         Employee e
-    LEFT JOIN 
+    LEFT JOIN
         Department d ON e.department_id = d.department_id
-    LEFT JOIN 
+    LEFT JOIN
         Position p ON e.position_id = p.position_id
-    WHERE 
+    WHERE
         e.employee_id = @EmployeeID;
 END;
 GO
@@ -260,7 +261,7 @@ BEGIN
         SET address = @NewValue
         WHERE employee_id = @EmployeeID;
     END
-    
+
     SELECT 'Contact information updated successfully' AS ConfirmationMessage;
 END;
 GO
@@ -272,17 +273,17 @@ CREATE PROCEDURE ViewEmploymentTimeline
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         e.hire_date,
         c.type AS contract_type,
         c.start_date,
         c.end_date,
         c.current_state
-    FROM 
+    FROM
         Employee e
-    LEFT JOIN 
+    LEFT JOIN
         Contract c ON e.contract_id = c.contract_id
-    WHERE 
+    WHERE
         e.employee_id = @EmployeeID;
 END;
 GO
@@ -301,7 +302,7 @@ BEGIN
         relationship = @Relation,
         emergency_contact_phone = @Phone
     WHERE employee_id = @EmployeeID;
-    
+
     SELECT 'Emergency contact updated successfully' AS ConfirmationMessage;
 END;
 GO
@@ -315,12 +316,12 @@ AS
 BEGIN
     INSERT INTO Verification (verification_type, issuer, issue_date)
     VALUES (@DocumentType, 'HR Department', GETDATE());
-    
+
     DECLARE @VerificationID INT = SCOPE_IDENTITY();
-    
+
     INSERT INTO Employee_Verification (employee_id, verification_id)
     VALUES (@EmployeeID, @VerificationID);
-    
+
     SELECT 'HR document request submitted successfully' AS ConfirmationMessage;
 END;
 GO
@@ -334,12 +335,12 @@ AS
 BEGIN
     INSERT INTO Notification (message_content, notification_type, urgency)
     VALUES ('Profile updated', @notificationType, 'Normal');
-    
+
     DECLARE @NotificationID INT = SCOPE_IDENTITY();
-    
+
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     VALUES (@EmployeeID, @NotificationID, 'Sent', GETDATE());
-    
+
     SELECT 'Notification sent successfully' AS ConfirmationMessage;
 END;
 GO
@@ -354,10 +355,10 @@ CREATE PROCEDURE LogFlexibleAttendance
 AS
 BEGIN
     DECLARE @TotalHours INT = DATEDIFF(HOUR, @CheckIn, @CheckOut);
-    
+
     INSERT INTO Attendance (employee_id, entry_time, exit_time, duration)
     VALUES (@EmployeeID, @Date + @CheckIn, @Date + @CheckOut, @TotalHours);
-    
+
     PRINT 'Attendance logged successfully. Total working hours: ' + CAST(@TotalHours AS VARCHAR);
 END;
 GO
@@ -371,12 +372,12 @@ AS
 BEGIN
     INSERT INTO Notification (message_content, notification_type, urgency)
     VALUES ('You missed a punch on ' + CAST(@Date AS VARCHAR), 'Missed Punch', 'High');
-    
+
     DECLARE @NotificationID INT = SCOPE_IDENTITY();
-    
+
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     VALUES (@EmployeeID, @NotificationID, 'Sent', GETDATE());
-    
+
     SELECT 'Notification sent for missed punch' AS NotificationMessage;
 END;
 GO
@@ -395,10 +396,10 @@ BEGIN
     BEGIN
         INSERT INTO Attendance (employee_id, entry_time)
         VALUES (@EmployeeID, @ClockInOutTime);
-        
+
         SELECT 'Clocked In Successfully';
     END
-    
+
     -- Clock OUT: Update the last open attendance record
     IF @Type = 'OUT'
     BEGIN
@@ -412,7 +413,7 @@ BEGIN
                 AND exit_time IS NULL
             ORDER BY entry_time DESC
         );
-        
+
         SELECT 'Clocked Out Successfully';
     END
 END
@@ -431,7 +432,7 @@ BEGIN
     -- Insert a new correction request
     INSERT INTO AttendanceCorrectionRequest (employee_id, date, correction_type, reason, status, recorded_by)
     VALUES (@EmployeeID, @Date, @CorrectionType, @Reason, 'Pending', @EmployeeID);
-    
+
     -- Confirmation message
     SELECT 'Correction request submitted successfully' AS Message;
 END
@@ -444,7 +445,7 @@ CREATE PROCEDURE ViewRequestStatus
 AS
 BEGIN
     -- Get all correction requests for this employee
-    SELECT 
+    SELECT
         request_id AS 'Request ID',
         'Correction Request' AS 'Request Type',
         date AS 'Date',
@@ -467,7 +468,7 @@ BEGIN
     -- Insert the document into LeaveDocument table
     INSERT INTO LeaveDocument (leave_request_id, file_path)
     VALUES (@LeaveRequestID, @FilePath);
-    
+
     -- Confirmation message
     SELECT 'Document attached successfully' AS Message;
 END
@@ -485,13 +486,13 @@ BEGIN
     -- Calculate the duration in days
     DECLARE @Duration INT;
     SET @Duration = DATEDIFF(DAY, @StartDate, @EndDate) + 1;
-    
+
     -- Update the leave request
     UPDATE LeaveRequest
     SET justification = @Reason,
         duration = @Duration
     WHERE request_id = @LeaveRequestID;
-    
+
     -- Confirmation message
     SELECT 'Leave request modified successfully' AS Message;
 END
@@ -507,7 +508,7 @@ BEGIN
     UPDATE LeaveRequest
     SET status = 'Cancelled'
     WHERE request_id = @LeaveRequestID;
-    
+
     -- Confirmation message
     SELECT 'Leave request cancelled successfully' AS Message;
 END
@@ -520,7 +521,7 @@ CREATE PROCEDURE ViewLeaveBalance
 AS
 BEGIN
     -- Get all leave entitlements for this employee
-    SELECT 
+    SELECT
         l.leave_type AS 'Leave Type',
         le.entitlement AS 'Remaining Days'
     FROM LeaveEntitlement le
@@ -535,7 +536,7 @@ CREATE PROCEDURE ViewLeaveHistory
     @EmployeeID INT
 AS
 BEGIN
-    SELECT 
+    SELECT
         request_id AS 'Request ID',
         l.leave_type AS 'Leave Type',
         justification AS 'Reason',
@@ -562,11 +563,11 @@ BEGIN
     -- Calculate the duration in days
     DECLARE @Duration INT;
     SET @Duration = DATEDIFF(DAY, @StartDate, @EndDate) + 1;
-    
+
     -- Insert the leave request
     INSERT INTO LeaveRequest (employee_id, leave_id, justification, duration, status)
     VALUES (@EmployeeID, @LeaveTypeID, @Reason, @Duration, 'Pending');
-    
+
     -- Confirmation message
     SELECT 'Leave request submitted successfully' AS Message;
 END
@@ -583,18 +584,18 @@ BEGIN
     -- Create the notification message based on status
     DECLARE @Message VARCHAR(500);
     SET @Message = 'Your leave request #' + CAST(@RequestID AS VARCHAR(10)) + ' has been ' + @Status;
-    
+
     -- Insert notification into Notification table
     INSERT INTO Notification (message_content, urgency, notification_type)
     VALUES (@Message, 'Medium', 'Leave Status');
-    
+
     DECLARE @NotificationID INT;
     SET @NotificationID = SCOPE_IDENTITY();
-    
+
     -- Link notification to employee
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     VALUES (@EmployeeID, @NotificationID, 'Sent', GETDATE());
-    
+
     -- Output the notification message
     SELECT @Message AS 'Notification';
 END
