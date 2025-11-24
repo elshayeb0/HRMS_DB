@@ -21,7 +21,8 @@ CREATE TABLE ShiftSchedule (
     end_time TIME,
     break_duration INT,
     shift_date DATE,
-    status VARCHAR(80)
+    status VARCHAR(80),
+    location VARCHAR(200)
 );
 GO
 

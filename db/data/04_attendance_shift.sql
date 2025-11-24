@@ -12,11 +12,14 @@
 USE HRMS_DB;
 GO
 
-INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status) VALUES
-('Morning Shift', 'Regular', '08:00:00', '17:00:00', 60, '2024-11-22', 'Active'),
-('Afternoon Shift', 'Regular', '13:00:00', '22:00:00', 60, '2024-11-22', 'Active'),
-('Night Shift', 'Regular', '22:00:00', '07:00:00', 60, '2024-11-22', 'Active'),
-('Flexible Shift', 'Flexible', '09:00:00', '18:00:00', 60, '2024-11-22', 'Active');
+INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status, location)
+VALUES 
+('Morning Shift', 'Regular', '08:00', '16:00', 60, '2024-01-15', 'Active', 'Main Office - Building A'),
+('Evening Shift', 'Regular', '16:00', '00:00', 60, '2024-01-15', 'Active', 'Main Office - Building A'),
+('Night Shift', 'Regular', '00:00', '08:00', 60, '2024-01-16', 'Active', 'Main Office - Building B'),
+('Day Shift', 'Weekend', '09:00', '17:00', 30, '2024-01-20', 'Active', 'Branch Office - Downtown'),
+('Flexible Shift', 'Flexible', '10:00', '18:00', 60, '2024-01-22', 'Active', 'Remote Work'),
+('On-Call Shift', 'On-Call', '08:00', '20:00', 120, '2024-01-25', 'Active', 'Field Service - Zone 3');
 
 INSERT INTO ShiftAssignment (employee_id, shift_id, start_date, end_date, status) VALUES
 (1, 1, '2024-11-01', NULL, 'Active'),
