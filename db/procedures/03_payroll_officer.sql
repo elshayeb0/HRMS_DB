@@ -1,6 +1,7 @@
 USE HRMS_DB;
 GO
 
+-- 1: Payroll Generation and Management
 CREATE PROCEDURE GeneratePayroll
     @StartDate DATE,
     @EndDate DATE
@@ -24,6 +25,7 @@ BEGIN
 END;
 GO
 
+-- 2: Adjust Payroll Items
 CREATE PROCEDURE AdjustPayrollItem
     @PayrollID INT,
     @Type VARCHAR(50),
@@ -41,9 +43,7 @@ BEGIN
 END;
 GO
 
-
-
-
+-- 3: Calculate Net Salary
 CREATE PROCEDURE CalculateNetSalary
     @PayrollID INT
 AS
@@ -56,7 +56,7 @@ BEGIN
 END;
 GO
 
-
+-- 4: Apply Payroll Policies
 CREATE PROCEDURE ApplyPayrollPolicy
     @PolicyID INT,
     @PayrollID INT,
@@ -76,7 +76,7 @@ BEGIN
 END;
 GO
 
-
+-- 5: Monthly Payroll Summary
 CREATE PROCEDURE GetMonthlyPayrollSummary
     @Month INT,
     @Year INT
@@ -90,7 +90,7 @@ BEGIN
 END;
 GO
 
-
+-- 6: Add Allowance/Deduction
 CREATE PROCEDURE AddAllowanceDeduction
     @PayrollID INT,
     @Type VARCHAR(50),
@@ -106,7 +106,7 @@ BEGIN
 END;
 GO
 
-
+-- 7: Employee Payroll History
 CREATE PROCEDURE GetEmployeePayrollHistory
     @EmployeeID INT
 AS
@@ -117,7 +117,7 @@ BEGIN
 END;
 GO
 
-
+-- 8: Get Bonus Eligible Employees
 CREATE PROCEDURE GetBonusEligibleEmployees
     @Eligibility_criteria NVARCHAR(MAX)
 AS
@@ -131,7 +131,7 @@ BEGIN
 END;
 GO
 
-
+-- 9: Update Salary Type
 CREATE PROCEDURE UpdateSalaryType
     @EmployeeID INT,
     @SalaryTypeID INT
@@ -145,7 +145,7 @@ BEGIN
 END;
 GO
 
-
+-- 10: Get Payroll by Department
 CREATE PROCEDURE GetPayrollByDepartment
     @DepartmentID INT,
     @Month INT,
@@ -166,7 +166,7 @@ BEGIN
 END;
 GO
 
-
+-- 11: Validate Attendance Before Payroll
 CREATE PROCEDURE ValidateAttendanceBeforePayroll
     @PayrollPeriodID INT
 AS
@@ -181,7 +181,7 @@ BEGIN
 END;
 GO
 
-
+-- 12: Sync Attendance to Payroll
 CREATE PROCEDURE SyncAttendanceToPayroll
     @SyncDate DATE
 AS
@@ -211,7 +211,7 @@ BEGIN
 END;
 GO
 
-
+-- 13: Sync Approved Permissions to Payroll
 CREATE PROCEDURE SyncApprovedPermissionsToPayroll
     @PayrollPeriodID INT
 AS
@@ -238,7 +238,7 @@ BEGIN
 END;
 GO
 
-
+-- 14: Configure Pay Grades
 CREATE PROCEDURE ConfigurePayGrades
     @GradeName VARCHAR(60),
     @MinSalary DECIMAL(11,3),
@@ -252,7 +252,7 @@ BEGIN
 END;
 GO
 
-
+-- 15: Configure Shift Allowances
 CREATE PROCEDURE ConfigureShiftAllowances
     @ShiftType VARCHAR(50),
     @AllowanceName VARCHAR(50),
@@ -268,7 +268,7 @@ BEGIN
 END;
 GO
 
-
+-- 16: Enable Multi-Currency Payroll
 CREATE PROCEDURE EnableMultiCurrencyPayroll
     @CurrencyCode VARCHAR(10),
     @ExchangeRate DECIMAL(10,4)
@@ -281,7 +281,7 @@ BEGIN
 END;
 GO
 
-
+-- 17: Manage Tax Rules
 CREATE PROCEDURE ManageTaxRules
     @TaxRuleName VARCHAR(50),
     @CountryCode VARCHAR(10),
@@ -296,7 +296,7 @@ BEGIN
 END;
 GO
 
-
+-- 18: Approve Payroll Configuration Changes
 CREATE PROCEDURE ApprovePayrollConfigChanges
     @ConfigID INT,
     @ApproverID INT,
@@ -310,7 +310,7 @@ BEGIN
 END;
 GO
 
-
+-- 19: Configure Signing Bonus
 CREATE PROCEDURE ConfigureSigningBonus
     @EmployeeID INT,
     @BonusAmount DECIMAL(10,2),
@@ -326,7 +326,7 @@ BEGIN
 END;
 GO
 
-
+-- 20: Configure Termination/Resignation Benefits
 CREATE PROCEDURE ConfigureTerminationBenefits
     @EmployeeID INT,
     @CompensationAmount DECIMAL(10,2),
@@ -343,7 +343,7 @@ BEGIN
 END;
 GO
 
-
+-- 21: Configure Insurance Brackets
 CREATE PROCEDURE ConfigureInsuranceBrackets
     @InsuranceType VARCHAR(50),
     @MinSalary DECIMAL(10,2),
@@ -363,7 +363,7 @@ BEGIN
 END;
 GO
 
--- Duplicate naming from HR Admin module adjusted to UpdateInsuranceBracketss
+-- 22: Update Insurance Brackets
 CREATE PROCEDURE UpdateInsuranceBracketss
     @BracketID INT,
     @MinSalary DECIMAL(10,2),
@@ -382,7 +382,7 @@ BEGIN
 END;
 GO
 
-
+-- 23: Configure Payroll Policies
 CREATE PROCEDURE ConfigurePayrollPolicies
     @PolicyType VARCHAR(50),
     @PolicyDetails NVARCHAR(MAX),
@@ -396,7 +396,7 @@ BEGIN
 END;
 GO
 
-
+-- 24: Define Pay Grades
 CREATE PROCEDURE DefinePayGrades
     @GradeName VARCHAR(50),
     @MinSalary DECIMAL(10,2),
@@ -411,8 +411,7 @@ BEGIN
 END;
 GO
 
-
-
+-- 25: Configure Escalation Workflow
 CREATE PROCEDURE ConfigureEscalationWorkflow
     @ThresholdAmount DECIMAL(11,2),
     @ApproverRole VARCHAR(60),
@@ -426,7 +425,7 @@ BEGIN
 END;
 GO
 
-
+-- 26: Define Pay Type
 CREATE PROCEDURE DefinePayType
     @EmployeeID INT,
     @PayType VARCHAR(50),
@@ -445,7 +444,7 @@ BEGIN
 END;
 GO
 
-
+-- 27: Configure Overtime Rules
 CREATE PROCEDURE ConfigureOvertimeRules
     @DayType VARCHAR(20),
     @Multiplier DECIMAL(3,2),
@@ -467,8 +466,7 @@ BEGIN
 END;
 GO
 
-
-
+-- 28: Configure Shift Allowances
 GO
 CREATE PROCEDURE ConfigureShiftAllowance
     @ShiftType VARCHAR(20),
@@ -485,9 +483,8 @@ END;
 GO
 
 
-
+--29: Configure Signing Bonus Policy
 GO
-
 CREATE PROCEDURE ConfigureSigningBonusPolicy
     @BonusType VARCHAR(50),
     @Amount DECIMAL(10,2),
@@ -501,7 +498,7 @@ BEGIN
 END;
 GO
 
-
+--32: Generate Tax Statement
 CREATE PROCEDURE GenerateTaxStatement
     @EmployeeID INT,
     @TaxYear INT
@@ -524,7 +521,7 @@ BEGIN
 END;
 GO
 
-
+--33: Approve Payroll Configuration
 CREATE PROCEDURE ApprovePayrollConfiguration
     @ConfigID INT,
     @ApprovedBy INT
@@ -540,7 +537,7 @@ BEGIN
 END;
 GO
 
-
+--34: Modify Past Payroll Entries
 CREATE PROCEDURE ModifyPastPayroll
     @PayrollRunID INT,
     @EmployeeID INT,
