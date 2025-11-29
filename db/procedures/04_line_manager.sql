@@ -1,67 +1,85 @@
-
 USE HRMS_DB;
 GO
 
--- =============================================
--- Procedure: 1) ReviewLeaveRequest
--- Purpose : Approve or deny a leave request
--- =============================================
-CREATE PROCEDURE ReviewLeaveRequest
+-------------------------------------------------------------
+-- 1) ReviewLeaveRequest
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ReviewLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT,
     @Decision VARCHAR(20)
 AS
 BEGIN
-    UPDATE LeaveRequest
-    SET
-        ManagerID = @ManagerID,
-        Decision = @Decision
-    WHERE LeaveRequestID = @LeaveRequestID;
+    SET NOCOUNT ON;
 
+    -- Update leave status
+    UPDATE LeaveRequest
+    SET status = @Decision,
+        approval_timing = ISNULL(approval_timing, GETDATE())
+    WHERE request_id = @LeaveRequestID;
+
+    -- Log manager decision as a note
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    SELECT employee_id,
+           @ManagerID,
+           'Leave request ' + CAST(request_id AS VARCHAR(20)) + ' ' + @Decision,
+           GETDATE()
+    FROM LeaveRequest
+    WHERE request_id = @LeaveRequestID;
+
+    -- Output as required by user story
     SELECT
         @LeaveRequestID AS LeaveRequestID,
-        @ManagerID AS ManagerID,
-        @Decision AS Decision;
+        @ManagerID      AS ManagerID,
+        @Decision       AS Decision;
 END;
 GO
 
--- =============================================
--- Procedure: 2) AssignShift
--- Purpose : Assign an employee to a work shift
--- =============================================
-CREATE PROCEDURE AssignShift
+-------------------------------------------------------------
+-- 2) AssignShift
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE AssignShift
     @EmployeeID INT,
     @ShiftID INT
 AS
 BEGIN
-    INSERT INTO EmployeeShift (EmployeeID, ShiftID)
-    VALUES (@EmployeeID, @ShiftID);
+    SET NOCOUNT ON;
+
+    INSERT INTO ShiftAssignment (employee_id, shift_id, start_date, end_date, status)
+    VALUES (
+        @EmployeeID,
+        @ShiftID,
+        CAST(GETDATE() AS DATE),
+        CAST(GETDATE() AS DATE),
+        'Assigned'
+    );
 
     SELECT 'Shift assigned successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 3) ViewTeamAttendance
--- Purpose : View attendance summary of team members for a given manager and date range
--- =============================================
-CREATE PROCEDURE ViewTeamAttendance
+-------------------------------------------------------------
+-- 3) ViewTeamAttendance
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ViewTeamAttendance
     @ManagerID INT,
     @DateRangeStart DATE,
     @DateRangeEnd DATE
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
         A.attendance_id AS AttendanceID,
-        A.employee_id AS EmployeeID,
-        E.full_name AS EmployeeName,
-        A.shift_id AS ShiftID,
-        A.entry_time AS EntryTime,
-        A.exit_time AS ExitTime,
-        A.duration AS Duration,
-        A.login_method AS LoginMethod,
+        A.employee_id   AS EmployeeID,
+        E.full_name     AS EmployeeName,
+        A.shift_id      AS ShiftID,
+        A.entry_time    AS EntryTime,
+        A.exit_time     AS ExitTime,
+        A.duration      AS Duration,
+        A.login_method  AS LoginMethod,
         A.logout_method AS LogoutMethod,
-        A.exception_id AS ExceptionID
+        A.exception_id  AS ExceptionID
     FROM Attendance AS A
     INNER JOIN Employee AS E
         ON A.employee_id = E.employee_id
@@ -74,22 +92,31 @@ BEGIN
 END;
 GO
 
--- =============================================
--- Procedure: 4) SendTeamNotification
--- Purpose : Send a notification to all team members under a manager
--- =============================================
-CREATE PROCEDURE SendTeamNotification
+-------------------------------------------------------------
+-- 4) SendTeamNotification
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE SendTeamNotification
     @ManagerID INT,
     @MessageContent VARCHAR(255),
     @UrgencyLevel VARCHAR(50)
 AS
 BEGIN
-    INSERT INTO Notification (EmployeeID, ManagerID, MessageContent, UrgencyLevel, SentAt)
+    SET NOCOUNT ON;
+
+    DECLARE @NotificationID INT;
+
+    -- Create one notification record
+    INSERT INTO Notification (message_content, timestamp, urgency, read_status, notification_type)
+    VALUES (@MessageContent, GETDATE(), @UrgencyLevel, 'Unread', 'TeamNotification');
+
+    SET @NotificationID = SCOPE_IDENTITY();
+
+    -- Link to all employees under the manager
+    INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     SELECT
         E.employee_id,
-        @ManagerID,
-        @MessageContent,
-        @UrgencyLevel,
+        @NotificationID,
+        'Sent',
         GETDATE()
     FROM Employee AS E
     WHERE E.manager_id = @ManagerID;
@@ -98,57 +125,75 @@ BEGIN
 END;
 GO
 
--- =============================================
--- Procedure: 5) ApproveMissionCompletion
--- Purpose : Approve completion of a mission assigned to an employee
--- =============================================
-CREATE PROCEDURE ApproveMissionCompletion
+-------------------------------------------------------------
+-- 5) ApproveMissionCompletion
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ApproveMissionCompletion
     @MissionID INT,
     @ManagerID INT,
     @Remarks VARCHAR(200)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
+    -- Mark mission as completed/approved
     UPDATE Mission
-    SET
-        ManagerID = @ManagerID,
-        CompletionRemarks = @Remarks,
-        CompletionStatus = 'Approved',
-        CompletionDate = GETDATE()
-    WHERE MissionID = @MissionID;
+    SET status = 'Completed'
+    WHERE mission_id = @MissionID
+      AND manager_id = @ManagerID;
+
+    -- Log a note for the employee
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    SELECT
+        employee_id,
+        @ManagerID,
+        ISNULL(@Remarks, 'Mission completion approved.'),
+        GETDATE()
+    FROM Mission
+    WHERE mission_id = @MissionID;
 
     SELECT 'Mission completion approved successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 6) RequestReplacement
--- Purpose : Request a replacement for an unavailable employee
--- =============================================
-CREATE PROCEDURE RequestReplacement
+-------------------------------------------------------------
+-- 6) RequestReplacement
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE RequestReplacement
     @EmployeeID INT,
     @Reason VARCHAR(150)
 AS
 BEGIN
-    INSERT INTO ReplacementRequest (EmployeeID, Reason, RequestDate, Status)
-    VALUES (@EmployeeID, @Reason, GETDATE(), 'Pending');
+    SET NOCOUNT ON;
+
+    -- Log replacement request as a manager note
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    SELECT
+        @EmployeeID,
+        manager_id,
+        'Replacement requested: ' + @Reason,
+        GETDATE()
+    FROM Employee
+    WHERE employee_id = @EmployeeID;
 
     SELECT 'Replacement request submitted successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 7) ViewDepartmentSummary
--- Purpose : Retrieve department summary including active projects
--- =============================================
-CREATE PROCEDURE ViewDepartmentSummary
+-------------------------------------------------------------
+-- 7) ViewDepartmentSummary
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ViewDepartmentSummary
     @DepartmentID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        D.department_id AS DepartmentID,
+        D.department_id   AS DepartmentID,
         D.department_name AS DepartmentName,
         COUNT(DISTINCT E.employee_id) AS EmployeeCount,
-        COUNT(DISTINCT M.mission_id) AS ActiveProjects
+        COUNT(DISTINCT M.mission_id)  AS ActiveProjects
     FROM Department AS D
     LEFT JOIN Employee AS E
         ON E.department_id = D.department_id
@@ -162,100 +207,114 @@ BEGIN
 END;
 GO
 
--- =============================================
--- Procedure: 8) ReassignShift
--- Purpose : Reassign a shift for an employee
--- =============================================
-CREATE PROCEDURE ReassignShift
+-------------------------------------------------------------
+-- 8) ReassignShift
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ReassignShift
     @EmployeeID INT,
     @OldShiftID INT,
     @NewShiftID INT
 AS
 BEGIN
-    UPDATE EmployeeShift
-    SET ShiftID = @NewShiftID
-    WHERE EmployeeID = @EmployeeID
-      AND ShiftID = @OldShiftID;
+    SET NOCOUNT ON;
+
+    UPDATE ShiftAssignment
+    SET shift_id = @NewShiftID
+    WHERE employee_id = @EmployeeID
+      AND shift_id    = @OldShiftID
+      AND status IN ('Active','Assigned');
 
     SELECT 'Shift reassigned successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 9) GetPendingLeaveRequests
--- Purpose : Retrieve list of pending leave requests for a manager
--- =============================================
-CREATE PROCEDURE GetPendingLeaveRequests
+-------------------------------------------------------------
+-- 9) GetPendingLeaveRequests
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE GetPendingLeaveRequests
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        L.LeaveRequestID,
-        L.EmployeeID,
-        E.full_name AS EmployeeName,
-        L.StartDate,
-        L.EndDate,
-        L.Reason,
-        L.Decision
-    FROM LeaveRequest AS L
+        LR.request_id         AS LeaveRequestID,
+        LR.employee_id        AS EmployeeID,
+        E.full_name           AS EmployeeName,
+        LR.leave_id           AS LeaveID,
+        L.leave_type          AS LeaveType,
+        LR.justification,
+        LR.duration,
+        LR.approval_timing,
+        LR.status
+    FROM LeaveRequest AS LR
     INNER JOIN Employee AS E
-        ON L.EmployeeID = E.employee_id
+        ON LR.employee_id = E.employee_id
+    LEFT JOIN Leave AS L
+        ON LR.leave_id = L.leave_id
     WHERE E.manager_id = @ManagerID
-      AND L.Decision = 'Pending'
-    ORDER BY L.StartDate;
+      AND LR.status    = 'Pending'
+    ORDER BY LR.approval_timing, LR.request_id;
 END;
 GO
--- =============================================
--- Procedure: 10) GetTeamStatistics
--- Purpose : View team-level statistics and reporting metrics
--- =============================================
-CREATE PROCEDURE GetTeamStatistics
+
+-------------------------------------------------------------
+-- 10) GetTeamStatistics
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE GetTeamStatistics
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
         @ManagerID AS ManagerID,
         COUNT(DISTINCT E.employee_id) AS TeamSize,
-        AVG(E.salary) AS AverageSalary,
+        AVG( (PG.min_salary + PG.max_salary) / 2.0 ) AS AverageSalary,
         COUNT(DISTINCT E.employee_id) AS SpanOfControl
     FROM Employee AS E
+    LEFT JOIN PayGrade AS PG
+        ON PG.pay_grade_id = E.pay_grade
     WHERE E.manager_id = @ManagerID;
 END;
 GO
 
--- =============================================
--- Procedure: 11) ViewTeamProfiles
--- Purpose : View basic profiles of team members (excluding sensitive data)
--- =============================================
-CREATE PROCEDURE ViewTeamProfiles
+-------------------------------------------------------------
+-- 11) ViewTeamProfiles
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ViewTeamProfiles
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        E.employee_id AS EmployeeID,
-        E.full_name AS FullName,
-        E.position_id AS PositionID,
-        E.department_id AS DepartmentID,
-        E.hire_date AS HireDate,
-        E.employment_state AS EmploymentState
+        E.employee_id      AS EmployeeID,
+        E.full_name        AS FullName,
+        E.position_id      AS PositionID,
+        E.department_id    AS DepartmentID,
+        E.hire_date        AS HireDate,
+        E.employment_status AS EmploymentStatus,
+        E.account_status    AS AccountStatus
     FROM Employee AS E
     WHERE E.manager_id = @ManagerID
     ORDER BY E.full_name;
 END;
 GO
 
--- =============================================
--- Procedure: 12) GetTeamSummary
--- Purpose : View summary of team (roles, tenure, departments)
--- =============================================
-CREATE PROCEDURE GetTeamSummary
+-------------------------------------------------------------
+-- 12) GetTeamSummary
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE GetTeamSummary
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        E.position_id AS PositionID,
+        E.position_id   AS PositionID,
         E.department_id AS DepartmentID,
-        COUNT(*) AS EmployeeCount,
+        COUNT(*)        AS EmployeeCount,
         AVG(DATEDIFF(YEAR, E.hire_date, GETDATE())) AS AverageTenureYears
     FROM Employee AS E
     WHERE E.manager_id = @ManagerID
@@ -265,81 +324,92 @@ BEGIN
 END;
 GO
 
--- =============================================
--- Procedure: 13) FilterTeamProfiles
--- Purpose : Filter team members by skill or role
--- =============================================
-CREATE PROCEDURE FilterTeamProfiles
+-------------------------------------------------------------
+-- 13) FilterTeamProfiles
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE FilterTeamProfiles
     @ManagerID INT,
     @Skill VARCHAR(50),
     @RoleID INT
 AS
 BEGIN
-    SELECT
-        E.employee_id AS EmployeeID,
-        E.full_name AS FullName,
-        E.position_id AS PositionID,
+    SET NOCOUNT ON;
+
+    SELECT DISTINCT
+        E.employee_id   AS EmployeeID,
+        E.full_name     AS FullName,
+        E.position_id   AS PositionID,
         E.department_id AS DepartmentID
     FROM Employee AS E
-    LEFT JOIN EmployeeSkill AS ES
+    LEFT JOIN Employee_Skill AS ES
         ON ES.employee_id = E.employee_id
+    LEFT JOIN Skill AS S
+        ON S.skill_id = ES.skill_id
+    LEFT JOIN Employee_Role AS ER
+        ON ER.employee_id = E.employee_id
     WHERE E.manager_id = @ManagerID
-      AND (ES.skill_name = @Skill OR E.position_id = @RoleID)
+      AND (
+            (@Skill IS NOT NULL AND @Skill <> '' AND S.skill_name = @Skill)
+         OR (@RoleID IS NOT NULL AND ER.role_id = @RoleID)
+          )
     ORDER BY E.full_name;
 END;
 GO
 
--- =============================================
--- Procedure: 14) ViewTeamCertifications
--- Purpose : View certifications and skills of team members
--- =============================================
-CREATE PROCEDURE ViewTeamCertifications
+-------------------------------------------------------------
+-- 14) ViewTeamCertifications
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ViewTeamCertifications
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        E.employee_id AS EmployeeID,
-        E.full_name AS FullName,
-        ES.skill_name AS SkillName,
-        C.certification_name AS CertificationName,
-        EC.certification_date AS CertificationDate
+        E.employee_id    AS EmployeeID,
+        E.full_name      AS FullName,
+        S.skill_name     AS SkillName,
+        V.verification_type AS CertificationName,
+        V.issue_date     AS CertificationDate
     FROM Employee AS E
-    LEFT JOIN EmployeeSkill AS ES
+    LEFT JOIN Employee_Skill AS ES
         ON ES.employee_id = E.employee_id
-    LEFT JOIN EmployeeCertification AS EC
-        ON EC.employee_id = E.employee_id
-    LEFT JOIN Certification AS C
-        ON C.certification_id = EC.certification_id
+    LEFT JOIN Skill AS S
+        ON S.skill_id = ES.skill_id
+    LEFT JOIN Employee_Verification AS EV
+        ON EV.employee_id = E.employee_id
+    LEFT JOIN Verification AS V
+        ON V.verification_id = EV.verification_id
     WHERE E.manager_id = @ManagerID
     ORDER BY
         E.full_name,
-        ES.skill_name,
-        C.certification_name;
+        S.skill_name,
+        V.verification_type;
 END;
 GO
 
--- =============================================
--- Procedure: 15) AddManagerNotes
--- Purpose : Add manager-specific notes (visible only to HR)
--- =============================================
-CREATE PROCEDURE AddManagerNotes
+-------------------------------------------------------------
+-- 15) AddManagerNotes
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE AddManagerNotes
     @EmployeeID INT,
     @ManagerID INT,
     @Note VARCHAR(500)
 AS
 BEGIN
-    INSERT INTO ManagerNotes (EmployeeID, ManagerID, NoteContent, NoteDate)
+    SET NOCOUNT ON;
+
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
     VALUES (@EmployeeID, @ManagerID, @Note, GETDATE());
 
     SELECT 'Manager note added successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 16) RecordManualAttendance
--- Purpose : Record attendance manually with an audit trail for missing punches
--- =============================================
-CREATE PROCEDURE RecordManualAttendance
+-------------------------------------------------------------
+-- 16) RecordManualAttendance
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE RecordManualAttendance
     @EmployeeID INT,
     @Date DATE,
     @ClockIn TIME,
@@ -348,19 +418,18 @@ CREATE PROCEDURE RecordManualAttendance
     @RecordedBy INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @EntryTime DATETIME;
     DECLARE @ExitTime DATETIME;
     DECLARE @Duration INT;
     DECLARE @AttendanceID INT;
 
-    -- Build full entry and exit datetime values from date and time
     SET @EntryTime = CAST(@Date AS DATETIME) + CAST(@ClockIn AS DATETIME);
     SET @ExitTime  = CAST(@Date AS DATETIME) + CAST(@ClockOut AS DATETIME);
 
-    -- Calculate duration in minutes
     SET @Duration = DATEDIFF(MINUTE, @EntryTime, @ExitTime);
 
-    -- Insert the manual attendance record
     INSERT INTO Attendance (
         employee_id,
         shift_id,
@@ -382,10 +451,8 @@ BEGIN
         NULL
     );
 
-    -- Get the generated attendance_id for audit trail
     SET @AttendanceID = SCOPE_IDENTITY();
 
-    -- Insert into AttendanceLog to keep an audit trail
     INSERT INTO AttendanceLog (attendance_id, actor, timestamp, reason)
     VALUES (@AttendanceID, @RecordedBy, GETDATE(), @Reason);
 
@@ -393,196 +460,219 @@ BEGIN
 END;
 GO
 
--- =============================================
--- Procedure: 17) ReviewMissedPunches
--- Purpose : View automatically flagged missed punches for team members
--- =============================================
-CREATE PROCEDURE ReviewMissedPunches
+-------------------------------------------------------------
+-- 17) ReviewMissedPunches
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ReviewMissedPunches
     @ManagerID INT,
     @Date DATE
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
         A.attendance_id AS AttendanceID,
-        A.employee_id AS EmployeeID,
-        E.full_name AS EmployeeName,
-        A.entry_time AS EntryTime,
-        A.exit_time AS ExitTime,
-        A.login_method AS LoginMethod,
+        A.employee_id   AS EmployeeID,
+        E.full_name     AS EmployeeName,
+        A.entry_time    AS EntryTime,
+        A.exit_time     AS ExitTime,
+        A.login_method  AS LoginMethod,
         A.logout_method AS LogoutMethod,
-        A.exception_id AS ExceptionID
+        A.exception_id  AS ExceptionID
     FROM Attendance AS A
     INNER JOIN Employee AS E
         ON A.employee_id = E.employee_id
-    INNER JOIN AttendanceException AS EX
+    INNER JOIN Exception AS EX
         ON EX.exception_id = A.exception_id
     WHERE E.manager_id = @ManagerID
       AND CAST(A.entry_time AS DATE) = @Date
-      AND EX.exception_type = 'Missed Punch'
+      AND EX.category = 'Missed Punch'
     ORDER BY A.entry_time;
 END;
 GO
 
--- =============================================
--- Procedure: 18) ApproveTimeRequest
--- Purpose : Approve or reject time management requests
--- =============================================
-CREATE PROCEDURE ApproveTimeRequest
+-------------------------------------------------------------
+-- 18) ApproveTimeRequest
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ApproveTimeRequest
     @RequestID INT,
     @ManagerID INT,
     @Decision VARCHAR(20),
     @Comments VARCHAR(200)
 AS
 BEGIN
-    UPDATE TimeRequest
+    SET NOCOUNT ON;
+
+    UPDATE AttendanceCorrectionRequest
     SET
-        ManagerID = @ManagerID,
-        Decision = @Decision,
-        Comments = @Comments,
-        DecisionDate = GETDATE()
-    WHERE RequestID = @RequestID;
+        status      = @Decision,
+        recorded_by = @ManagerID,
+        reason      = @Comments
+    WHERE request_id = @RequestID;
 
     SELECT 'Time management request processed successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 19) GetLeaveRequestDetails
--- Purpose : Review leave request assigned to a manager (view details only)
-
--- Note    : Implements user story 19 (named ReviewLeaveRequest in spec),
---           but uses a unique procedure name to avoid conflict with procedure 1.
--- =============================================
-CREATE PROCEDURE ViewLeaveRequest
+-------------------------------------------------------------
+-- 19) ViewLeaveRequest
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ViewLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT
-        L.LeaveRequestID,
-        L.EmployeeID,
-        E.full_name AS EmployeeName,
-        L.StartDate,
-        L.EndDate,
-        L.Reason,
-        L.Decision
-    FROM LeaveRequest AS L
+        LR.request_id      AS LeaveRequestID,
+        LR.employee_id     AS EmployeeID,
+        E.full_name        AS EmployeeName,
+        LR.leave_id        AS LeaveID,
+        L.leave_type       AS LeaveType,
+        LR.justification,
+        LR.duration,
+        LR.approval_timing,
+        LR.status
+    FROM LeaveRequest AS LR
     INNER JOIN Employee AS E
-        ON L.EmployeeID = E.employee_id
-    WHERE
-        L.LeaveRequestID = @LeaveRequestID
-        AND E.manager_id = @ManagerID;
+        ON LR.employee_id = E.employee_id
+    LEFT JOIN Leave AS L
+        ON LR.leave_id = L.leave_id
+    WHERE LR.request_id = @LeaveRequestID
+      AND E.manager_id  = @ManagerID;
 END;
 GO
 
--- =============================================
--- Procedure: 20) ApproveLeaveRequest
--- Purpose : Approve a leave request assigned to a manager
--- =============================================
-CREATE PROCEDURE ApproveLeaveRequest
+-------------------------------------------------------------
+-- 20) ApproveLeaveRequest (Line Manager)
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE ApproveLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     UPDATE LeaveRequest
-    SET
-        Decision = 'Approved',
-        ManagerID = @ManagerID,
-        DecisionDate = GETDATE()
-    WHERE LeaveRequestID = @LeaveRequestID;
+    SET status          = 'Approved',
+        approval_timing = ISNULL(approval_timing, GETDATE())
+    WHERE request_id = @LeaveRequestID;
+
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    SELECT
+        employee_id,
+        @ManagerID,
+        'Leave request ' + CAST(request_id AS VARCHAR(20)) + ' approved',
+        GETDATE()
+    FROM LeaveRequest
+    WHERE request_id = @LeaveRequestID;
 
     SELECT 'Leave request approved successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 21) RejectLeaveRequest
--- Purpose : Reject a leave request assigned to a manager
--- =============================================
-CREATE PROCEDURE RejectLeaveRequest
+-------------------------------------------------------------
+-- 21) RejectLeaveRequest
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE RejectLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT,
     @Reason VARCHAR(200)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     UPDATE LeaveRequest
-    SET
-        Decision = 'Rejected',
-        ManagerID = @ManagerID,
-        Comments = @Reason,
-        DecisionDate = GETDATE()
-    WHERE LeaveRequestID = @LeaveRequestID;
+    SET status          = 'Rejected',
+        approval_timing = ISNULL(approval_timing, GETDATE()),
+        justification   = ISNULL(justification, '') +
+                          CASE WHEN justification IS NULL OR justification = '' THEN '' ELSE ' | ' END +
+                          'Manager reason: ' + @Reason
+    WHERE request_id = @LeaveRequestID;
+
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    SELECT
+        employee_id,
+        @ManagerID,
+        'Leave request ' + CAST(request_id AS VARCHAR(20)) +
+        ' rejected. Reason: ' + @Reason,
+        GETDATE()
+    FROM LeaveRequest
+    WHERE request_id = @LeaveRequestID;
 
     SELECT 'Leave request rejected successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 22) DelegateLeaveApproval
--- Purpose : Delegate leave approval authority to another manager
--- =============================================
-CREATE PROCEDURE DelegateLeaveApproval
+-------------------------------------------------------------
+-- 22) DelegateLeaveApproval
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE DelegateLeaveApproval
     @ManagerID INT,
     @DelegateID INT,
     @StartDate DATE,
     @EndDate DATE
 AS
 BEGIN
-    INSERT INTO LeaveApprovalDelegation (
-        ManagerID,
-        DelegateID,
-        StartDate,
-        EndDate
-    )
-    VALUES (
-        @ManagerID,
-        @DelegateID,
-        @StartDate,
-        @EndDate
-    );
+    SET NOCOUNT ON;
+
+    DECLARE @Note VARCHAR(500);
+
+    SET @Note =
+        'Delegated leave approval to manager ID ' + CAST(@DelegateID AS VARCHAR(20)) +
+        ' from ' + CONVERT(VARCHAR(10), @StartDate, 120) +
+        ' to '   + CONVERT(VARCHAR(10), @EndDate, 120);
+
+    -- Log delegation as a manager note
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
+    VALUES (@ManagerID, @ManagerID, @Note, GETDATE());
 
     SELECT 'Leave approval authority delegated successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 23) FlagIrregularLeave
--- Purpose : Flag irregular leave patterns in team members
--- =============================================
-CREATE PROCEDURE FlagIrregularLeave
+-------------------------------------------------------------
+-- 23) FlagIrregularLeave
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE FlagIrregularLeave
     @EmployeeID INT,
     @ManagerID INT,
     @PatternDescription VARCHAR(200)
 AS
 BEGIN
-    INSERT INTO ManagerNotes (EmployeeID, ManagerID, NoteContent, NoteDate)
+    SET NOCOUNT ON;
+
+    INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
     VALUES (@EmployeeID, @ManagerID, @PatternDescription, GETDATE());
 
     SELECT 'Irregular leave pattern flagged successfully.' AS Message;
 END;
 GO
 
--- =============================================
--- Procedure: 24) NotifyNewLeaveRequest
--- Purpose : Receive notification when a new leave request is assigned to a manager
--- =============================================
-CREATE PROCEDURE NotifyNewLeaveRequest
+-------------------------------------------------------------
+-- 24) NotifyNewLeaveRequest
+-------------------------------------------------------------
+CREATE OR ALTER PROCEDURE NotifyNewLeaveRequest
     @ManagerID INT,
     @RequestID INT
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     DECLARE @MessageContent VARCHAR(255);
+    DECLARE @NotificationID INT;
 
-    SET @MessageContent = 'New leave request assigned. Request ID: ' + CAST(@RequestID AS VARCHAR(20));
+    SET @MessageContent =
+        'New leave request assigned. Request ID: ' + CAST(@RequestID AS VARCHAR(20));
 
-    INSERT INTO Notification (EmployeeID, ManagerID, MessageContent, UrgencyLevel, SentAt)
-    VALUES (
-        NULL,
-        @ManagerID,
-        @MessageContent,
-        'Normal',
-        GETDATE()
-    );
+    INSERT INTO Notification (message_content, timestamp, urgency, read_status, notification_type)
+    VALUES (@MessageContent, GETDATE(), 'Normal', 'Unread', 'LeaveRequest');
+
+    SET @NotificationID = SCOPE_IDENTITY();
+
+    INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
+    VALUES (@ManagerID, @NotificationID, 'Sent', GETDATE());
 
     SELECT @MessageContent AS NotificationMessage;
 END;
