@@ -1,6 +1,5 @@
 -- =============================================
 -- File: 02_hr_admin.sql
--- Author: Yassin Amr Zaki
 -- Project: HRMS_DB - Milestone 2
 
 -- Purpose: Stored procedures for "As an HR Admin" user stories
@@ -11,12 +10,13 @@
 USE HRMS_DB;
 GO
 
+
 -- 1:
 CREATE PROCEDURE CreateContract
     @EmployeeID INT,
     @Type VARCHAR(50),
     @StartDate DATE,
-    @EndDate DATE,
+    @EndDate DATE
 AS
 BEGIN
 
@@ -59,6 +59,7 @@ GO
 
 CREATE PROCEDURE ApproveLeaveRequest
     @LeaveRequestID INT,
+     @ApproverID INT,
     @Status VARCHAR(20)
 AS
 BEGIN
@@ -131,9 +132,10 @@ BEGIN
         c.start_date,
         c.end_date,
         c.current_state AS status
-    FROM Contract c, Employee e
-    WHERE e.contract_id = c.contract_id
-      AND c.current_state = 'Active'
+    FROM Contract c
+    INNER JOIN Employee e
+        ON e.contract_id = c.contract_id
+    WHERE c.current_state = 'Active'
     ORDER BY c.end_date;
 END;
 GO
@@ -148,16 +150,13 @@ BEGIN
 
     SELECT
         employee_id,
-        full_name AS employee_name,
-        email,
-        phone,
-        department_id,
-        position_id
+        full_name AS employee_name
     FROM Employee
     WHERE manager_id = @ManagerID
     ORDER BY full_name;
 END;
 GO
+
 
 -- 8:
 
@@ -179,7 +178,7 @@ BEGIN
 END;
 GO
 
- -- 9: check again
+ -- 9:
 CREATE PROCEDURE GetExpiringContracts
     @DaysBefore INT
 AS
@@ -226,53 +225,82 @@ CREATE PROCEDURE CreateEmployeeProfile
     @RoleID INT,
     @HireDate DATE,
     @Email VARCHAR(100),
-    @Phone VARCHAR(20)
+    @Phone VARCHAR(20),
+    @NationalID VARCHAR(50),
+    @DateOfBirth DATE,
+    @CountryOfBirth VARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO Employee (first_name, last_name, full_name, department_id, position_id, hire_date, email, phone, is_active, employment_status, account_status)
-    VALUES (@FirstName, @LastName, @FirstName + ' ' + @LastName, @DepartmentID, @RoleID, @HireDate, @Email, @Phone, 1, 'Active', 'Active');
+    -- Insert new employee
+    INSERT INTO Employee (
+        first_name, last_name, full_name, department_id, hire_date, email, phone, national_id, date_of_birth, country_of_birth,
+        is_active, employment_status, account_status
+    )
+    VALUES (
+        @FirstName, @LastName, @FirstName + ' ' + @LastName, @DepartmentID, @HireDate, @Email, @Phone, @NationalID, @DateOfBirth, @CountryOfBirth,
+        1, 'Active', 'Active'
+    );
 
-    SELECT 'Employee profile created successfully. New Employee ID: ' + CAST(SCOPE_IDENTITY() AS VARCHAR) AS Message;
+    -- Retrieve the employee_id using email (unique)
+    DECLARE @NewEmployeeID INT;
+    SELECT @NewEmployeeID = employee_id FROM Employee WHERE email = @Email;
 
+    -- Assign role
+    INSERT INTO Employee_Role (employee_id, role_id)
+    VALUES (@NewEmployeeID, @RoleID);
+
+    -- Confirmation message
+    SELECT 'Employee profile created successfully. New Employee ID: ' + CAST(@NewEmployeeID AS VARCHAR) AS Message;
 END;
 GO
+
 
 -- 12:  check again
 CREATE PROCEDURE UpdateEmployeeProfile
     @EmployeeID INT,
-    @FirstName VARCHAR(50) = NULL,
-    @LastName VARCHAR(50) = NULL,
-    @DepartmentID INT = NULL,
-    @PositionID INT = NULL,
-    @Email VARCHAR(100) = NULL,
-    @Phone VARCHAR(20) = NULL,
-    @Address VARCHAR(200) = NULL,
-    @EmploymentStatus VARCHAR(20) = NULL,
-    @AccountStatus VARCHAR(20) = NULL
+    @FieldName VARCHAR(50),
+    @NewValue VARCHAR(255)
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    UPDATE Employee
-    SET
-        first_name = ISNULL(@FirstName, first_name),
-        last_name = ISNULL(@LastName, last_name),
-        full_name = ISNULL(@FirstName, first_name) + ' ' + ISNULL(@LastName, last_name),
-        department_id = ISNULL(@DepartmentID, department_id),
-        position_id = ISNULL(@PositionID, position_id),
-        email = ISNULL(@Email, email),
-        phone = ISNULL(@Phone, phone),
-        address = ISNULL(@Address, address),
-        employment_status = ISNULL(@EmploymentStatus, employment_status),
-        account_status = ISNULL(@AccountStatus, account_status)
-    WHERE employee_id = @EmployeeID;
+    -- Update the column based on @FieldName
+    IF @FieldName = 'first_name'
+        UPDATE Employee SET first_name = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'last_name'
+        UPDATE Employee SET last_name = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'email'
+        UPDATE Employee SET email = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'phone'
+        UPDATE Employee SET phone = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'address'
+        UPDATE Employee SET address = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'employment_status'
+        UPDATE Employee SET employment_status = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'account_status'
+        UPDATE Employee SET account_status = @NewValue WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'department_id'
+        UPDATE Employee SET department_id = CAST(@NewValue AS INT) WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'position_id'
+        UPDATE Employee SET position_id = CAST(@NewValue AS INT) WHERE employee_id = @EmployeeID;
+
+    ELSE IF @FieldName = 'full_name'
+        UPDATE Employee SET full_name = @NewValue WHERE employee_id = @EmployeeID;
 
     SELECT 'Employee ID ' + CAST(@EmployeeID AS VARCHAR) + ' updated successfully.' AS Message;
-
 END;
 GO
+
 
 
 --13:
@@ -302,43 +330,32 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT employee_id, full_name, department_id, position_id, gender, hire_date, email, phone
+    SELECT employee_id, full_name, department_id, position_id, hire_date, email, phone
     FROM Employee
     WHERE
         (@FilterField = 'department_id' AND CAST(department_id AS VARCHAR) = @FilterValue)
-        OR (@FilterField = 'gender' AND gender = @FilterValue)
-        OR (@FilterField = 'position_id' AND CAST(position_id AS VARCHAR) = @FilterValue);
+        OR (@FilterField = 'position_id' AND CAST(position_id AS VARCHAR) = @FilterValue)
+        OR (@FilterField = 'employment_status' AND employment_status = @FilterValue);
 END;
 GO
 
 --15:
 CREATE PROCEDURE CreateShiftType
-    @ShiftTypeName VARCHAR(50),
-    @Description VARCHAR(200)
+    @Name VARCHAR(100),
+    @Type VARCHAR(50),
+    @Start_Time TIME,
+    @End_Time TIME,
+    @Break_Duration INT,
+    @Shift_Date DATE,
+    @Status VARCHAR(50)
 AS
 BEGIN
     SET NOCOUNT ON;
 
     INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status)
-    VALUES (@ShiftTypeName, @Description, NULL, NULL, NULL, NULL, 'Active');
+    VALUES (@Name, @Type, @Start_Time, @End_Time, @Break_Duration, @Shift_Date, @Status);
 
-    SELECT 'Shift type "' + @ShiftTypeName + '" created successfully.' AS Message;
-END;
-GO
-
---16:
-CREATE PROCEDURE CreateShiftName
-    @ShiftName VARCHAR(50),
-    @ShiftTypeID INT,
-    @Description VARCHAR(200)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status)
-    VALUES (@ShiftName, @ShiftTypeID, NULL, NULL, NULL, NULL, 'Active');
-
-    SELECT 'Shift name "' + @ShiftName + '" created successfully.' AS Message;
+    SELECT 'Shift type "' + @Name + '" created successfully.' AS Message;
 END;
 GO
 
@@ -346,25 +363,28 @@ GO
 --17:
 CREATE PROCEDURE AssignRotationalShift
     @EmployeeID INT,
-    @ShiftCycle VARCHAR(50),
+    @ShiftCycle INT,
     @StartDate DATE,
-    @EndDate DATE
+    @EndDate DATE,
+    @Status VARCHAR(20)
 AS
 BEGIN
     SET NOCOUNT ON;
 
+    -- Assign the employee to the shift cycle
     INSERT INTO ShiftAssignment (employee_id, shift_id, start_date, end_date, status)
-    VALUES (@EmployeeID, @ShiftCycle, @StartDate, @EndDate, 'Assigned');
+    VALUES (@EmployeeID, @ShiftCycle, @StartDate, @EndDate, @Status);
 
     SELECT 'Employee ID ' + CAST(@EmployeeID AS VARCHAR) +
-           ' assigned to shift cycle ' + @ShiftCycle +
+           ' assigned to shift cycle ' + CAST(@ShiftCycle AS VARCHAR) +
            ' from ' + CAST(@StartDate AS VARCHAR) +
-           ' to ' + CAST(@EndDate AS VARCHAR) AS Message;
+           ' to ' + CAST(@EndDate AS VARCHAR) +
+           ' with status: ' + @Status AS Message;
 END;
 GO
 
 
---18:
+--18: ai
 
 CREATE PROCEDURE NotifyShiftExpiry
     @EmployeeID INT,
@@ -374,7 +394,9 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Insert a notification directly with fixed message content
+    DECLARE @NotificationID INT;
+
+    -- Insert notification and capture the generated ID
     INSERT INTO Notification (message_content, urgency, notification_type)
     VALUES (
         'Shift Assignment ID ' + CAST(@ShiftAssignmentID AS VARCHAR) +
@@ -384,12 +406,14 @@ BEGIN
         'ShiftExpiry'
     );
 
-    -- Link the notification to the employee assuming the notification_id is known/fixed
-    -- Here you would need to know the ID to insert; simplified as 1 for example
+    -- Capture the ID of the inserted notification
+    SET @NotificationID = (SELECT MAX(notification_id) FROM Notification);
+
+    -- Link notification to employee
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status)
     VALUES (
         @EmployeeID,
-        1,
+        @NotificationID,
         'Pending'
     );
 
@@ -398,7 +422,8 @@ BEGIN
 END;
 GO
 
---19:
+
+--19: ai
 CREATE PROCEDURE DefineShortTimeRules
     @RuleName VARCHAR(50),
     @LateMinutes INT,
@@ -406,15 +431,26 @@ CREATE PROCEDURE DefineShortTimeRules
     @PenaltyType VARCHAR(50)
 AS
 BEGIN
-    -- Update what exists in LatenessPolicy
-    UPDATE LatenessPolicy
-    SET grace_period_mins = @LateMinutes,
-        deduction_rate = @EarlyLeaveMinutes; -- using EarlyLeaveMinutes as a placeholder
+    SET NOCOUNT ON;
+
+    DECLARE @PolicyID INT;
+
+    -- Insert a new payroll policy first
+    INSERT INTO PayrollPolicy (effective_date, type, description)
+    VALUES (NULL, 'Lateness', 'Short time rule: ' + @RuleName + ', Penalty: ' + @PenaltyType);
+
+    -- Capture the inserted policy_id using OUTPUT clause
+    SET @PolicyID = (SELECT MAX(policy_id) FROM PayrollPolicy);
+
+    -- Insert corresponding lateness rule
+    INSERT INTO LatenessPolicy (policy_id, grace_period_mins, deduction_rate)
+    VALUES (@PolicyID, @LateMinutes, @EarlyLeaveMinutes);
 
     -- Confirmation message
     SELECT 'Short time rule "' + @RuleName + '" with penalty type "' + @PenaltyType + '" applied successfully.' AS Message;
-END
+END;
 GO
+
 
 --20:
 CREATE PROCEDURE SetGracePeriod
@@ -427,18 +463,31 @@ BEGIN
     SELECT 'Grace period of ' + CAST(@Minutes AS VARCHAR(5)) + ' minutes set successfully.' AS Message;
 END
 GO
---21:
+--21: ai
 CREATE PROCEDURE DefinePenaltyThreshold
     @LateMinutes INT,
     @DeductionType VARCHAR(50)
 AS
 BEGIN
-    UPDATE DeductionPolicy
-    SET calculation_mode = @DeductionType;
+    SET NOCOUNT ON;
 
-    SELECT 'Penalty threshold for ' + CAST(@LateMinutes AS VARCHAR(5)) + ' late minutes set successfully.' AS Message;
-END
+    -- Insert a new PayrollPolicy
+    DECLARE @PolicyID INT;
+
+    INSERT INTO PayrollPolicy (effective_date, type, description)
+    VALUES (NULL, 'LatenessPenalty', 'Late > ' + CAST(@LateMinutes AS VARCHAR(5)) + ' minutes triggers ' + @DeductionType);
+
+    SET @PolicyID = SCOPE_IDENTITY();
+
+    -- Insert corresponding DeductionPolicy
+    INSERT INTO DeductionPolicy (policy_id, deduction_reason, calculation_mode)
+    VALUES (@PolicyID, 'Late by ' + CAST(@LateMinutes AS VARCHAR(5)) + ' mins', @DeductionType);
+
+    SELECT 'Penalty threshold for ' + CAST(@LateMinutes AS VARCHAR(5)) +
+           ' late minutes set successfully.' AS Message;
+END;
 GO
+
 --22:
 
 CREATE PROCEDURE DefinePermissionLimits
@@ -446,17 +495,16 @@ CREATE PROCEDURE DefinePermissionLimits
     @MaxHours INT
 AS
 BEGIN
-    -- Update what exists in LineManager approval_limit as a placeholder
-    UPDATE LineManager
-    SET approval_limit = @MaxHours;  -- Using MaxHours as the upper limit
+    SET NOCOUNT ON;
 
-    -- Confirmation message
-    SELECT 'Permission limits set successfully. Min hours: '
-           + CAST(@MinHours AS VARCHAR(5))
-           + ', Max hours: '
-           + CAST(@MaxHours AS VARCHAR(5)) AS Message;
-END
+    -- Only update approval_limit (max hours)
+    UPDATE LineManager
+    SET approval_limit = @MaxHours;
+
+    SELECT 'Permission limits set successfully. Max hours: ' + CAST(@MaxHours AS VARCHAR) AS Message;
+END;
 GO
+
 
 
 -- 23: Escalate pending leave requests
@@ -466,39 +514,38 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Update pending requests to escalate to their manager
+    -- Mark pending requests as escalated
     UPDATE LeaveRequest
-    SET employee_id = (SELECT manager_id
-                       FROM Employee
-                       WHERE employee_id = LeaveRequest.employee_id)
+    SET status = 'Escalated'
     WHERE status = 'Pending'
       AND approval_timing <= @Deadline;
 
     -- Confirmation message
-    SELECT 'Pending requests escalated to higher managers as of '
-           + CAST(@Deadline AS VARCHAR(30)) AS Message;
+    SELECT 'Pending requests escalated as of ' + CAST(@Deadline AS VARCHAR(30)) AS Message;
 END;
 GO
+
 
 
 
 --24:
 CREATE PROCEDURE LinkVacationToShift
-    @VacationPackageID INT,
+    @VacationLeaveID INT,
     @EmployeeID INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Link vacation package to employee
-    INSERT INTO Employee_Vacation (employee_id, vacation_package_id)
-    VALUES (@EmployeeID, @VacationPackageID);
+    -- Link vacation leave to the employee by creating a LeaveRequest
+    INSERT INTO LeaveRequest (employee_id, leave_id, justification, duration, status)
+    VALUES (@EmployeeID, @VacationLeaveID, 'Vacation linked to shift schedule', 0, 'Approved');
 
     -- Confirmation message
-    SELECT 'Vacation package ID ' + CAST(@VacationPackageID AS VARCHAR) +
+    SELECT 'VacationLeave ID ' + CAST(@VacationLeaveID AS VARCHAR) +
            ' linked to Employee ID ' + CAST(@EmployeeID AS VARCHAR) AS Message;
 END;
 GO
+
 
 
 
@@ -550,15 +597,19 @@ CREATE PROCEDURE UpdateLeaveEntitlements
     @EmployeeID INT
 AS
 BEGIN
-    -- Example: recalculate entitlements based on policies
-    UPDATE LeaveEntitlement
-    SET entitlement = LE.entitlement + ISNULL(LP.notice_period,0)
-    FROM LeaveEntitlement LE, LeavePolicy LP, Leave L
-    WHERE LE.employee_id = @EmployeeID AND LE.leave_type_id = L.leave_id AND LP.name = 'Default Policy';
+    SET NOCOUNT ON;
+
+    UPDATE LE
+    SET LE.entitlement = LE.entitlement + LP.notice_period
+    FROM LeaveEntitlement LE
+    INNER JOIN Leave L ON LE.leave_type_id = L.leave_id
+    INNER JOIN LeavePolicy LP ON LP.name = 'Default Policy'
+    WHERE LE.employee_id = @EmployeeID;
 
     SELECT 'Leave entitlements updated successfully.' AS Message;
 END;
 GO
+
 
 --29:
 
@@ -704,21 +755,33 @@ END;
 GO
 
     --36:
-    CREATE PROCEDURE ManageLeaveRoles
+   CREATE PROCEDURE ManageLeaveRoles
     @RoleID INT,
     @Permission VARCHAR(100)
 AS
 BEGIN
-    -- Remove existing permission with the same name
-    DELETE FROM RolePermission WHERE role_id = @RoleID AND permission_name = @Permission;
+    SET NOCOUNT ON;
 
-    -- Insert the new permission
-    INSERT INTO RolePermission(role_id, permission_name, allowed_action)
-    VALUES (@RoleID, @Permission, @Permission);
+    -- Update the permission if it already exists
+    UPDATE RolePermission
+    SET allowed_action = @Permission
+    WHERE role_id = @RoleID
+      AND permission_name = @Permission;
+
+    -- Insert the permission if it does not exist
+    INSERT INTO RolePermission (role_id, permission_name, allowed_action)
+    SELECT @RoleID, @Permission, @Permission
+    WHERE NOT EXISTS (
+        SELECT *
+        FROM RolePermission
+        WHERE role_id = @RoleID
+          AND permission_name = @Permission
+    );
 
     SELECT 'Leave role permission updated successfully.' AS Message;
 END;
 GO
+
 
  --37:
  CREATE PROCEDURE FinalizeLeaveRequest
@@ -756,28 +819,50 @@ CREATE PROCEDURE BulkProcessLeaveRequests
     @LeaveRequestIDs VARCHAR(500)
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     -- Update all leave requests whose IDs are in the comma-separated string
     UPDATE LeaveRequest
     SET status = 'Processed'
-    WHERE CHARINDEX(CAST(request_id AS VARCHAR), @LeaveRequestIDs) > 0;
+    WHERE request_id IN (
+        SELECT CAST(value AS INT)
+        FROM STRING_SPLIT(@LeaveRequestIDs, ',')
+    );
 
     -- Return confirmation message
     SELECT 'Leave requests processed successfully.' AS Message;
 END;
 GO
 
+
  --40:
- CREATE PROCEDURE VerifyMedicalLeave
+CREATE PROCEDURE VerifyMedicalLeave
     @LeaveRequestID INT,
     @DocumentID INT
 AS
 BEGIN
-    UPDATE LeaveDocument
-    SET file_path = file_path  -- no change, just a placeholder to execute update
-    WHERE document_id = @DocumentID AND leave_request_id = @LeaveRequestID;
+    SET NOCOUNT ON;
 
-    SELECT 'Medical leave document verified successfully.' AS Message;
-END
+    -- Check if document exists
+    IF EXISTS (
+        SELECT 1 FROM LeaveDocument
+        WHERE document_id = @DocumentID
+        AND leave_request_id = @LeaveRequestID
+    )
+    BEGIN
+        -- Update leave request status to indicate verification
+        UPDATE LeaveRequest
+        SET status = 'Verified'
+        WHERE request_id = @LeaveRequestID
+        AND status = 'Pending';
+
+        SELECT 'Medical leave document verified successfully.' AS Message;
+    END
+    ELSE
+    BEGIN
+        SELECT 'Document not found for this leave request.' AS Message;
+    END
+END;
 GO
 
 --41:
@@ -786,16 +871,20 @@ CREATE PROCEDURE SyncLeaveBalances
     @LeaveRequestID INT
 AS
 BEGIN
-    -- Example: add approved leave duration to LeaveEntitlement
-    UPDATE LeaveEntitlement
-    SET entitlement = entitlement +
-        (SELECT duration FROM LeaveRequest WHERE request_id = @LeaveRequestID AND status = 'Approved')
-    WHERE employee_id = (SELECT employee_id FROM LeaveRequest WHERE request_id = @LeaveRequestID)
-      AND leave_type_id = (SELECT leave_id FROM LeaveRequest WHERE request_id = @LeaveRequestID);
+    -- Update the leave balance for the approved request
+    UPDATE LE
+    SET LE.entitlement = LE.entitlement + LR.duration
+    FROM LeaveEntitlement LE
+    INNER JOIN LeaveRequest LR
+        ON LE.employee_id = LR.employee_id
+       AND LE.leave_type_id = LR.leave_id
+    WHERE LR.request_id = @LeaveRequestID
+      AND LR.status = 'Approved';
 
     SELECT 'Leave balances synced successfully.' AS Message;
 END
 GO
+
 
 
 --42:
@@ -803,33 +892,83 @@ CREATE PROCEDURE ProcessLeaveCarryForward
     @Year INT
 AS
 BEGIN
-    -- Carry forward leave entitlements from @Year to @Year + 1
-    INSERT INTO LeaveEntitlement (employee_id, leave_type_id, entitlement, year)
-    SELECT employee_id, leave_type_id, entitlement, @Year + 1
-    FROM LeaveEntitlement
-    WHERE year = @Year;
+    SET NOCOUNT ON;
+
+    -- Since LeaveEntitlement doesn't have year column,
+    -- we'll add remaining balance to next year's entitlement
+    -- This assumes annual reset has already created next year's base entitlement
+
+    UPDATE LE_Current
+    SET LE_Current.entitlement = LE_Current.entitlement +
+        (SELECT ISNULL(SUM(LR.duration), 0)
+         FROM LeaveRequest LR
+         WHERE LR.employee_id = LE_Current.employee_id
+         AND LR.leave_id = LE_Current.leave_type_id
+         AND LR.status = 'Approved'
+         AND YEAR(LR.approval_timing) = @Year)
+    FROM LeaveEntitlement LE_Current;
 
     SELECT 'Leave carry-forward for year ' + CAST(@Year AS VARCHAR) + ' processed successfully.' AS Message;
-END
+END;
 GO
 
+
 --43:
-CREATE PROCEDURE SyncLeaveToPayroll
+CREATE PROCEDURE SyncLeaveToAttendance
     @LeaveRequestID INT
 AS
 BEGIN
-    -- Insert leave info into Payroll table from LeaveRequest
-    INSERT INTO Payroll (employee_id, leave_days)
-    SELECT employee_id, leave_days
-    FROM LeaveRequest
-    WHERE leave_request_id = @LeaveRequestID
-      AND status = 'Approved';
+    SET NOCOUNT ON;
 
-    SELECT 'Leave request synced to payroll successfully.' AS Message;
+    -- Insert a new exception for this leave request
+    INSERT INTO Exception (name, category, status)
+    SELECT
+        'Leave Exception for LeaveRequest ' + CAST(LR.request_id AS VARCHAR),
+        'Leave',
+        'Active'
+    FROM LeaveRequest LR
+    WHERE LR.request_id = @LeaveRequestID
+      AND LR.status = 'Approved';
+
+    -- Link the newly created exception to the employee
+    INSERT INTO Employee_Exception (employee_id, exception_id)
+    SELECT LR.employee_id, E.exception_id
+    FROM LeaveRequest LR
+    JOIN Exception E
+        ON E.name = 'Leave Exception for LeaveRequest ' + CAST(LR.request_id AS VARCHAR)
+    WHERE LR.request_id = @LeaveRequestID
+      AND LR.status = 'Approved';
+
+    SELECT 'Leave request synced to attendance as an exception successfully.' AS Message;
 END
 GO
 
+
 --44:
+CREATE PROCEDURE UpdateInsuranceBrackets
+    @BracketID INT,
+    @NewMinSalary DECIMAL(10,2),
+    @NewMaxSalary DECIMAL(10,2),
+    @NewEmployeeContribution DECIMAL(5,2),
+    @NewEmployerContribution DECIMAL(5,2),
+    @UpdatedBy INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Update only the fields that exist in Insurance table
+    -- contribution_rate could represent total contribution percentage
+    DECLARE @TotalContribution DECIMAL(6,3);
+    SET @TotalContribution = @NewEmployeeContribution + @NewEmployerContribution;
+
+    UPDATE Insurance
+    SET contribution_rate = @TotalContribution,
+        coverage = 'Salary Range: ' + CAST(@NewMinSalary AS VARCHAR) + ' - ' + CAST(@NewMaxSalary AS VARCHAR)
+    WHERE insurance_id = @BracketID;
+
+    SELECT 'Insurance bracket ID ' + CAST(@BracketID AS VARCHAR) + ' updated successfully.' AS Message;
+END;
+GO
 
 
 --45:
@@ -838,13 +977,14 @@ CREATE PROCEDURE ApprovePolicyUpdate
     @ApprovedBy INT
 AS
 BEGIN
-    -- Mark the policy as approved by the given employee
-    UPDATE PayGrade
-    SET approved_by = @ApprovedBy, status = 'Approved'
-    WHERE pay_grade_id = @PolicyID;
+    SET NOCOUNT ON;
 
-    -- Return a confirmation message
-    SELECT 'Payroll policy update approved successfully.' AS Message;
+    -- Update PayrollPolicy status
+    UPDATE PayrollPolicy
+    SET description = description + ' [Approved by Employee ' + CAST(@ApprovedBy AS VARCHAR) + ']'
+    WHERE policy_id = @PolicyID;
+
+    SELECT 'Payroll policy update approved successfully for Policy ID ' +
+           CAST(@PolicyID AS VARCHAR) AS Message;
 END;
 GO
-
