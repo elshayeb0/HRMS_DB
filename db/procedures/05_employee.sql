@@ -1,11 +1,7 @@
 USE HRMS_DB;
 GO
 
--- =============================================
--- Stored Procedure: SubmitLeaveRequest
--- Description: Submits a leave request for an employee
--- =============================================
-
+-- 1) SubmitLeaveRequest
 CREATE PROCEDURE SubmitLeaveRequest
     @EmployeeID INT,
     @LeaveTypeID INT,
@@ -15,25 +11,17 @@ CREATE PROCEDURE SubmitLeaveRequest
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Insert leave request with calculated duration
     INSERT INTO LeaveRequest (employee_id, leave_id, justification, duration, approval_timing, status)
     VALUES (@EmployeeID, @LeaveTypeID, @Reason, DATEDIFF(DAY, @StartDate, @EndDate) + 1, GETDATE(), 'Pending');
-
-    -- Confirmation message
     PRINT 'Leave request submitted successfully.';
 END;
 GO
 
-
--- =============================================
-
-
+-- 2) GetLeaveBalance
 CREATE PROCEDURE GetLeaveBalance
     @EmployeeID INT
 AS
 BEGIN
-    -- Get all leave entitlements for this employee
     SELECT
         l.leave_type AS 'Leave Type',
         le.entitlement AS 'Remaining Days'
@@ -43,9 +31,7 @@ BEGIN
 END
 GO
 
--- =============================================
-
-
+-- 3) RecordAttendance
 CREATE PROCEDURE RecordAttendance
     @EmployeeID INT,
     @ShiftID INT,
@@ -60,9 +46,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
-
+-- 4) SubmitReimbursement
 CREATE PROCEDURE SubmitReimbursement
     @EmployeeID INT,
     @ExpenseType VARCHAR(50),
@@ -70,16 +54,18 @@ CREATE PROCEDURE SubmitReimbursement
 AS
 BEGIN
     INSERT INTO Reimbursement (employee_id, type, claim_type, current_status)
-    VALUES (@EmployeeID, @ExpenseType, @ExpenseType, 'Pending');
+VALUES (
+    @EmployeeID,
+    @ExpenseType,
+    @ExpenseType + ' | Amount: ' + CAST(@Amount AS VARCHAR(20)),
+    'Pending'
+);
 
     SELECT 'Reimbursement request submitted successfully' AS ConfirmationMessage;
 END;
 GO
 
--- =============================================
-
-
-
+-- 5) AddEmployeeSkill
 CREATE PROCEDURE AddEmployeeSkill
     @EmployeeID INT,
     @SkillName VARCHAR(50)
@@ -98,10 +84,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
-
-
+-- 6) ViewAssignedShifts
 CREATE PROCEDURE ViewAssignedShifts
     @EmployeeID INT
 AS
@@ -120,10 +103,7 @@ BEGIN
 END;
 GO
 
-
--- =============================================
-
-
+-- 7) ViewMyContracts
 CREATE PROCEDURE ViewMyContracts
     @EmployeeID INT
 AS
@@ -143,8 +123,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 8) ViewMyPayroll
 CREATE PROCEDURE ViewMyPayroll
     @EmployeeID INT
 AS
@@ -166,8 +145,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 9) UpdatePersonalDetails
 CREATE PROCEDURE UpdatePersonalDetails
     @EmployeeID INT,
     @Phone VARCHAR(20),
@@ -183,8 +161,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 10) ViewMyMissions
 CREATE PROCEDURE ViewMyMissions
     @EmployeeID INT
 AS
@@ -202,8 +179,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 11) ViewEmployeeProfile
 CREATE PROCEDURE ViewEmployeeProfile
     @EmployeeID INT
 AS
@@ -231,8 +207,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 12) UpdateContactInformation
 CREATE PROCEDURE UpdateContactInformation
     @EmployeeID INT,
     @RequestType VARCHAR(50),
@@ -256,9 +231,7 @@ BEGIN
 END;
 GO
 
--- =============================================
--- NEED TO BE CHECKED
-
+-- 13) ViewEmploymentTimeline
 CREATE PROCEDURE ViewEmploymentTimeline
     @EmployeeID INT
 AS
@@ -278,8 +251,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 14) UpdateEmergencyContact
 CREATE PROCEDURE UpdateEmergencyContact
     @EmployeeID INT,
     @ContactName VARCHAR(100),
@@ -297,8 +269,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 15) RequestHRDocument
 CREATE PROCEDURE RequestHRDocument
     @EmployeeID INT,
     @DocumentType VARCHAR(50)
@@ -316,8 +287,7 @@ BEGIN
 END;
 GO
 
--- =============================================
-
+-- 16) NotifyProfileUpdate
 CREATE PROCEDURE NotifyProfileUpdate
     @EmployeeID INT,
     @notificationType VARCHAR(50)
@@ -335,8 +305,7 @@ BEGIN
 END;
 GO
 
--- ============================================
-
+--17) LogFlexibleAttendance
 CREATE PROCEDURE LogFlexibleAttendance
     @EmployeeID INT,
     @Date DATE,
@@ -355,8 +324,7 @@ BEGIN
 END;
 GO
 
-    -- =============================================
-
+-- 18) NotifyMissedPunch
     CREATE PROCEDURE NotifyMissedPunch
     @EmployeeID INT,
     @Date DATE
@@ -374,16 +342,13 @@ BEGIN
 END;
 GO
 
--- =============================================
-
-
+-- 19) RecordMultiplePunches
 CREATE PROCEDURE RecordMultiplePunches
     @EmployeeID INT,
     @ClockInOutTime DATETIME,
     @Type VARCHAR(10)
 AS
 BEGIN
-    -- Clock IN: Create a new attendance record
     IF @Type = 'IN'
     BEGIN
         INSERT INTO Attendance (employee_id, entry_time)
@@ -391,8 +356,6 @@ BEGIN
 
         SELECT 'Clocked In Successfully';
     END
-
-    -- Clock OUT: Update the last open attendance record
     IF @Type = 'OUT'
     BEGIN
         UPDATE Attendance
@@ -411,9 +374,7 @@ BEGIN
 END
 GO
 
-
--- ================================================
-
+-- 20) SubmitCorrectionRequest
 CREATE PROCEDURE SubmitCorrectionRequest
     @EmployeeID INT,
     @Date DATE,
@@ -430,13 +391,11 @@ BEGIN
 END
 GO
 
--- ================================================
-
+-- 21) ViewRequestStatus
 CREATE PROCEDURE ViewRequestStatus
     @EmployeeID INT
 AS
 BEGIN
-    -- Get all correction requests for this employee
     SELECT
         request_id AS 'Request ID',
         'Correction Request' AS 'Request Type',
@@ -450,24 +409,19 @@ BEGIN
 END
 GO
 
--- ================================================
-
+-- 22) AttachLeaveDocuments
 CREATE PROCEDURE AttachLeaveDocuments
     @LeaveRequestID INT,
     @FilePath VARCHAR(200)
 AS
 BEGIN
-    -- Insert the document into LeaveDocument table
     INSERT INTO LeaveDocument (leave_request_id, file_path)
     VALUES (@LeaveRequestID, @FilePath);
-
-    -- Confirmation message
     SELECT 'Document attached successfully' AS Message;
 END
 GO
 
--- ================================================
-
+-- 23) ModifyLeaveRequest
 CREATE PROCEDURE ModifyLeaveRequest
     @LeaveRequestID INT,
     @StartDate DATE,
@@ -475,44 +429,35 @@ CREATE PROCEDURE ModifyLeaveRequest
     @Reason VARCHAR(100)
 AS
 BEGIN
-    -- Calculate the duration in days
     DECLARE @Duration INT;
     SET @Duration = DATEDIFF(DAY, @StartDate, @EndDate) + 1;
-
-    -- Update the leave request
     UPDATE LeaveRequest
     SET justification = @Reason,
         duration = @Duration
     WHERE request_id = @LeaveRequestID;
 
-    -- Confirmation message
     SELECT 'Leave request modified successfully' AS Message;
 END
 GO
 
--- ================================================
-
+-- 24) CancelLeaveRequest
 CREATE PROCEDURE CancelLeaveRequest
     @LeaveRequestID INT
 AS
 BEGIN
-    -- Update the status to Cancelled
     UPDATE LeaveRequest
     SET status = 'Cancelled'
     WHERE request_id = @LeaveRequestID;
 
-    -- Confirmation message
     SELECT 'Leave request cancelled successfully' AS Message;
 END
 GO
 
--- ================================================
-
+-- 25) ViewLeaveBalance
 CREATE PROCEDURE ViewLeaveBalance
     @EmployeeID INT
 AS
 BEGIN
-    -- Get all leave entitlements for this employee
     SELECT
         l.leave_type AS 'Leave Type',
         le.entitlement AS 'Remaining Days'
@@ -522,8 +467,7 @@ BEGIN
 END
 GO
 
---================================================
-
+-- 26) ViewLeaveHistory
 CREATE PROCEDURE ViewLeaveHistory
     @EmployeeID INT
 AS
@@ -542,8 +486,7 @@ BEGIN
 END
 GO
 
--- ================================================
-
+-- 27) SubmitLeaveAfterAbsence
 CREATE PROCEDURE SubmitLeaveAfterAbsence
     @EmployeeID INT,
     @LeaveTypeID INT,
@@ -552,43 +495,33 @@ CREATE PROCEDURE SubmitLeaveAfterAbsence
     @Reason VARCHAR(100)
 AS
 BEGIN
-    -- Calculate the duration in days
     DECLARE @Duration INT;
     SET @Duration = DATEDIFF(DAY, @StartDate, @EndDate) + 1;
-
-    -- Insert the leave request
     INSERT INTO LeaveRequest (employee_id, leave_id, justification, duration, status)
     VALUES (@EmployeeID, @LeaveTypeID, @Reason, @Duration, 'Pending');
-
-    -- Confirmation message
     SELECT 'Leave request submitted successfully' AS Message;
 END
 GO
 
---==============================================
-
+-- 28) NotifyLeaveStatusChange
 CREATE PROCEDURE NotifyLeaveStatusChange
     @EmployeeID INT,
     @RequestID INT,
     @Status VARCHAR(20)
 AS
 BEGIN
-    -- Create the notification message based on status
     DECLARE @Message VARCHAR(500);
     SET @Message = 'Your leave request #' + CAST(@RequestID AS VARCHAR(10)) + ' has been ' + @Status;
 
-    -- Insert notification into Notification table
     INSERT INTO Notification (message_content, urgency, notification_type)
     VALUES (@Message, 'Medium', 'Leave Status');
 
     DECLARE @NotificationID INT;
     SET @NotificationID = SCOPE_IDENTITY();
 
-    -- Link notification to employee
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     VALUES (@EmployeeID, @NotificationID, 'Sent', GETDATE());
 
-    -- Output the notification message
     SELECT @Message AS 'Notification';
 END
 GO
