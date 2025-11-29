@@ -1,5 +1,3 @@
-
-
 USE HRMS_DB;
 GO
 
@@ -365,8 +363,8 @@ BEGIN
 END;
 GO
 
-
-CREATE PROCEDURE UpdateInsuranceBrackets
+-- Duplicate naming from HR Admin module adjusted to UpdateInsuranceBracketss
+CREATE PROCEDURE UpdateInsuranceBracketss
     @BracketID INT,
     @MinSalary DECIMAL(10,2),
     @MaxSalary DECIMAL(10,2),
@@ -406,12 +404,13 @@ CREATE PROCEDURE DefinePayGrades
     @CreatedBy INT
 AS
 BEGIN
-    INSERT INTO PayGrade (grade_name, min_salary, max_salary, created_by)
-    VALUES (@GradeName, @MinSalary, @MaxSalary, @CreatedBy);
+    INSERT INTO PayGrade (grade_name, min_salary, max_salary)
+    VALUES (@GradeName, @MinSalary, @MaxSalary);
 
-    PRINT  'Pay grade defined successfully'  ;
+    PRINT 'Pay grade defined successfully';
 END;
 GO
+
 
 
 CREATE PROCEDURE ConfigureEscalationWorkflow
@@ -469,8 +468,7 @@ END;
 GO
 
 
-ALTER TABLE ShiftSchedule
-ADD allowance_amount DECIMAL(10,2) DEFAULT 0;
+
 GO
 CREATE PROCEDURE ConfigureShiftAllowance
     @ShiftType VARCHAR(20),
@@ -487,8 +485,7 @@ END;
 GO
 
 
-ALTER TABLE BonusPolicy
-ADD amount DECIMAL(10,2);
+
 GO
 
 CREATE PROCEDURE ConfigureSigningBonusPolicy
