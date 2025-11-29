@@ -1,12 +1,4 @@
--- =============================================
--- File: 01_system_admin.sql
--- Author: Hazem Ahmed
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Stored procedures for "As a System Admin" user stories
-
--- Note: Names must match the Milestone 2 specification exactly
--- =============================================
 
 USE HRMS_DB;
 GO
@@ -107,10 +99,10 @@ BEGIN
         PRINT 'Role already assigned to this employee';
         RETURN;
     END
-   
+
     INSERT INTO Employee_Role(employee_id, role_id, assigned_date)
     VALUES(@EmployeeID, @RoleID, GETDATE());
-   
+
     PRINT 'Role assigned successfully';
 END;
 GO
@@ -404,24 +396,24 @@ CREATE PROCEDURE ManageUserAccounts
 AS
 BEGIN
     DECLARE @RoleID INT;
-   
+
     SELECT @RoleID = role_id FROM Role WHERE role_name = @Role;
-   
+
     -- CRITICAL FIX: Check if role exists
     IF @RoleID IS NULL
     BEGIN
         SELECT 'Error: Role not found' AS ConfirmationMessage;
         RETURN;
     END
-   
+
     IF @Action = 'ADD'
         INSERT INTO Employee_Role (employee_id, role_id, assigned_date)
         VALUES (@UserID, @RoleID, GETDATE());
-   
+
     IF @Action = 'REMOVE'
         DELETE FROM Employee_Role
         WHERE employee_id = @UserID AND role_id = @RoleID;
-   
+
     SELECT 'User account managed successfully' AS ConfirmationMessage;
 END
 GO

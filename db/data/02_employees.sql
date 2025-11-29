@@ -1,29 +1,104 @@
--- =============================================
--- File: 02_employees.sql
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Insert core employees, roles, hierarchies, skills,
---          verifications and related mappings
-
--- Dependencies: 01_lookup_data.sql
--- Run order: Data step 2
--- =============================================
 
 USE HRMS_DB;
 GO
 
-INSERT INTO Employee (first_name, last_name, full_name, national_id, date_of_birth, country_of_birth, phone, email, address, emergency_contact_name, emergency_contact_phone, relationship, biography, profile_image, employment_progress, account_status, employment_status, hire_date, is_active, profile_completion, department_id, position_id, manager_id, contract_id, tax_form_id, salary_type_id, pay_grade) VALUES
-('John', 'Smith', 'John Smith', 'US123456789', '1975-05-15', 'United States', '+1-555-0101', 'john.smith@company.com', '123 Main St, New York, NY', 'Jane Smith', '+1-555-0102', 'Spouse', 'Experienced executive with 20+ years in leadership', '/profiles/jsmith.jpg', 'Completed Onboarding', 'Active', 'Active', '2020-01-15', 1, 100, 1, 1, NULL, 1, 1, 6),
-('Sarah', 'Johnson', 'Sarah Johnson', 'US987654321', '1985-08-22', 'United States', '+1-555-0201', 'sarah.johnson@company.com', '456 Oak Ave, Boston, MA', 'Michael Johnson', '+1-555-0202', 'Spouse', 'HR professional with expertise in talent management', '/profiles/sjohnson.jpg', 'Completed Onboarding', 'Active', 'Active', '2021-03-01', 1, 100, 2, 2, 1, 2, 1, 1, 5),
-('Ahmed', 'Hassan', 'Ahmed Hassan', 'EG112233445', '1988-03-10', 'Egypt', '+20-100-1234567', 'ahmed.hassan@company.com', '78 Nile St, Cairo, Egypt', 'Fatima Hassan', '+20-100-7654321', 'Spouse', 'IT Manager with cloud infrastructure expertise', '/profiles/ahassan.jpg', 'Completed Onboarding', 'Active', 'Active', '2021-06-15', 1, 100, 3, 3, 1, 3, 1, 1, 5),
-('Emily', 'Davis', 'Emily Davis', 'US556677889', '1990-11-30', 'United States', '+1-555-0301', 'emily.davis@company.com', '789 Pine Rd, Chicago, IL', 'Robert Davis', '+1-555-0302', 'Father', 'Finance expert with CPA certification', '/profiles/edavis.jpg', 'Completed Onboarding', 'Active', 'Active', '2022-01-10', 1, 100, 4, 4, 1, 4, 1, 1, 5),
-('Michael', 'Brown', 'Michael Brown', 'US334455667', '1992-07-18', 'United States', '+1-555-0401', 'michael.brown@company.com', '321 Elm St, Seattle, WA', 'Lisa Brown', '+1-555-0402', 'Mother', 'Full-stack developer specializing in cloud solutions', '/profiles/mbrown.jpg', 'Completed Onboarding', 'Active', 'Active', '2022-08-01', 1, 95, 3, 5, 3, 5, 2, 2, 3),
-('David', 'Wilson', 'David Wilson', 'UK998877665', '1987-02-14', 'United Kingdom', '+44-20-12345678', 'david.wilson@company.com', '55 Baker St, London, UK', 'Emma Wilson', '+44-20-87654321', 'Spouse', 'IT consultant with 15 years experience', '/profiles/dwilson.jpg', 'Completed Onboarding', 'Active', 'Active', '2023-01-01', 1, 100, 3, 10, 3, 6, 1, 3, 4),
-('Maria', 'Garcia', 'Maria Garcia', 'US778899001', '1998-09-25', 'United States', '+1-555-0501', 'maria.garcia@company.com', '654 Maple Dr, Austin, TX', 'Carlos Garcia', '+1-555-0502', 'Father', 'Computer Science student completing internship', '/profiles/mgarcia.jpg', 'In Progress', 'Active', 'Active', '2024-06-01', 1, 80, 3, 5, 3, 7, 1, 2, 1),
-('Jennifer', 'Lee', 'Jennifer Lee', 'US445566778', '1989-04-20', 'United States', '+1-555-0601', 'jennifer.lee@company.com', '987 Cedar Ln, San Francisco, CA', 'Kevin Lee', '+1-555-0602', 'Spouse', 'HR specialist focused on recruitment', '/profiles/jlee.jpg', 'Completed Onboarding', 'Active', 'Active', '2023-05-01', 1, 100, 2, 6, 2, 8, 1, 1, 3),
-('Robert', 'Martinez', 'Robert Martinez', 'US223344556', '1991-12-05', 'United States', '+1-555-0701', 'robert.martinez@company.com', '159 Birch Ave, Miami, FL', 'Ana Martinez', '+1-555-0702', 'Spouse', 'Certified accountant with tax expertise', '/profiles/rmartinez.jpg', 'Completed Onboarding', 'Active', 'Active', '2023-09-15', 1, 100, 4, 7, 4, 9, 1, 1, 3),
-('Lisa', 'Anderson', 'Lisa Anderson', 'US667788990', '1986-06-08', 'United States', '+1-555-0801', 'lisa.anderson@company.com', '753 Spruce St, Denver, CO', 'Mark Anderson', '+1-555-0802', 'Spouse', 'Sales leader with proven track record', '/profiles/landerson.jpg', 'Completed Onboarding', 'Active', 'Active', '2024-02-01', 1, 100, 5, 8, 1, 10, 1, 1, 4);
+INSERT INTO Employee (
+    first_name, last_name, full_name, national_id, date_of_birth, country_of_birth,
+    phone, email, address, emergency_contact_name, emergency_contact_phone,
+    relationship, biography, profile_image, employment_progress, account_status,
+    employment_status, hire_date, is_active, profile_completion,
+    department_id, position_id, manager_id, contract_id, tax_form_id, salary_type_id, pay_grade
+) VALUES
+-- Employee 1 (John Smith - CEO)
+('John', 'Smith', 'John Smith', 'US123456789', '1975-05-15', 'United States',
+ '+1-555-0101', 'john.smith@company.com', '123 Main St, New York, NY',
+ 'Emma Smith', '+1-555-0102', 'Spouse',
+ 'Company CEO with 20+ years leadership', '/profiles/jsmith.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2020-01-01', 1, 100,
+ 1, 1, NULL, NULL, 1, 1, 6),
 
+-- Employee 2 (Sarah Johnson - HR Manager)
+('Sarah', 'Johnson', 'Sarah Johnson', 'US987654321', '1985-08-22', 'United States',
+ '+1-555-0201', 'sarah.johnson@company.com', '456 Oak Ave, Boston, MA',
+ 'Michael Johnson', '+1-555-0202', 'Spouse',
+ 'HR professional with expertise in talent management', '/profiles/sjohnson.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2021-03-01', 1, 100,
+ 2, 2, 1, NULL, 1, 1, 5),
+
+-- Employee 3 (Ahmed Hassan - IT Manager)
+('Ahmed', 'Hassan', 'Ahmed Hassan', 'EG112233445', '1988-03-10', 'Egypt',
+ '+20-100-1234567', 'ahmed.hassan@company.com', '78 Nile St, Cairo, Egypt',
+ 'Fatima Hassan', '+20-100-7654321', 'Spouse',
+ 'IT Manager with cloud infrastructure expertise', '/profiles/ahassan.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2021-06-15', 1, 100,
+ 3, 3, 1, NULL, 1, 1, 5),
+
+-- Employee 4 (Emily Davis - Finance Manager)
+('Emily', 'Davis', 'Emily Davis', 'US556677889', '1990-11-30', 'United States',
+ '+1-555-0301', 'emily.davis@company.com', '789 Pine Rd, Chicago, IL',
+ 'Robert Davis', '+1-555-0302', 'Father',
+ 'Finance expert with CPA certification', '/profiles/edavis.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2022-01-10', 1, 100,
+ 4, 4, 1, NULL, 1, 1, 5),
+
+-- Employee 5 (Michael Brown - Software Engineer)
+('Michael', 'Brown', 'Michael Brown', 'US334455667', '1992-07-18', 'United States',
+ '+1-555-0401', 'michael.brown@company.com', '321 Elm St, Seattle, WA',
+ 'Lisa Brown', '+1-555-0402', 'Mother',
+ 'Full-stack developer specializing in cloud solutions', '/profiles/mbrown.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2022-08-01', 1, 95,
+ 3, 5, 3, NULL, 2, 2, 3),
+
+-- Employee 6 (David Wilson - IT Consultant)
+('David', 'Wilson', 'David Wilson', 'UK998877665', '1987-02-14', 'United Kingdom',
+ '+44-20-12345678', 'david.wilson@company.com', '55 Baker St, London, UK',
+ 'Emma Wilson', '+44-20-87654321', 'Spouse',
+ 'IT consultant with 15 years experience', '/profiles/dwilson.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2023-01-01', 1, 100,
+ 3, 10, 3, NULL, 1, 3, 4),
+
+-- Employee 7 (Maria Garcia - Intern)
+('Maria', 'Garcia', 'Maria Garcia', 'US778899001', '1998-09-25', 'United States',
+ '+1-555-0501', 'maria.garcia@company.com', '654 Maple Dr, Austin, TX',
+ 'Carlos Garcia', '+1-555-0502', 'Father',
+ 'Computer Science student completing internship', '/profiles/mgarcia.jpg',
+ 'In Progress', 'Active', 'Active',
+ '2024-06-01', 1, 80,
+ 3, 5, 3, NULL, 1, 2, 1),
+
+-- Employee 8 (Jennifer Lee - HR Specialist)
+('Jennifer', 'Lee', 'Jennifer Lee', 'US445566778', '1989-04-20', 'United States',
+ '+1-555-0601', 'jennifer.lee@company.com', '987 Cedar Ln, San Francisco, CA',
+ 'Kevin Lee', '+1-555-0602', 'Spouse',
+ 'HR specialist focused on recruitment', '/profiles/jlee.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2023-05-01', 1, 100,
+ 2, 6, 2, NULL, 1, 1, 3),
+
+-- Employee 9 (Robert Martinez - Accountant)
+('Robert', 'Martinez', 'Robert Martinez', 'US223344556', '1991-12-05', 'United States',
+ '+1-555-0701', 'robert.martinez@company.com', '159 Birch Ave, Miami, FL',
+ 'Ana Martinez', '+1-555-0702', 'Spouse',
+ 'Certified accountant with tax expertise', '/profiles/rmartinez.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2023-09-15', 1, 100,
+ 4, 7, 4, NULL, 1, 1, 3),
+
+-- Employee 10 (Lisa Anderson - Sales Manager)
+('Lisa', 'Anderson', 'Lisa Anderson', 'US667788990', '1986-06-08', 'United States',
+ '+1-555-0801', 'lisa.anderson@company.com', '753 Spruce St, Denver, CO',
+ 'Mark Anderson', '+1-555-0802', 'Spouse',
+ 'Sales leader with proven track record', '/profiles/landerson.jpg',
+ 'Completed Onboarding', 'Active', 'Active',
+ '2024-02-01', 1, 100,
+ 5, 8, 1, NULL, 1, 1, 4);
 
 INSERT INTO HRAdministrator (employee_id, approval_level, record_access_scope, document_validation_rights) VALUES
 (2, 3, 'All departments and employees', 'Can validate all HR documents'),

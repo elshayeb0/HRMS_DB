@@ -1,14 +1,4 @@
--- =============================================
--- File: 01_lookup_data.sql
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Insert lookup/reference data
---          (Departments, Positions, 
---           Salary types, PayGrades, Currencies, etc.)
-
--- Dependencies: All schema scripts
--- Run order: Data step 1
--- =============================================
 
 USE HRMS_DB;
 GO
@@ -41,11 +31,11 @@ INSERT INTO Currency (CurrencyCode, CurrencyName, ExchangeRate) VALUES
 ('SAR', 'Saudi Riyal', 3.75000);
 
 INSERT INTO SalaryType (type, payment_frequency, currency) VALUES
-('Monthly', 'Monthly', 'USD'),
-('Hourly', 'Bi-Weekly', 'USD'),
-('Contract', 'Milestone', 'USD'),
-('Monthly', 'Monthly', 'EGP'),
-('Hourly', 'Weekly', 'EUR');
+('Monthly', 'Monthly', 'US Dollar'),
+('Hourly', 'Bi-Weekly', 'US Dollar'),
+('Contract', 'Milestone', 'US Dollar'),
+('Monthly', 'Monthly', 'Egyptian Pound'),
+('Hourly', 'Weekly', 'Euro');
 
 INSERT INTO HourlySalaryType (salary_type_id, hourly_rate, max_monthly_hours) VALUES
 (2, 45.000, 160),

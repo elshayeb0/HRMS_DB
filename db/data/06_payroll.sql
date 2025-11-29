@@ -1,13 +1,4 @@
--- =============================================
--- File: 06_payroll.sql
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Insert sample payroll runs, allowances/deductions,
---          payroll policy links, logs and periods
-
--- Dependencies: Previous data scripts
--- Run order: Data step 6
--- =============================================
 
 USE HRMS_DB;
 GO
@@ -41,7 +32,7 @@ INSERT INTO LatenessPolicy (policy_id, grace_period_mins, deduction_rate) VALUES
 (2, 15, 0.50);
 
 INSERT INTO BonusPolicy (policy_id, bonus_type, eligibility_criteria, amount)
-VALUES 
+VALUES
     (1, 'Performance Bonus', 'Employees with performance rating above 4.0', 5000.00),
     (2, 'Annual Bonus', 'All full-time employees with 1+ year service', 3000.00),
     (3, 'Project Completion Bonus', 'Team members who complete projects on time', 2500.00),
@@ -81,7 +72,7 @@ INSERT INTO Termination (date, reason, contract_id) VALUES
 -- Insert PayrollSpecialists
 -- Note: Assumes Employee table already has these employee_ids
 INSERT INTO PayrollSpecialist (employee_id, assigned_region, processing_frequency, last_processed_period)
-VALUES 
+VALUES
     (101, 'North America', 'Bi-Weekly', '2024-11-15'),
     (102, 'Europe', 'Monthly', '2024-11-01'),
     (103, 'Asia Pacific', 'Bi-Weekly', '2024-11-15'),
@@ -92,7 +83,7 @@ GO
 -- Insert ApprovalWorkflows
 -- Note: created_by references employee_id from Employee table
 INSERT INTO ApprovalWorkflow (workflow_type, threshold_amount, approver_role, created_by, status)
-VALUES 
+VALUES
     ('Expense Reimbursement', 1000.00, 'Manager', 101, 'Active'),
     ('Purchase Order', 5000.00, 'Director', 102, 'Active'),
     ('Budget Approval', 10000.00, 'VP Finance', 101, 'Active'),
@@ -104,30 +95,30 @@ GO
 -- Insert ApprovalWorkflowSteps
 -- Note: role_id must exist in Role table
 INSERT INTO ApprovalWorkflowStep (workflow_id, step_number, role_id, action_required)
-VALUES 
+VALUES
     -- Expense Reimbursement workflow (workflow_id = 1)
     (1, 1, 201, 'Review expense report and receipts'),
     (1, 2, 202, 'Verify budget availability'),
     (1, 3, 203, 'Final approval and process payment'),
-    
+
     -- Purchase Order workflow (workflow_id = 2)
     (2, 1, 204, 'Review purchase requisition'),
     (2, 2, 205, 'Approve vendor selection'),
     (2, 3, 206, 'Authorize purchase order'),
-    
+
     -- Budget Approval workflow (workflow_id = 3)
     (3, 1, 207, 'Review budget proposal'),
     (3, 2, 208, 'Financial analysis and recommendation'),
     (3, 3, 209, 'Executive approval'),
-    
+
     -- Payroll Adjustment workflow (workflow_id = 4)
     (4, 1, 210, 'Verify adjustment request'),
     (4, 2, 211, 'HR approval'),
-    
+
     -- Vendor Payment workflow (workflow_id = 5)
     (5, 1, 212, 'Verify invoice and delivery'),
     (5, 2, 213, 'Approve payment'),
-    
+
     -- Contract Approval workflow (workflow_id = 6)
     (6, 1, 214, 'Legal review of contract terms'),
     (6, 2, 215, 'Financial impact assessment'),

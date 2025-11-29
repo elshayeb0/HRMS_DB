@@ -1,12 +1,4 @@
--- =============================================
--- File: 05_employee.sql
--- Author: Ahmed Saadallah
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Stored procedures for "As an Employee" user stories
-
--- Note: Names must match the Milestone 2 specification exactly
--- =============================================
 
 USE HRMS_DB;
 GO
@@ -355,9 +347,11 @@ CREATE PROCEDURE LogFlexibleAttendance
 AS
 BEGIN
     DECLARE @TotalHours INT = DATEDIFF(HOUR, @CheckIn, @CheckOut);
+    DECLARE @EntryDateTime DATETIME = CAST(@Date AS DATETIME) + CAST(@CheckIn AS DATETIME);
+    DECLARE @ExitDateTime  DATETIME = CAST(@Date AS DATETIME) + CAST(@CheckOut AS DATETIME);
 
     INSERT INTO Attendance (employee_id, entry_time, exit_time, duration)
-    VALUES (@EmployeeID, @Date + @CheckIn, @Date + @CheckOut, @TotalHours);
+    VALUES (@EmployeeID, @EntryDateTime, @ExitDateTime, @TotalHours);
 
     PRINT 'Attendance logged successfully. Total working hours: ' + CAST(@TotalHours AS VARCHAR);
 END;

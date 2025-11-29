@@ -1,12 +1,3 @@
--- =============================================
--- File: 04_line_manager.sql
--- Author: Ziad Elshayeb
--- Project: HRMS_DB - Milestone 2
-
--- Purpose: Stored procedures for "As a Line Manager" user stories
-
--- Note: Names must match the Milestone 2 specification exactly
--- =============================================
 
 USE HRMS_DB;
 GO
@@ -462,7 +453,7 @@ GO
 -- Note    : Implements user story 19 (named ReviewLeaveRequest in spec),
 --           but uses a unique procedure name to avoid conflict with procedure 1.
 -- =============================================
-CREATE PROCEDURE GetLeaveRequestDetails
+CREATE PROCEDURE ViewLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT
 AS

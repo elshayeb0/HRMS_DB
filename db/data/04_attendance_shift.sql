@@ -1,19 +1,10 @@
--- =============================================
--- File: 04_attendance_shift.sql
--- Project: HRMS_DB - Milestone 2
 
--- Purpose: Insert shift definitions, shift assignments, attendance
---          logs, exceptions, devices, attendance sources
-
--- Dependencies: 02_employees.sql, 03_contracts_missions.sql
--- Run order: Data step 4
--- =============================================
 
 USE HRMS_DB;
 GO
 
 INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status, location, allowance_amount)
-VALUES 
+VALUES
     ('Morning Shift', 'Regular', '08:00:00', '16:00:00', 60, '2024-01-15', 'Active', 'Main Office', 0.00),
     ('Evening Shift', 'Regular', '16:00:00', '00:00:00', 60, '2024-01-15', 'Active', 'Main Office', 50.00),
     ('Night Shift', 'Overnight', '00:00:00', '08:00:00', 60, '2024-01-15', 'Active', 'Main Office', 100.00),
