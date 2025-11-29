@@ -43,7 +43,7 @@ CREATE TABLE SalaryType (
     salary_type_id INT IDENTITY(1,1) PRIMARY KEY,
     type VARCHAR(40) NOT NULL,
     payment_frequency VARCHAR(60),
-    currency VARCHAR(20),
+    currency VARCHAR(65),
     FOREIGN KEY (currency) REFERENCES Currency(CurrencyName)
 );
 GO
@@ -84,7 +84,7 @@ CREATE TABLE AllowanceDeduction (
     employee_id INT,
     type VARCHAR(60),
     amount DECIMAL(11,3),
-    currency VARCHAR(12),
+    currency VARCHAR(65),
     duration INT,
     timezone VARCHAR(60),
     FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id),
