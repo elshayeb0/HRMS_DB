@@ -1,5 +1,3 @@
-
-
 USE HRMS_DB;
 GO
 
@@ -315,7 +313,7 @@ END;
 GO
 
 
---14: check again
+--14:
 CREATE PROCEDURE GenerateProfileReport
     @FilterField VARCHAR(50),
     @FilterValue VARCHAR(100)
@@ -334,6 +332,7 @@ GO
 
 --15:
 CREATE PROCEDURE CreateShiftType
+    @ShiftID INT,
     @Name VARCHAR(100),
     @Type VARCHAR(50),
     @Start_Time TIME,
@@ -344,11 +343,11 @@ CREATE PROCEDURE CreateShiftType
 AS
 BEGIN
     SET NOCOUNT ON;
-
     INSERT INTO ShiftSchedule (name, type, start_time, end_time, break_duration, shift_date, status)
     VALUES (@Name, @Type, @Start_Time, @End_Time, @Break_Duration, @Shift_Date, @Status);
 
-    SELECT 'Shift type "' + @Name + '" created successfully.' AS Message;
+    SELECT 'Shift type "' + @Name + '" (Logical ID: ' + CAST(@ShiftID AS VARCHAR(10)) +
+           ') created successfully.' AS Message;
 END;
 GO
 
@@ -377,7 +376,7 @@ END;
 GO
 
 
---18: ai
+--18:
 
 CREATE PROCEDURE NotifyShiftExpiry
     @EmployeeID INT,
@@ -416,7 +415,7 @@ END;
 GO
 
 
---19: ai
+--19:
 CREATE PROCEDURE DefineShortTimeRules
     @RuleName VARCHAR(50),
     @LateMinutes INT,
@@ -456,7 +455,8 @@ BEGIN
     SELECT 'Grace period of ' + CAST(@Minutes AS VARCHAR(5)) + ' minutes set successfully.' AS Message;
 END
 GO
---21: ai
+
+--21:
 CREATE PROCEDURE DefinePenaltyThreshold
     @LateMinutes INT,
     @DeductionType VARCHAR(50)
@@ -864,7 +864,6 @@ CREATE PROCEDURE SyncLeaveBalances
     @LeaveRequestID INT
 AS
 BEGIN
-    -- Update the leave balance for the approved request
     UPDATE LE
     SET LE.entitlement = LE.entitlement + LR.duration
     FROM LeaveEntitlement LE
@@ -886,11 +885,6 @@ CREATE PROCEDURE ProcessLeaveCarryForward
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Since LeaveEntitlement doesn't have year column,
-    -- we'll add remaining balance to next year's entitlement
-    -- This assumes annual reset has already created next year's base entitlement
-
     UPDATE LE_Current
     SET LE_Current.entitlement = LE_Current.entitlement +
         (SELECT ISNULL(SUM(LR.duration), 0)

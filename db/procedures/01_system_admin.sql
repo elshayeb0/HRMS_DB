@@ -1,5 +1,3 @@
-
-
 USE HRMS_DB;
 GO
 
