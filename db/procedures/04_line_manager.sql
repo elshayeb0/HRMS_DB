@@ -4,21 +4,17 @@ GO
 -------------------------------------------------------------
 -- 1) ReviewLeaveRequest
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ReviewLeaveRequest
+CREATE PROCEDURE ReviewLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT,
     @Decision VARCHAR(20)
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Update leave status
     UPDATE LeaveRequest
     SET status = @Decision,
         approval_timing = ISNULL(approval_timing, GETDATE())
     WHERE request_id = @LeaveRequestID;
-
-    -- Log manager decision as a note
     INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
     SELECT employee_id,
            @ManagerID,
@@ -26,8 +22,6 @@ BEGIN
            GETDATE()
     FROM LeaveRequest
     WHERE request_id = @LeaveRequestID;
-
-    -- Output as required by user story
     SELECT
         @LeaveRequestID AS LeaveRequestID,
         @ManagerID      AS ManagerID,
@@ -38,7 +32,7 @@ GO
 -------------------------------------------------------------
 -- 2) AssignShift
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE AssignShift
+CREATE PROCEDURE AssignShift
     @EmployeeID INT,
     @ShiftID INT
 AS
@@ -61,7 +55,7 @@ GO
 -------------------------------------------------------------
 -- 3) ViewTeamAttendance
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ViewTeamAttendance
+CREATE PROCEDURE ViewTeamAttendance
     @ManagerID INT,
     @DateRangeStart DATE,
     @DateRangeEnd DATE
@@ -95,7 +89,7 @@ GO
 -------------------------------------------------------------
 -- 4) SendTeamNotification
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE SendTeamNotification
+CREATE PROCEDURE SendTeamNotification
     @ManagerID INT,
     @MessageContent VARCHAR(255),
     @UrgencyLevel VARCHAR(50)
@@ -104,14 +98,10 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @NotificationID INT;
-
-    -- Create one notification record
     INSERT INTO Notification (message_content, timestamp, urgency, read_status, notification_type)
     VALUES (@MessageContent, GETDATE(), @UrgencyLevel, 'Unread', 'TeamNotification');
 
     SET @NotificationID = SCOPE_IDENTITY();
-
-    -- Link to all employees under the manager
     INSERT INTO Employee_Notification (employee_id, notification_id, delivery_status, delivered_at)
     SELECT
         E.employee_id,
@@ -128,21 +118,17 @@ GO
 -------------------------------------------------------------
 -- 5) ApproveMissionCompletion
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ApproveMissionCompletion
+CREATE PROCEDURE ApproveMissionCompletion
     @MissionID INT,
     @ManagerID INT,
     @Remarks VARCHAR(200)
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Mark mission as completed/approved
     UPDATE Mission
     SET status = 'Completed'
     WHERE mission_id = @MissionID
       AND manager_id = @ManagerID;
-
-    -- Log a note for the employee
     INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
     SELECT
         employee_id,
@@ -159,14 +145,12 @@ GO
 -------------------------------------------------------------
 -- 6) RequestReplacement
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE RequestReplacement
+CREATE PROCEDURE RequestReplacement
     @EmployeeID INT,
     @Reason VARCHAR(150)
 AS
 BEGIN
     SET NOCOUNT ON;
-
-    -- Log replacement request as a manager note
     INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
     SELECT
         @EmployeeID,
@@ -183,7 +167,7 @@ GO
 -------------------------------------------------------------
 -- 7) ViewDepartmentSummary
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ViewDepartmentSummary
+CREATE PROCEDURE ViewDepartmentSummary
     @DepartmentID INT
 AS
 BEGIN
@@ -210,7 +194,7 @@ GO
 -------------------------------------------------------------
 -- 8) ReassignShift
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ReassignShift
+CREATE PROCEDURE ReassignShift
     @EmployeeID INT,
     @OldShiftID INT,
     @NewShiftID INT
@@ -231,7 +215,7 @@ GO
 -------------------------------------------------------------
 -- 9) GetPendingLeaveRequests
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE GetPendingLeaveRequests
+CREATE PROCEDURE GetPendingLeaveRequests
     @ManagerID INT
 AS
 BEGIN
@@ -261,7 +245,7 @@ GO
 -------------------------------------------------------------
 -- 10) GetTeamStatistics
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE GetTeamStatistics
+CREATE PROCEDURE GetTeamStatistics
     @ManagerID INT
 AS
 BEGIN
@@ -282,7 +266,7 @@ GO
 -------------------------------------------------------------
 -- 11) ViewTeamProfiles
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ViewTeamProfiles
+CREATE PROCEDURE ViewTeamProfiles
     @ManagerID INT
 AS
 BEGIN
@@ -305,7 +289,7 @@ GO
 -------------------------------------------------------------
 -- 12) GetTeamSummary
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE GetTeamSummary
+CREATE PROCEDURE GetTeamSummary
     @ManagerID INT
 AS
 BEGIN
@@ -327,7 +311,7 @@ GO
 -------------------------------------------------------------
 -- 13) FilterTeamProfiles
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE FilterTeamProfiles
+CREATE PROCEDURE FilterTeamProfiles
     @ManagerID INT,
     @Skill VARCHAR(50),
     @RoleID INT
@@ -359,7 +343,7 @@ GO
 -------------------------------------------------------------
 -- 14) ViewTeamCertifications
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ViewTeamCertifications
+CREATE PROCEDURE ViewTeamCertifications
     @ManagerID INT
 AS
 BEGIN
@@ -391,7 +375,7 @@ GO
 -------------------------------------------------------------
 -- 15) AddManagerNotes
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE AddManagerNotes
+CREATE PROCEDURE AddManagerNotes
     @EmployeeID INT,
     @ManagerID INT,
     @Note VARCHAR(500)
@@ -409,7 +393,7 @@ GO
 -------------------------------------------------------------
 -- 16) RecordManualAttendance
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE RecordManualAttendance
+CREATE PROCEDURE RecordManualAttendance
     @EmployeeID INT,
     @Date DATE,
     @ClockIn TIME,
@@ -463,7 +447,7 @@ GO
 -------------------------------------------------------------
 -- 17) ReviewMissedPunches
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ReviewMissedPunches
+CREATE PROCEDURE ReviewMissedPunches
     @ManagerID INT,
     @Date DATE
 AS
@@ -494,7 +478,7 @@ GO
 -------------------------------------------------------------
 -- 18) ApproveTimeRequest
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ApproveTimeRequest
+CREATE PROCEDURE ApproveTimeRequest
     @RequestID INT,
     @ManagerID INT,
     @Decision VARCHAR(20),
@@ -517,7 +501,7 @@ GO
 -------------------------------------------------------------
 -- 19) ViewLeaveRequest
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ViewLeaveRequest
+CREATE PROCEDURE ViewLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT
 AS
@@ -547,7 +531,7 @@ GO
 -------------------------------------------------------------
 -- 20) ApproveLeaveRequest (Line Manager)
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE ApproveLeaveRequest
+CREATE PROCEDURE ApproveLeaveRequestt
     @LeaveRequestID INT,
     @ManagerID INT
 AS
@@ -575,7 +559,7 @@ GO
 -------------------------------------------------------------
 -- 21) RejectLeaveRequest
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE RejectLeaveRequest
+CREATE PROCEDURE RejectLeaveRequest
     @LeaveRequestID INT,
     @ManagerID INT,
     @Reason VARCHAR(200)
@@ -608,7 +592,7 @@ GO
 -------------------------------------------------------------
 -- 22) DelegateLeaveApproval
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE DelegateLeaveApproval
+CREATE PROCEDURE DelegateLeaveApproval
     @ManagerID INT,
     @DelegateID INT,
     @StartDate DATE,
@@ -635,7 +619,7 @@ GO
 -------------------------------------------------------------
 -- 23) FlagIrregularLeave
 -------------------------------------------------------------
-CREATE OR ALTER PROCEDURE FlagIrregularLeave
+CREATE PROCEDURE FlagIrregularLeave
     @EmployeeID INT,
     @ManagerID INT,
     @PatternDescription VARCHAR(200)

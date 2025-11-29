@@ -50,7 +50,7 @@ GO
 
 CREATE PROCEDURE ApproveLeaveRequest
     @LeaveRequestID INT,
-     @ApproverID INT,
+    @ApproverID INT,
     @Status VARCHAR(20)
 AS
 BEGIN
