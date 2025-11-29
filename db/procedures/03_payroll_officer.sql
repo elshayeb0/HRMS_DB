@@ -129,8 +129,7 @@ GO
 
 
 CREATE PROCEDURE GetBonusEligibleEmployees
-    @Month INT,
-    @Year INT
+    @Eligibility_criteria NVARCHAR(MAX)
 AS
 BEGIN
     SELECT DISTINCT e.employee_id, e.first_name, e.last_name
@@ -138,8 +137,7 @@ BEGIN
     JOIN Payroll p ON e.employee_id = p.employee_id
     JOIN PayrollPolicy_ID pp ON p.payroll_id = pp.payroll_id
     JOIN BonusPolicy b ON pp.policy_id = b.policy_id
-    WHERE MONTH(p.period_end) = @Month
-      AND YEAR(p.period_end) = @Year;
+    WHERE b.eligibility_criteria = @Eligibility_criteria;
 END;
 GO
 
