@@ -69,11 +69,19 @@ GO
 
 CREATE PROCEDURE ApplyPayrollPolicy
     @PolicyID INT,
-    @PayrollID INT
+    @PayrollID INT,
+    @type VARCHAR(20),
+    @description VARCHAR(50)
 AS
 BEGIN
     INSERT INTO PayrollPolicy_ID (payroll_id, policy_id)
     VALUES (@PayrollID, @PolicyID);
+
+    UPDATE PayrollPolicy
+    SET type = @type,
+        description = @description
+    WHERE policy_id = @PolicyID;
+
     PRINT 'Payroll policy applied successfully';
 END;
 GO
