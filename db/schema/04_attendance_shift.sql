@@ -70,7 +70,8 @@ CREATE TABLE AttendanceLog (
     actor INT,
     timestamp DATETIME,
     reason VARCHAR(600),
-    FOREIGN KEY (attendance_id) REFERENCES Attendance(attendance_id)
+    FOREIGN KEY (attendance_id) REFERENCES Attendance(attendance_id),
+    FOREIGN KEY (actor) REFERENCES Employee(employee_id)
 );
 GO
 

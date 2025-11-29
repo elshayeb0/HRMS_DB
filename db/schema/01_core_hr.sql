@@ -11,6 +11,23 @@
 
 USE HRMS_DB;
 GO
+
+CREATE TABLE Position (
+    position_id INT IDENTITY(1,1) PRIMARY KEY,
+    position_title VARCHAR(150) NOT NULL,
+    responsibilities VARCHAR(400),
+    status VARCHAR(30) DEFAULT 'Active'
+);
+GO
+
+CREATE TABLE Department (
+    department_id INT IDENTITY(1,1) PRIMARY KEY,
+    department_name VARCHAR(80) NOT NULL,
+    purpose VARCHAR(400),
+    department_head_id INT NULL
+);
+GO
+
 CREATE TABLE Employee (
     employee_id INT IDENTITY(1,1) PRIMARY KEY,
     first_name VARCHAR(30),
@@ -42,12 +59,12 @@ CREATE TABLE Employee (
     pay_grade INT,
     FOREIGN KEY (department_id) REFERENCES Department(department_id),
     FOREIGN KEY (position_id) REFERENCES Position(position_id),
-    FOREIGN KEY (manager_id) REFERENCES Employee(employee_id),
-    FOREIGN KEY (contract_id) REFERENCES Contract(contract_id),
-    FOREIGN KEY (tax_form_id) REFERENCES TaxForm(tax_form_id),
-    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id),
-    FOREIGN KEY (pay_grade) REFERENCES PayGrade(pay_grade_id)
+    FOREIGN KEY (manager_id) REFERENCES Employee(employee_id)
 );
+GO
+
+ALTER TABLE Department
+ADD CONSTRAINT FK_Department_Head FOREIGN KEY (department_head_id) REFERENCES Employee(employee_id);
 GO
 
 CREATE TABLE HRAdministrator (
@@ -65,22 +82,6 @@ CREATE TABLE SystemAdministrator (
     configurable_fields VARCHAR(MAX),
     audit_visibility_scope VARCHAR(100),
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
-);
-GO
-
-CREATE TABLE Position (
-    position_id INT IDENTITY(1,1) PRIMARY KEY,
-    position_title VARCHAR(150) NOT NULL,
-    responsibilities VARCHAR(400),
-    status VARCHAR(30) DEFAULT 'Active'
-);
-GO
-CREATE TABLE Department (
-    department_id INT IDENTITY(1,1) PRIMARY KEY,
-    department_name VARCHAR(80) NOT NULL,
-    purpose VARCHAR(400),
-    department_head_id INT NULL
-    FOREIGN KEY (department_head_id) REFERENCES Employee(employee_id)
 );
 GO
 
@@ -110,7 +111,6 @@ CREATE TABLE Employee_Role (
 );
 GO
 
-
 CREATE TABLE EmployeeHierarchy (
     employee_id INT,
     manager_id INT,
@@ -137,7 +137,6 @@ CREATE TABLE LineManager (
 );
 GO
 
-
 CREATE TABLE Employee_Skill (
     employee_id INT,
     skill_id INT,
@@ -146,4 +145,4 @@ CREATE TABLE Employee_Skill (
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
     FOREIGN KEY (skill_id) REFERENCES Skill(skill_id)
 );
-
+GO

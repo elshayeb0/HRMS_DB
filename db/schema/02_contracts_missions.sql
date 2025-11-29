@@ -21,6 +21,10 @@ CREATE TABLE Contract (
 );
 GO
 
+ALTER TABLE Employee
+ADD CONSTRAINT FK_Employee_Contract FOREIGN KEY (contract_id) REFERENCES Contract(contract_id);
+GO
+
 CREATE TABLE FullTimeContract (
     contract_id INT PRIMARY KEY,
     leave_entitlement INT,

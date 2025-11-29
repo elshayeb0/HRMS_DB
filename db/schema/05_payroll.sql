@@ -30,13 +30,26 @@ CREATE TABLE Payroll (
 GO
 
 
+CREATE TABLE Currency (
+    CurrencyCode VARCHAR(11) PRIMARY KEY,
+    CurrencyName VARCHAR(65) NOT NULL UNIQUE,
+    ExchangeRate DECIMAL(13,5) NOT NULL,
+    CreatedDate DATETIME DEFAULT GETDATE(),
+    LastUpdated DATETIME DEFAULT GETDATE()
+);
+GO
+
 CREATE TABLE SalaryType (
     salary_type_id INT IDENTITY(1,1) PRIMARY KEY,
     type VARCHAR(40) NOT NULL,
     payment_frequency VARCHAR(60),
     currency VARCHAR(20),
-    FOREIGN KEY (currency) REFERENCES Currency(CurrencyCode)
+    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName)
 );
+GO
+
+ALTER TABLE Employee
+ADD CONSTRAINT FK_Employee_SalaryType FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id);
 GO
 
 CREATE TABLE HourlySalaryType (
@@ -65,15 +78,6 @@ CREATE TABLE ContractSalaryType (
 );
 GO
 
-CREATE TABLE Currency (
-    CurrencyCode VARCHAR(11) PRIMARY KEY,
-    CurrencyName VARCHAR(65) NOT NULL,
-    ExchangeRate DECIMAL(13,5) NOT NULL,
-    CreatedDate DATETIME DEFAULT GETDATE(),
-    LastUpdated DATETIME DEFAULT GETDATE()
-);
-GO
-
 CREATE TABLE AllowanceDeduction (
     ad_id INT IDENTITY(1,1) PRIMARY KEY,
     payroll_id INT,
@@ -85,7 +89,7 @@ CREATE TABLE AllowanceDeduction (
     timezone VARCHAR(60),
     FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id),
     FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
-    FOREIGN KEY (currency) REFERENCES Currency(CurrencyCode)
+    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName)
 );
 GO
 
@@ -170,12 +174,20 @@ CREATE TABLE TaxForm (
 );
 GO
 
+ALTER TABLE Employee
+ADD CONSTRAINT FK_Employee_TaxForm FOREIGN KEY (tax_form_id) REFERENCES TaxForm(tax_form_id);
+GO
+
 CREATE TABLE PayGrade (
     pay_grade_id INT IDENTITY(1,1) PRIMARY KEY,
     grade_name VARCHAR(60) NOT NULL,
     min_salary DECIMAL(11,3),
     max_salary DECIMAL(11,3)
 );
+GO
+
+ALTER TABLE Employee
+ADD CONSTRAINT FK_Employee_PayGrade FOREIGN KEY (pay_grade) REFERENCES PayGrade(pay_grade_id);
 GO
 
 CREATE TABLE PayrollSpecialist (
