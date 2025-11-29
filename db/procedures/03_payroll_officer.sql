@@ -37,16 +37,20 @@ GO
 CREATE PROCEDURE AdjustPayrollItem
     @PayrollID INT,
     @Type VARCHAR(50),
-    @Amount DECIMAL(10,2)
+    @Amount DECIMAL(10,2),
+    @duration INT,
+    @timezone VARCHAR(20)
 AS
 BEGIN
-    UPDATE Payroll
-    SET adjustments = ISNULL(adjustments,0) + @Amount
+    INSERT INTO AllowanceDeduction (payroll_id, employee_id, type, amount, currency, duration, timezone)
+    SELECT payroll_id, employee_id, @Type, @Amount, 'EGP', @duration, @timezone
+    FROM Payroll
     WHERE payroll_id = @PayrollID;
 
-    PRINT 'Payroll item adjusted successfully' ;
+    PRINT 'Payroll item adjusted successfully';
 END;
 GO
+
 
 
 
