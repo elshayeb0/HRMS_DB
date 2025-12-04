@@ -14,10 +14,10 @@ INSERT INTO Payroll (employee_id, taxes, period_start, period_end, base_amount, 
 
 -- Allowances and deductions tied to payroll lines.
 INSERT INTO AllowanceDeduction (payroll_id, employee_id, type, amount, currency, duration, timezone) VALUES
-(1, 1, 'Allowance', 1000.000, 'USD', 30, 'EST'),
-(2, 2, 'Allowance', 500.000, 'USD', 30, 'EST'),
-(5, 5, 'Allowance', 200.000, 'USD', 30, 'PST'),
-(5, 5, 'Deduction', 50.000, 'USD', 30, 'PST');
+(1, 1, 'Allowance', 1000.000, 'US Dollar', 30, 'EST'),
+(2, 2, 'Allowance', 500.000, 'US Dollar', 30, 'EST'),
+(5, 5, 'Allowance', 200.000, 'US Dollar', 30, 'PST'),
+(5, 5, 'Deduction', 50.000, 'US Dollar', 30, 'PST');
 
 -- Payroll policy headers.
 INSERT INTO PayrollPolicy (effective_date, type, description) VALUES
@@ -37,11 +37,10 @@ INSERT INTO LatenessPolicy (policy_id, grace_period_mins, deduction_rate) VALUES
 -- Bonus policy definitions.
 INSERT INTO BonusPolicy (policy_id, bonus_type, eligibility_criteria, amount)
 VALUES
-    (1, 'Performance Bonus', 'Employees with performance rating above 4.0', 5000.00),
-    (2, 'Annual Bonus', 'All full-time employees with 1+ year service', 3000.00),
-    (3, 'Project Completion Bonus', 'Team members who complete projects on time', 2500.00),
-    (4, 'Referral Bonus', 'Employees who refer successful hires', 1000.00),
-    (5, 'Holiday Bonus', 'All active employees during holiday season', 1500.00);
+(1, 'Performance Bonus', 'Employees with performance rating above 4.0', 5000.00),
+(2, 'Annual Bonus', 'All full-time employees with 1+ year service', 3000.00),
+(3, 'Project Completion Bonus', 'Team members who complete projects on time', 2500.00),
+(4, 'Referral Bonus', 'Employees who refer successful hires', 1000.00);
 
 
 -- Deduction policy definition.
@@ -81,11 +80,11 @@ INSERT INTO Termination (date, reason, contract_id) VALUES
 -- Note: Assumes Employee table already has these employee_ids
 INSERT INTO PayrollSpecialist (employee_id, assigned_region, processing_frequency, last_processed_period)
 VALUES
-    (101, 'North America', 'Bi-Weekly', '2024-11-15'),
-    (102, 'Europe', 'Monthly', '2024-11-01'),
-    (103, 'Asia Pacific', 'Bi-Weekly', '2024-11-15'),
-    (104, 'Latin America', 'Weekly', '2024-11-18'),
-    (105, 'Middle East', 'Monthly', '2024-11-01');
+    (1, 'North America', 'Bi-Weekly', '2024-11-15'),
+    (2, 'Europe', 'Monthly', '2024-11-01'),
+    (3, 'Asia Pacific', 'Bi-Weekly', '2024-11-15'),
+    (4, 'Latin America', 'Weekly', '2024-11-18'),
+    (5, 'Middle East', 'Monthly', '2024-11-01');
 GO
 
 -- Insert ApprovalWorkflows
@@ -105,30 +104,30 @@ GO
 INSERT INTO ApprovalWorkflowStep (workflow_id, step_number, role_id, action_required)
 VALUES
     -- Expense Reimbursement workflow (workflow_id = 1)
-    (1, 1, 201, 'Review expense report and receipts'),
-    (1, 2, 202, 'Verify budget availability'),
-    (1, 3, 203, 'Final approval and process payment'),
+    (1, 1, 3, 'Review expense report and receipts'),
+    (1, 2, 2, 'Verify budget availability'),
+    (1, 3, 5, 'Final approval and process payment'),
 
     -- Purchase Order workflow (workflow_id = 2)
-    (2, 1, 204, 'Review purchase requisition'),
-    (2, 2, 205, 'Approve vendor selection'),
-    (2, 3, 206, 'Authorize purchase order'),
+    (2, 1, 3, 'Review purchase requisition'),
+    (2, 2, 2, 'Approve vendor selection'),
+    (2, 3, 1, 'Authorize purchase order'),
 
     -- Budget Approval workflow (workflow_id = 3)
-    (3, 1, 207, 'Review budget proposal'),
-    (3, 2, 208, 'Financial analysis and recommendation'),
-    (3, 3, 209, 'Executive approval'),
+    (3, 1, 3, 'Review budget proposal'),
+    (3, 2, 2, 'Financial analysis and recommendation'),
+    (3, 3, 1, 'Executive approval'),
 
     -- Payroll Adjustment workflow (workflow_id = 4)
-    (4, 1, 210, 'Verify adjustment request'),
-    (4, 2, 211, 'HR approval'),
+    (4, 1, 5, 'Verify adjustment request'),
+    (4, 2, 2, 'HR approval'),
 
     -- Vendor Payment workflow (workflow_id = 5)
-    (5, 1, 212, 'Verify invoice and delivery'),
-    (5, 2, 213, 'Approve payment'),
+    (5, 1, 2, 'Verify invoice and delivery'),
+    (5, 2, 3, 'Approve payment'),
 
     -- Contract Approval workflow (workflow_id = 6)
-    (6, 1, 214, 'Legal review of contract terms'),
-    (6, 2, 215, 'Financial impact assessment'),
-    (6, 3, 216, 'Executive sign-off');
+    (6, 1, 6, 'Legal review of contract terms'),
+    (6, 2, 2, 'Financial impact assessment'),
+    (6, 3, 1, 'Executive sign-off');
 GO
