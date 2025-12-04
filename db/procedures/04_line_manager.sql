@@ -2,7 +2,7 @@ USE HRMS_DB;
 GO
 
 -------------------------------------------------------------
--- 1) ReviewLeaveRequest
+-- 1) ReviewLeaveRequest: Approve or reject a leave request and record manager notes.
 -------------------------------------------------------------
 CREATE PROCEDURE ReviewLeaveRequest
     @LeaveRequestID INT,
@@ -30,7 +30,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 2) AssignShift
+-- 2) AssignShift: Assign a shift to an employee starting today and mark it assigned.
 -------------------------------------------------------------
 CREATE PROCEDURE AssignShift
     @EmployeeID INT,
@@ -53,7 +53,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 3) ViewTeamAttendance
+-- 3) ViewTeamAttendance: View attendance records for direct reports in a date range.
 -------------------------------------------------------------
 CREATE PROCEDURE ViewTeamAttendance
     @ManagerID INT,
@@ -87,7 +87,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 4) SendTeamNotification
+-- 4) SendTeamNotification: Push a notification from a manager to their team.
 -------------------------------------------------------------
 CREATE PROCEDURE SendTeamNotification
     @ManagerID INT,
@@ -116,7 +116,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 5) ApproveMissionCompletion
+-- 5) ApproveMissionCompletion: Mark a mission as completed and log manager remarks.
 -------------------------------------------------------------
 CREATE PROCEDURE ApproveMissionCompletion
     @MissionID INT,
@@ -143,7 +143,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 6) RequestReplacement
+-- 6) RequestReplacement: Log a manager request to replace an employee.
 -------------------------------------------------------------
 CREATE PROCEDURE RequestReplacement
     @EmployeeID INT,
@@ -165,7 +165,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 7) ViewDepartmentSummary
+-- 7) ViewDepartmentSummary: Summarize headcount and active missions for a department.
 -------------------------------------------------------------
 CREATE PROCEDURE ViewDepartmentSummary
     @DepartmentID INT
@@ -192,7 +192,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 8) ReassignShift
+-- 8) ReassignShift: Move an employee from one shift assignment to another.
 -------------------------------------------------------------
 CREATE PROCEDURE ReassignShift
     @EmployeeID INT,
@@ -213,7 +213,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 9) GetPendingLeaveRequests
+-- 9) GetPendingLeaveRequests: List pending leave requests for a manager's team.
 -------------------------------------------------------------
 CREATE PROCEDURE GetPendingLeaveRequests
     @ManagerID INT
@@ -243,7 +243,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 10) GetTeamStatistics
+-- 10) GetTeamStatistics: Return team size and average salary metrics for a manager.
 -------------------------------------------------------------
 CREATE PROCEDURE GetTeamStatistics
     @ManagerID INT
@@ -264,7 +264,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 11) ViewTeamProfiles
+-- 11) ViewTeamProfiles: List employment details for team members.
 -------------------------------------------------------------
 CREATE PROCEDURE ViewTeamProfiles
     @ManagerID INT
@@ -287,7 +287,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 12) GetTeamSummary
+-- 12) GetTeamSummary: Summarize team counts by position and department with tenure.
 -------------------------------------------------------------
 CREATE PROCEDURE GetTeamSummary
     @ManagerID INT
@@ -309,7 +309,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 13) FilterTeamProfiles
+-- 13) FilterTeamProfiles: Filter team members by skill or role.
 -------------------------------------------------------------
 CREATE PROCEDURE FilterTeamProfiles
     @ManagerID INT,
@@ -341,7 +341,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 14) ViewTeamCertifications
+-- 14) ViewTeamCertifications: Show skills and verifications for team members.
 -------------------------------------------------------------
 CREATE PROCEDURE ViewTeamCertifications
     @ManagerID INT
@@ -373,7 +373,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 15) AddManagerNotes
+-- 15) AddManagerNotes: Add a managerial note about an employee.
 -------------------------------------------------------------
 CREATE PROCEDURE AddManagerNotes
     @EmployeeID INT,
@@ -391,7 +391,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 16) RecordManualAttendance
+-- 16) RecordManualAttendance: Capture manual clock-in/out with justification.
 -------------------------------------------------------------
 CREATE PROCEDURE RecordManualAttendance
     @EmployeeID INT,
@@ -445,7 +445,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 17) ReviewMissedPunches
+-- 17) ReviewMissedPunches: List missed punch exceptions for a given date.
 -------------------------------------------------------------
 CREATE PROCEDURE ReviewMissedPunches
     @ManagerID INT,
@@ -476,7 +476,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 18) ApproveTimeRequest
+-- 18) ApproveTimeRequest: Process an attendance correction request.
 -------------------------------------------------------------
 CREATE PROCEDURE ApproveTimeRequest
     @RequestID INT,
@@ -499,7 +499,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 19) ViewLeaveRequest
+-- 19) ViewLeaveRequest: Retrieve a specific leave request for a manager.
 -------------------------------------------------------------
 CREATE PROCEDURE ViewLeaveRequest
     @LeaveRequestID INT,
@@ -529,7 +529,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 20) ApproveLeaveRequest (Line Manager)
+-- 20) ApproveLeaveRequest (Line Manager): Approve a leave request and log manager note.
 -------------------------------------------------------------
 CREATE PROCEDURE ApproveLeaveRequestt
     @LeaveRequestID INT,
@@ -557,7 +557,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 21) RejectLeaveRequest
+-- 21) RejectLeaveRequest: Reject a leave request with a reason and note.
 -------------------------------------------------------------
 CREATE PROCEDURE RejectLeaveRequest
     @LeaveRequestID INT,
@@ -590,7 +590,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 22) DelegateLeaveApproval
+-- 22) DelegateLeaveApproval: Log delegation of leave approval to another manager.
 -------------------------------------------------------------
 CREATE PROCEDURE DelegateLeaveApproval
     @ManagerID INT,
@@ -617,7 +617,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 23) FlagIrregularLeave
+-- 23) FlagIrregularLeave: Record irregular leave patterns for follow-up.
 -------------------------------------------------------------
 CREATE PROCEDURE FlagIrregularLeave
     @EmployeeID INT,
@@ -635,7 +635,7 @@ END;
 GO
 
 -------------------------------------------------------------
--- 24) NotifyNewLeaveRequest
+-- 24) NotifyNewLeaveRequest: Notify a manager about a newly assigned leave request.
 -------------------------------------------------------------
 CREATE OR ALTER PROCEDURE NotifyNewLeaveRequest
     @ManagerID INT,

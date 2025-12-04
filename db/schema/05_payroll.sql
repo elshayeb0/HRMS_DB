@@ -1,190 +1,189 @@
-
-
+-- Payroll schema: payroll records, salary types, policies, and related entities.
 USE HRMS_DB;
 GO
 
-CREATE TABLE Payroll (
-    payroll_id INT IDENTITY(1,1) PRIMARY KEY,
-    employee_id INT,
-    taxes DECIMAL(11,3),
-    period_start DATE,
-    period_end DATE,
-    base_amount DECIMAL(11,3),
-    adjustments DECIMAL(11,3),
-    contributions DECIMAL(11,3),
-    actual_pay DECIMAL(11,3),
-    net_salary DECIMAL(11,3),
-    payment_date DATE,
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
+CREATE TABLE Payroll ( -- payroll run per employee per period
+    payroll_id INT IDENTITY(1,1) PRIMARY KEY, -- unique payroll record
+    employee_id INT, -- FK to employee being paid
+    taxes DECIMAL(11,3), -- tax amount for the period
+    period_start DATE, -- start date of payroll period
+    period_end DATE, -- end date of payroll period
+    base_amount DECIMAL(11,3), -- base salary before adjustments
+    adjustments DECIMAL(11,3), -- manual adjustments applied
+    contributions DECIMAL(11,3), -- employer/employee contributions
+    actual_pay DECIMAL(11,3), -- gross pay after adjustments
+    net_salary DECIMAL(11,3), -- net salary after deductions
+    payment_date DATE, -- date payment issued
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) -- enforce employee existence
 );
-GO
+GO -- complete Payroll definition
 
 
-CREATE TABLE Currency (
-    CurrencyCode VARCHAR(11) PRIMARY KEY,
-    CurrencyName VARCHAR(65) NOT NULL UNIQUE,
-    ExchangeRate DECIMAL(13,5) NOT NULL,
-    CreatedDate DATETIME DEFAULT GETDATE(),
-    LastUpdated DATETIME DEFAULT GETDATE()
+CREATE TABLE Currency ( -- supported currencies
+    CurrencyCode VARCHAR(11) PRIMARY KEY, -- ISO or custom code
+    CurrencyName VARCHAR(65) NOT NULL UNIQUE, -- descriptive currency name
+    ExchangeRate DECIMAL(13,5) NOT NULL, -- exchange rate to base currency
+    CreatedDate DATETIME DEFAULT GETDATE(), -- timestamp of creation
+    LastUpdated DATETIME DEFAULT GETDATE() -- last update timestamp
 );
-GO
+GO -- complete Currency definition
 
-CREATE TABLE SalaryType (
-    salary_type_id INT IDENTITY(1,1) PRIMARY KEY,
-    type VARCHAR(40) NOT NULL,
-    payment_frequency VARCHAR(60),
-    currency VARCHAR(65),
-    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName)
+CREATE TABLE SalaryType ( -- salary payment archetypes
+    salary_type_id INT IDENTITY(1,1) PRIMARY KEY, -- unique salary type id
+    type VARCHAR(40) NOT NULL, -- type label (Hourly/Monthly/Contract)
+    payment_frequency VARCHAR(60), -- pay cadence descriptor
+    currency VARCHAR(65), -- FK to CurrencyName
+    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName) -- enforce currency existence
 );
-GO
+GO -- complete SalaryType definition
 
-ALTER TABLE Employee
+ALTER TABLE Employee -- attach salary type to employee
 ADD CONSTRAINT FK_Employee_SalaryType FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id);
-GO
+GO -- finalize Employee alteration
 
-CREATE TABLE HourlySalaryType (
-    salary_type_id INT PRIMARY KEY,
-    hourly_rate DECIMAL(11,3),
-    max_monthly_hours INT,
-    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id)
+CREATE TABLE HourlySalaryType ( -- details for hourly salary types
+    salary_type_id INT PRIMARY KEY, -- PK/FK to SalaryType
+    hourly_rate DECIMAL(11,3), -- wage per hour
+    max_monthly_hours INT, -- maximum hours per month
+    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id) -- enforce salary type existence
 );
-GO
+GO -- complete HourlySalaryType definition
 
-CREATE TABLE MonthlySalaryType (
-    salary_type_id INT PRIMARY KEY,
-    tax_rule VARCHAR(150),
-    contribution_scheme VARCHAR(150),
-    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id)
+CREATE TABLE MonthlySalaryType ( -- details for monthly salary types
+    salary_type_id INT PRIMARY KEY, -- PK/FK to SalaryType
+    tax_rule VARCHAR(150), -- tax rule applied
+    contribution_scheme VARCHAR(150), -- benefits or pension scheme
+    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id) -- enforce salary type existence
 );
-GO
+GO -- complete MonthlySalaryType definition
 
 
 
-CREATE TABLE ContractSalaryType (
-    salary_type_id INT PRIMARY KEY,
-    contract_value DECIMAL(11,3),
-    installment_details VARCHAR(505),
-    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id)
+CREATE TABLE ContractSalaryType ( -- details for contract-based pay
+    salary_type_id INT PRIMARY KEY, -- PK/FK to SalaryType
+    contract_value DECIMAL(11,3), -- total contract value
+    installment_details VARCHAR(505), -- payment schedule details
+    FOREIGN KEY (salary_type_id) REFERENCES SalaryType(salary_type_id) -- enforce salary type existence
 );
-GO
+GO -- complete ContractSalaryType definition
 
-CREATE TABLE AllowanceDeduction (
-    ad_id INT IDENTITY(1,1) PRIMARY KEY,
-    payroll_id INT,
-    employee_id INT,
-    type VARCHAR(60),
-    amount DECIMAL(11,3),
-    currency VARCHAR(65),
-    duration INT,
-    timezone VARCHAR(60),
-    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id),
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
-    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName)
+CREATE TABLE AllowanceDeduction ( -- allowances and deductions tied to payroll
+    ad_id INT IDENTITY(1,1) PRIMARY KEY, -- unique allowance/deduction id
+    payroll_id INT, -- FK to Payroll
+    employee_id INT, -- FK to Employee
+    type VARCHAR(60), -- type (allowance or deduction)
+    amount DECIMAL(11,3), -- monetary value
+    currency VARCHAR(65), -- FK to CurrencyName
+    duration INT, -- applicable duration (e.g., months)
+    timezone VARCHAR(60), -- timezone context for timing rules
+    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id), -- enforce payroll existence
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id), -- enforce employee existence
+    FOREIGN KEY (currency) REFERENCES Currency(CurrencyName) -- enforce currency existence
 );
-GO
+GO -- complete AllowanceDeduction definition
 
 
-CREATE TABLE PayrollPolicy (
-    policy_id INT IDENTITY(1,1) PRIMARY KEY,
-    effective_date DATE,
-    type VARCHAR(50),
-    description VARCHAR(MAX)
+CREATE TABLE PayrollPolicy ( -- overarching payroll policies
+    policy_id INT IDENTITY(1,1) PRIMARY KEY, -- unique policy id
+    effective_date DATE, -- date policy starts
+    type VARCHAR(50), -- policy type/category
+    description VARCHAR(MAX) -- explanation of policy
 );
-GO
+GO -- complete PayrollPolicy definition
 
-CREATE TABLE OvertimePolicy (
-    policy_id INT PRIMARY KEY,
-    weekday_rate_multiplier DECIMAL(3,2),
-    weekend_rate_multiplier DECIMAL(3,2),
-    max_hours_per_month INT,
-    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
+CREATE TABLE OvertimePolicy ( -- overtime-specific rules
+    policy_id INT PRIMARY KEY, -- PK/FK to PayrollPolicy
+    weekday_rate_multiplier DECIMAL(3,2), -- overtime multiplier on weekdays
+    weekend_rate_multiplier DECIMAL(3,2), -- overtime multiplier on weekends
+    max_hours_per_month INT, -- cap on overtime hours
+    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id) -- enforce policy existence
 );
-GO
+GO -- complete OvertimePolicy definition
 
-CREATE TABLE LatenessPolicy (
-    policy_id INT PRIMARY KEY,
-    grace_period_mins INT,
-    deduction_rate DECIMAL(6,2),
-    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
+CREATE TABLE LatenessPolicy ( -- lateness penalties
+    policy_id INT PRIMARY KEY, -- PK/FK to PayrollPolicy
+    grace_period_mins INT, -- allowed minutes late before penalty
+    deduction_rate DECIMAL(6,2), -- deduction applied for lateness
+    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id) -- enforce policy existence
 );
-GO
+GO -- complete LatenessPolicy definition
 
-CREATE TABLE BonusPolicy (
-    policy_id INT PRIMARY KEY,
-    bonus_type VARCHAR(60),
-    eligibility_criteria VARCHAR(MAX),
-    amount DECIMAL(10,2),
-    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
+CREATE TABLE BonusPolicy ( -- rules for bonuses
+    policy_id INT PRIMARY KEY, -- PK/FK to PayrollPolicy
+    bonus_type VARCHAR(60), -- type of bonus
+    eligibility_criteria VARCHAR(MAX), -- who qualifies
+    amount DECIMAL(10,2), -- bonus amount or rate
+    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id) -- enforce policy existence
 );
-GO
+GO -- complete BonusPolicy definition
 
-CREATE TABLE DeductionPolicy (
-    policy_id INT PRIMARY KEY,
-    deduction_reason VARCHAR(150),
-    calculation_mode VARCHAR(60),
-    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
+CREATE TABLE DeductionPolicy ( -- rules for deductions
+    policy_id INT PRIMARY KEY, -- PK/FK to PayrollPolicy
+    deduction_reason VARCHAR(150), -- reason for deduction
+    calculation_mode VARCHAR(60), -- how deduction is calculated
+    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id) -- enforce policy existence
 );
-GO
+GO -- complete DeductionPolicy definition
 
-CREATE TABLE PayrollPolicy_ID (
-    payroll_id INT,
-    policy_id INT,
-    PRIMARY KEY (payroll_id, policy_id),
-    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id),
-    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id)
+CREATE TABLE PayrollPolicy_ID ( -- link payroll runs to policies
+    payroll_id INT, -- FK to Payroll
+    policy_id INT, -- FK to PayrollPolicy
+    PRIMARY KEY (payroll_id, policy_id), -- composite PK prevents duplicates
+    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id), -- enforce payroll existence
+    FOREIGN KEY (policy_id) REFERENCES PayrollPolicy(policy_id) -- enforce policy existence
 );
-GO
+GO -- complete PayrollPolicy_ID definition
 
-CREATE TABLE Payroll_Log (
-    payroll_log_id INT IDENTITY(1,1) PRIMARY KEY,
-    payroll_id INT,
-    actor INT,
-    change_date DATETIME,
-    modification_type VARCHAR(50),
-    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id)
+CREATE TABLE Payroll_Log ( -- audit trail for payroll changes
+    payroll_log_id INT IDENTITY(1,1) PRIMARY KEY, -- unique log entry id
+    payroll_id INT, -- FK to Payroll
+    actor INT, -- identifier of user making change
+    change_date DATETIME, -- timestamp of change
+    modification_type VARCHAR(50), -- type of modification
+    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id) -- enforce payroll existence
 );
-GO
+GO -- complete Payroll_Log definition
 
-CREATE TABLE PayrollPeriod (
-    payroll_period_id INT IDENTITY(1,1) PRIMARY KEY,
-    payroll_id INT,
-    start_date DATE,
-    end_date DATE,
-    status VARCHAR(50),
-    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id)
+CREATE TABLE PayrollPeriod ( -- payroll period master
+    payroll_period_id INT IDENTITY(1,1) PRIMARY KEY, -- unique period id
+    payroll_id INT, -- FK to Payroll
+    start_date DATE, -- start date of period
+    end_date DATE, -- end date of period
+    status VARCHAR(50), -- status of the period
+    FOREIGN KEY (payroll_id) REFERENCES Payroll(payroll_id) -- enforce payroll existence
 );
-GO
+GO -- complete PayrollPeriod definition
 
 
-CREATE TABLE TaxForm (
-    tax_form_id INT IDENTITY(1,1) PRIMARY KEY,
-    jurisdiction VARCHAR(150),
-    validity_period INT,
-    form_content VARCHAR(MAX)
+CREATE TABLE TaxForm ( -- tax forms available to employees
+    tax_form_id INT IDENTITY(1,1) PRIMARY KEY, -- unique tax form id
+    jurisdiction VARCHAR(150), -- jurisdiction of the form
+    validity_period INT, -- days of validity
+    form_content VARCHAR(MAX) -- description or serialized form template
 );
-GO
+GO -- complete TaxForm definition
 
-ALTER TABLE Employee
+ALTER TABLE Employee -- attach tax form FK
 ADD CONSTRAINT FK_Employee_TaxForm FOREIGN KEY (tax_form_id) REFERENCES TaxForm(tax_form_id);
-GO
+GO -- finalize Employee alteration for tax forms
 
-CREATE TABLE PayGrade (
-    pay_grade_id INT IDENTITY(1,1) PRIMARY KEY,
-    grade_name VARCHAR(60) NOT NULL,
-    min_salary DECIMAL(11,3),
-    max_salary DECIMAL(11,3)
+CREATE TABLE PayGrade ( -- pay grade ladder
+    pay_grade_id INT IDENTITY(1,1) PRIMARY KEY, -- unique pay grade id
+    grade_name VARCHAR(60) NOT NULL, -- grade label
+    min_salary DECIMAL(11,3), -- lower salary bound
+    max_salary DECIMAL(11,3) -- upper salary bound
 );
-GO
+GO -- complete PayGrade definition
 
-ALTER TABLE Employee
+ALTER TABLE Employee -- attach pay grade FK
 ADD CONSTRAINT FK_Employee_PayGrade FOREIGN KEY (pay_grade) REFERENCES PayGrade(pay_grade_id);
-GO
+GO -- finalize Employee alteration for pay grade
 
-CREATE TABLE PayrollSpecialist (
-    employee_id INT PRIMARY KEY,
-    assigned_region VARCHAR(100),
-    processing_frequency VARCHAR(50),
-    last_processed_period DATE,
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id)
+CREATE TABLE PayrollSpecialist ( -- payroll specialist assignments
+    employee_id INT PRIMARY KEY, -- FK/PK to employee fulfilling role
+    assigned_region VARCHAR(100), -- region handled
+    processing_frequency VARCHAR(50), -- cadence of processing
+    last_processed_period DATE, -- last period processed
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id) -- enforce employee existence
 );
-GO
+GO -- complete PayrollSpecialist definition

@@ -1,88 +1,96 @@
-
-
+-- Leave management schema: leave types, policies, requests, and supporting documents.
 USE HRMS_DB;
 GO
 
-CREATE TABLE Leave (
-    leave_id INT IDENTITY(1,1) PRIMARY KEY,
-    leave_type VARCHAR(60) NOT NULL,
-    leave_description VARCHAR(480)
+-- Base leave types.
+CREATE TABLE Leave ( -- master leave types
+    leave_id INT IDENTITY(1,1) PRIMARY KEY, -- unique leave type id
+    leave_type VARCHAR(60) NOT NULL, -- display name of the leave type
+    leave_description VARCHAR(480) -- description of when to use it
 );
-GO
+GO -- complete Leave definition
 
-CREATE TABLE VacationLeave (
-    leave_id INT PRIMARY KEY,
-    carry_over_days INT,
-    approving_manager INT,
-    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id)
+-- Vacation-specific attributes.
+CREATE TABLE VacationLeave ( -- attributes attached to vacation leave
+    leave_id INT PRIMARY KEY, -- PK/FK to Leave
+    carry_over_days INT, -- allowed carry-over days
+    approving_manager INT, -- manager responsible for approval
+    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete VacationLeave definition
 
-CREATE TABLE SickLeave (
-    leave_id INT PRIMARY KEY,
-    medical_cert_required BIT,
-    physician_id INT,
-    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id)
+-- Sick leave with medical documentation requirements.
+CREATE TABLE SickLeave ( -- sick leave specialization
+    leave_id INT PRIMARY KEY, -- PK/FK to Leave
+    medical_cert_required BIT, -- flag for required medical certificate
+    physician_id INT, -- optional physician reference
+    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete SickLeave definition
 
 
-CREATE TABLE ProbationLeave (
-    leave_id INT PRIMARY KEY,
-    eligibility_start_date DATE,
-    probation_period INT,
-    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id)
+-- Probation leave eligibility window.
+CREATE TABLE ProbationLeave ( -- probationary leave specialization
+    leave_id INT PRIMARY KEY, -- PK/FK to Leave
+    eligibility_start_date DATE, -- eligibility start date
+    probation_period INT, -- length of probation in days or months
+    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete ProbationLeave definition
 
-CREATE TABLE HolidayLeave (
-    leave_id INT PRIMARY KEY,
-    holiday_name VARCHAR(90),
-    official_recognition BIT,
-    regional_scope VARCHAR(89),
-    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id)
+-- Holiday leave tied to recognized occasions.
+CREATE TABLE HolidayLeave ( -- holiday leave specialization
+    leave_id INT PRIMARY KEY, -- PK/FK to Leave
+    holiday_name VARCHAR(90), -- referenced holiday name
+    official_recognition BIT, -- whether officially recognized
+    regional_scope VARCHAR(89), -- region where holiday applies
+    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete HolidayLeave definition
 
-CREATE TABLE LeavePolicy (
-    policy_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(100),
-    purpose VARCHAR(500),
-    eligibility_rules VARCHAR(500),
-    notice_period INT,
-    special_leave_type VARCHAR(50),
-    reset_on_new_year BIT
+-- Policy definitions that govern leave usage.
+CREATE TABLE LeavePolicy ( -- policy metadata
+    policy_id INT IDENTITY(1,1) PRIMARY KEY, -- unique policy id
+    name VARCHAR(100), -- policy name
+    purpose VARCHAR(500), -- policy rationale
+    eligibility_rules VARCHAR(500), -- who is eligible
+    notice_period INT, -- required notice in days
+    special_leave_type VARCHAR(50), -- targeted leave type if any
+    reset_on_new_year BIT -- flag to reset entitlement yearly
 );
-GO
+GO -- complete LeavePolicy definition
 
-CREATE TABLE LeaveRequest (
-    request_id INT IDENTITY(1,1) PRIMARY KEY,
-    employee_id INT,
-    leave_id INT,
-    justification VARCHAR(700),
-    duration INT,
-    approval_timing DATETIME,
-    status VARCHAR(60) DEFAULT 'Pending',
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
-    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id)
+-- Requests submitted by employees against leave types.
+CREATE TABLE LeaveRequest ( -- employee leave requests
+    request_id INT IDENTITY(1,1) PRIMARY KEY, -- unique request id
+    employee_id INT, -- requesting employee FK
+    leave_id INT, -- requested leave type FK
+    justification VARCHAR(700), -- employee justification text
+    duration INT, -- requested duration
+    approval_timing DATETIME, -- date/time of approval decision
+    status VARCHAR(60) DEFAULT 'Pending', -- workflow status
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id), -- enforce employee existence
+    FOREIGN KEY (leave_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete LeaveRequest definition
 
-CREATE TABLE LeaveEntitlement (
-    employee_id INT,
-    leave_type_id INT,
-    entitlement DECIMAL(8,3),
-    PRIMARY KEY (employee_id, leave_type_id),
-    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id),
-    FOREIGN KEY (leave_type_id) REFERENCES Leave(leave_id)
+-- Annual leave entitlement balances by employee and leave type.
+CREATE TABLE LeaveEntitlement ( -- entitlement balances
+    employee_id INT, -- FK to employee
+    leave_type_id INT, -- FK to leave type
+    entitlement DECIMAL(8,3), -- available entitlement amount
+    PRIMARY KEY (employee_id, leave_type_id), -- composite PK per employee/type
+    FOREIGN KEY (employee_id) REFERENCES Employee(employee_id), -- enforce employee existence
+    FOREIGN KEY (leave_type_id) REFERENCES Leave(leave_id) -- enforce leave type existence
 );
-GO
+GO -- complete LeaveEntitlement definition
 
-CREATE TABLE LeaveDocument (
-    document_id INT IDENTITY(1,1) PRIMARY KEY,
-    leave_request_id INT,
-    file_path VARCHAR(255),
-    uploaded_at DATETIME DEFAULT GETDATE(),
-    FOREIGN KEY (leave_request_id) REFERENCES LeaveRequest(request_id)
+-- Uploaded documents attached to leave requests.
+CREATE TABLE LeaveDocument ( -- uploaded documentation for leave
+    document_id INT IDENTITY(1,1) PRIMARY KEY, -- unique document id
+    leave_request_id INT, -- FK to LeaveRequest
+    file_path VARCHAR(255), -- storage path for document
+    uploaded_at DATETIME DEFAULT GETDATE(), -- timestamp of upload
+    FOREIGN KEY (leave_request_id) REFERENCES LeaveRequest(request_id) -- enforce request existence
 );
-GO
+GO -- complete LeaveDocument definition

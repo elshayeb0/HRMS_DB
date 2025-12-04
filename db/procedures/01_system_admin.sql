@@ -1,7 +1,7 @@
 USE HRMS_DB;
 GO
 
- -- 1;
+-- 1. ViewEmployeeInfo: Return the full employee record for a given ID.
 
 CREATE PROCEDURE ViewEmployeeInfo
     @EmployeeID INT
@@ -13,7 +13,7 @@ BEGIN
 END;
 GO
 
- -- 2;
+-- 2. AddEmployee: Insert a new employee and return the generated ID.
 
 
 CREATE PROCEDURE AddEmployee
@@ -65,7 +65,7 @@ BEGIN
 END;
 GO
 
--- 3;
+-- 3. UpdateEmployeeInfo: Update contact details for an employee.
 
 CREATE PROCEDURE UpdateEmployeeInfo
     @EmployeeID INT,
@@ -84,7 +84,7 @@ BEGIN
 END;
 GO
 
--- 4;
+-- 4. AssignRole: Attach a role to an employee if not already assigned.
 
 CREATE PROCEDURE AssignRole
     @EmployeeID INT,
@@ -105,7 +105,7 @@ BEGIN
 END;
 GO
 
--- 5;
+-- 5. GetDepartmentEmployeeStats: Return employee counts per department.
 
 CREATE PROCEDURE GetDepartmentEmployeeStats
 AS
@@ -124,7 +124,7 @@ BEGIN
 END
 GO
 
--- 6;
+-- 6. ReassignManager: Update an employee's manager link.
 
 CREATE PROCEDURE ReassignManager
     @EmployeeID INT,
@@ -138,7 +138,7 @@ BEGIN
 END;
 GO
 
--- 7;
+-- 7. ReassignHierarchy: Change both department and manager for an employee.
 
 CREATE PROCEDURE ReassignHierarchy
     @EmployeeID INT,
@@ -155,7 +155,7 @@ BEGIN
 END;
 GO
 
--- 8;
+-- 8. NotifyStructureChange: Broadcast a structure-change notification to a list of employees.
 
 CREATE PROCEDURE NotifyStructureChange
     @AffectedEmployees VARCHAR(500),
@@ -181,7 +181,7 @@ BEGIN
 END
 GO
 
--- 9;
+-- 9. ViewOrgHierarchy: Display employees with manager, department, and position context.
 
 CREATE PROCEDURE ViewOrgHierarchy
 AS
@@ -202,7 +202,7 @@ BEGIN
 END
 GO
 
--- 10;
+-- 10. AssignShiftToEmployee: Assign an existing shift to a specific employee for a date range.
 
 CREATE PROCEDURE AssignShiftToEmployee
 @EmployeeID INT,
@@ -216,9 +216,9 @@ VALUES (@EmployeeID, @ShiftID, @StartDate, @EndDate);
 
 SELECT 'Shift assigned successfully' AS Message;
 END;
-go
+GO
 
--- 11;
+-- 11. UpdateShiftStatus: Update the status of a shift assignment.
 
 CREATE PROCEDURE UpdateShiftStatus
     @ShiftAssignmentID INT,
@@ -233,7 +233,7 @@ BEGIN
 END;
 GO
 
--- 12;
+-- 12. AssignShiftToDepartment: Assign one shift to every employee in a department.
 
 CREATE PROCEDURE AssignShiftToDepartment
     @DepartmentID INT,
@@ -251,7 +251,7 @@ BEGIN
 END;
 GO
 
--- 13;
+-- 13. AssignCustomShift: Create a shift and assign it to a single employee.
 
 CREATE PROCEDURE AssignCustomShift
     @EmployeeID INT,
@@ -277,7 +277,7 @@ BEGIN
 END;
 GO
 
--- 14;
+-- 14. ConfigureSplitShift: Create two back-to-back shift slots under one name.
 
 CREATE PROCEDURE ConfigureSplitShift
     @ShiftName VARCHAR(50),
@@ -297,7 +297,7 @@ BEGIN
 END;
 GO
 
--- 15;
+-- 15. EnableFirstInLastOut: Toggle messaging for first-in/last-out attendance handling.
 
 CREATE PROCEDURE EnableFirstInLastOut
     @Enable BIT
@@ -314,7 +314,7 @@ BEGIN
 END
 GO
 
--- 16;
+-- 16. TagAttendanceSource: Record where an attendance punch originated.
 
 CREATE PROCEDURE TagAttendanceSource
     @AttendanceID INT,
@@ -331,7 +331,7 @@ BEGIN
 END;
 GO
 
--- 17;
+-- 17. SyncOfflineAttendance: Insert offline punches and their capture source.
 
 CREATE PROCEDURE SyncOfflineAttendance
     @DeviceID INT,
@@ -350,7 +350,7 @@ BEGIN
 END;
 GO
 
--- 18;
+-- 18. LogAttendanceEdit: Record an attendance edit with before/after values.
 
 CREATE PROCEDURE LogAttendanceEdit
     @AttendanceID INT,
@@ -371,7 +371,7 @@ END
 GO
 
 
---19;
+-- 19. ApplyHolidayOverrides: Link an employee to a holiday exception entry.
 
 CREATE PROCEDURE ApplyHolidayOverrides
     @HolidayID INT,
@@ -385,7 +385,7 @@ BEGIN
 END
 GO
 
---20;
+-- 20. ManageUserAccounts: Add or remove a role for an employee account.
 
 CREATE PROCEDURE ManageUserAccounts
     @UserID INT,

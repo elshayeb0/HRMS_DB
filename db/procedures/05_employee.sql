@@ -1,7 +1,7 @@
 USE HRMS_DB;
 GO
 
--- 1) SubmitLeaveRequest
+-- 1) SubmitLeaveRequest: Create a pending leave request with calculated duration.
 CREATE PROCEDURE SubmitLeaveRequest
     @EmployeeID INT,
     @LeaveTypeID INT,
@@ -17,7 +17,7 @@ BEGIN
 END;
 GO
 
--- 2) GetLeaveBalance
+-- 2) GetLeaveBalance: Show remaining entitlement days per leave type.
 CREATE PROCEDURE GetLeaveBalance
     @EmployeeID INT
 AS
@@ -31,7 +31,7 @@ BEGIN
 END
 GO
 
--- 3) RecordAttendance
+-- 3) RecordAttendance: Insert a basic attendance entry for a shift.
 CREATE PROCEDURE RecordAttendance
     @EmployeeID INT,
     @ShiftID INT,
@@ -46,7 +46,7 @@ BEGIN
 END;
 GO
 
--- 4) SubmitReimbursement
+-- 4) SubmitReimbursement: Submit a reimbursement request with amount and type.
 CREATE PROCEDURE SubmitReimbursement
     @EmployeeID INT,
     @ExpenseType VARCHAR(50),
@@ -65,7 +65,7 @@ VALUES (
 END;
 GO
 
--- 5) AddEmployeeSkill
+-- 5) AddEmployeeSkill: Link an employee to an existing skill.
 CREATE PROCEDURE AddEmployeeSkill
     @EmployeeID INT,
     @SkillName VARCHAR(50)
@@ -84,7 +84,7 @@ BEGIN
 END;
 GO
 
--- 6) ViewAssignedShifts
+-- 6) ViewAssignedShifts: View scheduled shifts assigned to an employee.
 CREATE PROCEDURE ViewAssignedShifts
     @EmployeeID INT
 AS
@@ -103,7 +103,7 @@ BEGIN
 END;
 GO
 
--- 7) ViewMyContracts
+-- 7) ViewMyContracts: Display the employee's linked contract details.
 CREATE PROCEDURE ViewMyContracts
     @EmployeeID INT
 AS
@@ -123,7 +123,7 @@ BEGIN
 END;
 GO
 
--- 8) ViewMyPayroll
+-- 8) ViewMyPayroll: Show payroll records for the employee.
 CREATE PROCEDURE ViewMyPayroll
     @EmployeeID INT
 AS
@@ -145,7 +145,7 @@ BEGIN
 END;
 GO
 
--- 9) UpdatePersonalDetails
+-- 9) UpdatePersonalDetails: Update phone and address for the employee.
 CREATE PROCEDURE UpdatePersonalDetails
     @EmployeeID INT,
     @Phone VARCHAR(20),
@@ -161,7 +161,7 @@ BEGIN
 END;
 GO
 
--- 10) ViewMyMissions
+-- 10) ViewMyMissions: List missions assigned to the employee.
 CREATE PROCEDURE ViewMyMissions
     @EmployeeID INT
 AS
@@ -179,7 +179,7 @@ BEGIN
 END;
 GO
 
--- 11) ViewEmployeeProfile
+-- 11) ViewEmployeeProfile: Retrieve personal and organizational details for an employee.
 CREATE PROCEDURE ViewEmployeeProfile
     @EmployeeID INT
 AS
@@ -207,7 +207,7 @@ BEGIN
 END;
 GO
 
--- 12) UpdateContactInformation
+-- 12) UpdateContactInformation: Update phone or address based on request type.
 CREATE PROCEDURE UpdateContactInformation
     @EmployeeID INT,
     @RequestType VARCHAR(50),
@@ -231,7 +231,7 @@ BEGIN
 END;
 GO
 
--- 13) ViewEmploymentTimeline
+-- 13) ViewEmploymentTimeline: Show hire date alongside contract timeline data.
 CREATE PROCEDURE ViewEmploymentTimeline
     @EmployeeID INT
 AS
@@ -251,7 +251,7 @@ BEGIN
 END;
 GO
 
--- 14) UpdateEmergencyContact
+-- 14) UpdateEmergencyContact: Update emergency contact name, relation, and phone.
 CREATE PROCEDURE UpdateEmergencyContact
     @EmployeeID INT,
     @ContactName VARCHAR(100),
@@ -269,7 +269,7 @@ BEGIN
 END;
 GO
 
--- 15) RequestHRDocument
+-- 15) RequestHRDocument: Request an HR-issued document and link it to the employee.
 CREATE PROCEDURE RequestHRDocument
     @EmployeeID INT,
     @DocumentType VARCHAR(50)
@@ -287,7 +287,7 @@ BEGIN
 END;
 GO
 
--- 16) NotifyProfileUpdate
+-- 16) NotifyProfileUpdate: Send a notification when a profile change occurs.
 CREATE PROCEDURE NotifyProfileUpdate
     @EmployeeID INT,
     @notificationType VARCHAR(50)
@@ -305,7 +305,7 @@ BEGIN
 END;
 GO
 
---17) LogFlexibleAttendance
+-- 17) LogFlexibleAttendance: Log flexible attendance hours with total duration.
 CREATE PROCEDURE LogFlexibleAttendance
     @EmployeeID INT,
     @Date DATE,
@@ -324,8 +324,8 @@ BEGIN
 END;
 GO
 
--- 18) NotifyMissedPunch
-    CREATE PROCEDURE NotifyMissedPunch
+-- 18) NotifyMissedPunch: Notify an employee when a punch is missing.
+CREATE PROCEDURE NotifyMissedPunch
     @EmployeeID INT,
     @Date DATE
 AS
@@ -342,7 +342,7 @@ BEGIN
 END;
 GO
 
--- 19) RecordMultiplePunches
+-- 19) RecordMultiplePunches: Handle multiple clock-in/out events for a day.
 CREATE PROCEDURE RecordMultiplePunches
     @EmployeeID INT,
     @ClockInOutTime DATETIME,
@@ -374,7 +374,7 @@ BEGIN
 END
 GO
 
--- 20) SubmitCorrectionRequest
+-- 20) SubmitCorrectionRequest: Submit an attendance correction request.
 CREATE PROCEDURE SubmitCorrectionRequest
     @EmployeeID INT,
     @Date DATE,
@@ -391,7 +391,7 @@ BEGIN
 END
 GO
 
--- 21) ViewRequestStatus
+-- 21) ViewRequestStatus: View statuses of submitted correction requests.
 CREATE PROCEDURE ViewRequestStatus
     @EmployeeID INT
 AS
@@ -409,7 +409,7 @@ BEGIN
 END
 GO
 
--- 22) AttachLeaveDocuments
+-- 22) AttachLeaveDocuments: Attach supporting files to a leave request.
 CREATE PROCEDURE AttachLeaveDocuments
     @LeaveRequestID INT,
     @FilePath VARCHAR(200)
@@ -421,7 +421,7 @@ BEGIN
 END
 GO
 
--- 23) ModifyLeaveRequest
+-- 23) ModifyLeaveRequest: Update justification and duration for an existing leave request.
 CREATE PROCEDURE ModifyLeaveRequest
     @LeaveRequestID INT,
     @StartDate DATE,
@@ -440,7 +440,7 @@ BEGIN
 END
 GO
 
--- 24) CancelLeaveRequest
+-- 24) CancelLeaveRequest: Cancel a leave request by ID.
 CREATE PROCEDURE CancelLeaveRequest
     @LeaveRequestID INT
 AS
@@ -453,7 +453,7 @@ BEGIN
 END
 GO
 
--- 25) ViewLeaveBalance
+-- 25) ViewLeaveBalance: Show remaining leave balances (duplicate convenience access).
 CREATE PROCEDURE ViewLeaveBalance
     @EmployeeID INT
 AS
@@ -467,7 +467,7 @@ BEGIN
 END
 GO
 
--- 26) ViewLeaveHistory
+-- 26) ViewLeaveHistory: Display historical leave requests for the employee.
 CREATE PROCEDURE ViewLeaveHistory
     @EmployeeID INT
 AS
@@ -486,7 +486,7 @@ BEGIN
 END
 GO
 
--- 27) SubmitLeaveAfterAbsence
+-- 27) SubmitLeaveAfterAbsence: Submit a leave request after an absence has occurred.
 CREATE PROCEDURE SubmitLeaveAfterAbsence
     @EmployeeID INT,
     @LeaveTypeID INT,
@@ -503,7 +503,7 @@ BEGIN
 END
 GO
 
--- 28) NotifyLeaveStatusChange
+-- 28) NotifyLeaveStatusChange: Notify an employee about a leave status update.
 CREATE PROCEDURE NotifyLeaveStatusChange
     @EmployeeID INT,
     @RequestID INT,

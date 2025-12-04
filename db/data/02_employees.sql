@@ -1,14 +1,13 @@
-
-
 USE HRMS_DB;
 GO
 
+-- Seed core employee records with personal, contact, and employment attributes.
 INSERT INTO Employee (
-    first_name, last_name, full_name, national_id, date_of_birth, country_of_birth,
-    phone, email, address, emergency_contact_name, emergency_contact_phone,
-    relationship, biography, profile_image, employment_progress, account_status,
-    employment_status, hire_date, is_active, profile_completion,
-    department_id, position_id, manager_id, contract_id, tax_form_id, salary_type_id, pay_grade
+    first_name, last_name, full_name, national_id, date_of_birth, country_of_birth, -- identity details
+    phone, email, address, emergency_contact_name, emergency_contact_phone, -- contact details
+    relationship, biography, profile_image, employment_progress, account_status, -- profile metadata
+    employment_status, hire_date, is_active, profile_completion, -- employment status tracking
+    department_id, position_id, manager_id, contract_id, tax_form_id, salary_type_id, pay_grade -- relational links
 ) VALUES
 -- Employee 1 (John Smith - CEO)
 ('John', 'Smith', 'John Smith', 'US123456789', '1975-05-15', 'United States',
@@ -100,15 +99,16 @@ INSERT INTO Employee (
  '2024-02-01', 1, 100,
  5, 8, 1, NULL, 1, 1, 4);
 
+-- HR administrators seeded with approval scopes.
 INSERT INTO HRAdministrator (employee_id, approval_level, record_access_scope, document_validation_rights) VALUES
 (2, 3, 'All departments and employees', 'Can validate all HR documents'),
 (8, 2, 'HR department only', 'Can validate recruitment documents');
 
--- System Administrator
+-- System administrator with platform-wide privileges.
 INSERT INTO SystemAdministrator (employee_id, system_privilege_level, configurable_fields, audit_visibility_scope) VALUES
 (3, 5, 'All system settings, user permissions, database configuration', 'Full audit log access');
 
--- Line Manager
+-- Line manager metadata for leadership roles.
 INSERT INTO LineManager (employee_id, team_size, supervised_departments, approval_limit) VALUES
 (2, 5, 'Human Resources', 10000.00),
 (3, 8, 'Information Technology', 15000.00),
@@ -116,6 +116,7 @@ INSERT INTO LineManager (employee_id, team_size, supervised_departments, approva
 (10, 6, 'Sales', 20000.00);
 
 
+-- Role catalog for RBAC.
 INSERT INTO Role (role_name, purpose) VALUES
 ('Admin', 'Full system administrative access'),
 ('HR Admin', 'Human resources administrative functions'),
@@ -124,7 +125,7 @@ INSERT INTO Role (role_name, purpose) VALUES
 ('Payroll Specialist', 'Payroll processing and management'),
 ('System Admin', 'Technical system administration');
 
--- RolePermission
+-- RolePermission mappings describing allowed actions.
 INSERT INTO RolePermission (role_id, permission_name, allowed_action) VALUES
 (1, 'System Settings', 'Full Access'),
 (1, 'User Management', 'Create, Read, Update, Delete'),
@@ -137,6 +138,7 @@ INSERT INTO RolePermission (role_id, permission_name, allowed_action) VALUES
 (5, 'Payroll Processing', 'Create, Read, Update'),
 (6, 'System Configuration', 'Full Access');
 
+-- Assign specific roles to employees.
 INSERT INTO Employee_Role (employee_id, role_id, assigned_date) VALUES
 (1, 1, '2020-01-15'),
 (2, 2, '2021-03-01'),
@@ -151,7 +153,7 @@ INSERT INTO Employee_Role (employee_id, role_id, assigned_date) VALUES
 (9, 5, '2023-09-15'),
 (10, 3, '2024-02-01');
 
--- Employee Hierarchy
+-- Employee hierarchy for reporting lines.
 INSERT INTO EmployeeHierarchy (employee_id, manager_id, hierarchy_level) VALUES
 (2, 1, 1),
 (3, 1, 1),
@@ -164,6 +166,7 @@ INSERT INTO EmployeeHierarchy (employee_id, manager_id, hierarchy_level) VALUES
 (9, 4, 2);
 
 
+-- Skill catalog seed data.
 INSERT INTO Skill (skill_name, description) VALUES
 ('Leadership', 'Team and organizational leadership capabilities'),
 ('Python Programming', 'Proficiency in Python development'),
@@ -177,6 +180,7 @@ INSERT INTO Skill (skill_name, description) VALUES
 ('Cybersecurity', 'Information security and risk management');
 
 
+-- Skill proficiency assignments per employee.
 INSERT INTO Employee_Skill (employee_id, skill_id, proficiency_level) VALUES
 -- Employee 1 (John Smith - CEO)
 (1, 1, 'Expert'),      -- Leadership
@@ -204,6 +208,7 @@ INSERT INTO Employee_Skill (employee_id, skill_id, proficiency_level) VALUES
 (4, 5, 'Advanced'),    -- Communication
 (4, 6, 'Expert');     -- Financial Analysis
 
+-- Verification catalog entries used for compliance checks.
 INSERT INTO Verification (verification_type, issuer, issue_date, expiry_period) VALUES
 ('Background Check', 'SecureCheck Inc.', '2024-01-15', 365),
 ('Degree Verification', 'National Clearinghouse', '2024-03-01', 0),
@@ -216,6 +221,7 @@ INSERT INTO Verification (verification_type, issuer, issue_date, expiry_period) 
 ('Reference Check', 'HR Verification Services', '2024-03-01', 365),
 ('Work Authorization', 'Immigration Services', '2024-01-15', 730);
 
+-- Associate employees with verification results.
 INSERT INTO Employee_Verification (employee_id, verification_id) VALUES
 (1, 1),
 (1, 2),
@@ -251,6 +257,7 @@ INSERT INTO Employee_Verification (employee_id, verification_id) VALUES
 (10, 9);
 
 
+-- Manager-authored notes for performance tracking.
 INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at) VALUES
 (5, 3, 'Michael has shown excellent progress on the cloud migration project. Recommend for promotion consideration.', '2024-11-15 10:30:00'),
 (7, 3, 'Maria is a quick learner and has adapted well to the team. Consider full-time position after internship.', '2024-11-10 14:20:00'),
@@ -260,4 +267,3 @@ INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at) VAL
 (10, 1, 'Lisa exceeded Q4 sales targets by 25%. Outstanding contribution to company growth.', '2024-11-20 13:30:00'),
 (7, 3, 'Mid-internship review: Maria is performing above expectations. Strong technical skills.', '2024-09-15 15:00:00'),
 (8, 2, 'Handled difficult candidate negotiation professionally. Great interpersonal skills demonstrated.', '2024-10-05 10:20:00');
-

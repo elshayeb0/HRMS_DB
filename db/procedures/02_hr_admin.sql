@@ -2,7 +2,7 @@ USE HRMS_DB;
 GO
 
 
--- 1:
+-- 1. CreateContract: Insert a new contract and associate it with an employee.
 CREATE PROCEDURE CreateContract
     @EmployeeID INT,
     @Type VARCHAR(50),
@@ -28,7 +28,7 @@ BEGIN
 END;
 GO
 
--- 2:
+-- 2. RenewContract: Update the end date for an existing contract.
 CREATE PROCEDURE RenewContract
     @ContractID INT,
     @NewEndDate DATE
@@ -46,7 +46,7 @@ BEGIN
 END;
 GO
 
--- 3:
+-- 3. ApproveLeaveRequest: Set a leave request's status with approver context.
 
 CREATE PROCEDURE ApproveLeaveRequest
     @LeaveRequestID INT,
@@ -66,7 +66,7 @@ BEGIN
 END;
 GO
 
--- 4:
+-- 4. AssignMission: Create a mission for an employee under a manager.
 
 CREATE PROCEDURE AssignMission
     @EmployeeID INT,
@@ -88,7 +88,7 @@ BEGIN
 END;
 GO
 
--- 5:
+-- 5. ReviewReimbursement: Approve or reject a reimbursement claim.
 
 CREATE PROCEDURE ReviewReimbursement
     @ClaimID INT,
@@ -108,7 +108,7 @@ BEGIN
 END;
 GO
 
---6:
+-- 6. GetActiveContracts: List active contracts with associated employees.
 
 CREATE PROCEDURE GetActiveContracts
 AS
@@ -131,7 +131,7 @@ BEGIN
 END;
 GO
 
--- 7:
+-- 7. GetTeamByManager: List direct reports for a manager.
 
 CREATE PROCEDURE GetTeamByManager
     @ManagerID INT
@@ -149,7 +149,7 @@ END;
 GO
 
 
--- 8:
+-- 8. UpdateLeavePolicy: Modify eligibility rules and notice period for a policy.
 
 CREATE PROCEDURE UpdateLeavePolicy
     @PolicyID INT,
@@ -169,7 +169,7 @@ BEGIN
 END;
 GO
 
- -- 9:
+-- 9. GetExpiringContracts: Return active contracts ending within a window.
 CREATE PROCEDURE GetExpiringContracts
     @DaysBefore INT
 AS
@@ -190,7 +190,7 @@ END;
 GO
 
 
--- 10:
+-- 10. AssignDepartmentHead: Set the head/manager for a department.
 CREATE PROCEDURE AssignDepartmentHead
     @DepartmentID INT,
     @ManagerID INT
@@ -208,7 +208,7 @@ BEGIN
 END;
 GO
 
--- 11:
+-- 11. CreateEmployeeProfile: Create an employee and assign a role.
 CREATE PROCEDURE CreateEmployeeProfile
     @FirstName VARCHAR(50),
     @LastName VARCHAR(50),
@@ -248,7 +248,7 @@ END;
 GO
 
 
--- 12:  check again
+-- 12. UpdateEmployeeProfile: Update a specific employee field dynamically.
 CREATE PROCEDURE UpdateEmployeeProfile
     @EmployeeID INT,
     @FieldName VARCHAR(50),
@@ -294,7 +294,7 @@ GO
 
 
 
---13:
+-- 13. SetProfileCompleteness: Set profile completion percentage for an employee.
 
 CREATE PROCEDURE SetProfileCompleteness
     @EmployeeID INT,
@@ -313,7 +313,7 @@ END;
 GO
 
 
---14:
+-- 14. GenerateProfileReport: Return employees filtered by department, position, or status.
 CREATE PROCEDURE GenerateProfileReport
     @FilterField VARCHAR(50),
     @FilterValue VARCHAR(100)
@@ -330,7 +330,7 @@ BEGIN
 END;
 GO
 
---15:
+-- 15. CreateShiftType: Insert a shift schedule entry with timing and status.
 CREATE PROCEDURE CreateShiftType
     @ShiftID INT,
     @Name VARCHAR(100),
@@ -352,7 +352,7 @@ END;
 GO
 
 
---17:
+-- 17. AssignRotationalShift: Assign an employee to a shift cycle with dates.
 CREATE PROCEDURE AssignRotationalShift
     @EmployeeID INT,
     @ShiftCycle INT,
@@ -376,7 +376,7 @@ END;
 GO
 
 
---18:
+-- 18. NotifyShiftExpiry: Create a notification for an expiring shift assignment.
 
 CREATE PROCEDURE NotifyShiftExpiry
     @EmployeeID INT,
@@ -415,7 +415,7 @@ END;
 GO
 
 
---19:
+-- 19. DefineShortTimeRules: Create a lateness policy and matching lateness rule.
 CREATE PROCEDURE DefineShortTimeRules
     @RuleName VARCHAR(50),
     @LateMinutes INT,
@@ -444,7 +444,7 @@ END;
 GO
 
 
---20:
+-- 20. SetGracePeriod: Apply a grace period to lateness policies.
 CREATE PROCEDURE SetGracePeriod
     @Minutes INT
 AS
@@ -456,7 +456,7 @@ BEGIN
 END
 GO
 
---21:
+-- 21. DefinePenaltyThreshold: Create a lateness penalty policy and deduction.
 CREATE PROCEDURE DefinePenaltyThreshold
     @LateMinutes INT,
     @DeductionType VARCHAR(50)
@@ -481,7 +481,7 @@ BEGIN
 END;
 GO
 
---22:
+-- 22. DefinePermissionLimits: Set approval limits for line managers.
 
 CREATE PROCEDURE DefinePermissionLimits
     @MinHours INT,
@@ -500,7 +500,7 @@ GO
 
 
 
--- 23: Escalate pending leave requests
+-- 23. EscalatePendingRequests: Mark pending leave requests as escalated past a deadline.
 CREATE PROCEDURE EscalatePendingRequests
     @Deadline DATETIME
 AS
@@ -521,7 +521,7 @@ GO
 
 
 
---24:
+-- 24. LinkVacationToShift: Auto-approve a vacation leave request tied to scheduling.
 CREATE PROCEDURE LinkVacationToShift
     @VacationLeaveID INT,
     @EmployeeID INT
@@ -542,7 +542,7 @@ GO
 
 
 
---25:
+-- 25. ConfigureLeavePolicies: Seed a default leave policy when absent.
 CREATE PROCEDURE ConfigureLeavePolicies
 AS
 BEGIN
@@ -554,7 +554,7 @@ BEGIN
 END
 GO
 
---26:
+-- 26. AuthenticateLeaveAdmin: Validate HR admin credentials for leave actions.
 CREATE PROCEDURE AuthenticateLeaveAdmin
     @AdminID INT,
     @Password VARCHAR(100)
@@ -567,7 +567,7 @@ BEGIN
 END;
 GO
 
---27:
+-- 27. ApplyLeaveConfiguration: Seed zero entitlements for all employee/leave combinations.
 CREATE PROCEDURE ApplyLeaveConfiguration
 AS
 BEGIN
@@ -584,7 +584,7 @@ BEGIN
 END;
 GO
 
---28:
+-- 28. UpdateLeaveEntitlements: Increase entitlements using the default policy notice period.
 
 CREATE PROCEDURE UpdateLeaveEntitlements
     @EmployeeID INT
@@ -604,7 +604,7 @@ END;
 GO
 
 
---29:
+-- 29. ConfigureLeaveEligibility: Set eligibility requirements for a leave type.
 
 CREATE PROCEDURE ConfigureLeaveEligibility
     @LeaveType VARCHAR(50),
@@ -621,7 +621,7 @@ BEGIN
 END;
 GO
 
---30:
+-- 30. ManageLeaveTypes: Upsert leave types and their descriptions.
 CREATE PROCEDURE ManageLeaveTypes
     @LeaveType VARCHAR(50),
     @Description VARCHAR(200)
@@ -639,7 +639,7 @@ BEGIN
 END;
 GO
 
---31:
+-- 31. AssignLeaveEntitlement: Set a specific entitlement for an employee and leave type.
 
 CREATE PROCEDURE AssignLeaveEntitlement
     @EmployeeID INT,
@@ -660,7 +660,7 @@ BEGIN
 END;
 GO
 
---32:
+-- 32. ConfigureLeaveRules: Upsert leave policy settings and approval workflow.
 CREATE PROCEDURE ConfigureLeaveRules
     @LeaveType VARCHAR(50),
     @MaxDuration INT,
@@ -688,7 +688,7 @@ BEGIN
 END;
 GO
 
---33:
+-- 33. ConfigureSpecialLeave: Upsert specialized leave rules text.
 
 CREATE PROCEDURE ConfigureSpecialLeave
     @LeaveType VARCHAR(50),
@@ -709,7 +709,7 @@ BEGIN
 END;
 GO
 
---34:
+-- 34. SetLeaveYearRules: Define the leave year start and end dates.
 CREATE PROCEDURE SetLeaveYearRules
     @StartDate DATE,
     @EndDate DATE
@@ -730,7 +730,7 @@ END;
 GO
 
 
---35:
+-- 35. AdjustLeaveBalance: Apply a manual adjustment to an employee's entitlement.
 CREATE PROCEDURE AdjustLeaveBalance
     @EmployeeID INT,
     @LeaveType VARCHAR(50),
@@ -747,8 +747,8 @@ BEGIN
 END;
 GO
 
-    --36:
-   CREATE PROCEDURE ManageLeaveRoles
+-- 36. ManageLeaveRoles: Upsert role permissions for leave actions.
+CREATE PROCEDURE ManageLeaveRoles
     @RoleID INT,
     @Permission VARCHAR(100)
 AS
@@ -776,8 +776,8 @@ END;
 GO
 
 
- --37:
- CREATE PROCEDURE FinalizeLeaveRequest
+-- 37. FinalizeLeaveRequest: Mark approved leave as finalized.
+CREATE PROCEDURE FinalizeLeaveRequest
     @LeaveRequestID INT
 AS
 BEGIN
@@ -791,7 +791,7 @@ BEGIN
 END;
 GO
 
---38:
+-- 38. OverrideLeaveDecision: Override a leave request with a provided reason.
 CREATE PROCEDURE OverrideLeaveDecision
     @LeaveRequestID INT,
     @Reason VARCHAR(200)
@@ -807,7 +807,7 @@ BEGIN
 END;
 GO
 
---39: couldnt be used without CHARINDEX
+-- 39. BulkProcessLeaveRequests: Mark comma-delimited leave requests as processed.
 CREATE PROCEDURE BulkProcessLeaveRequests
     @LeaveRequestIDs VARCHAR(500)
 AS
@@ -828,7 +828,7 @@ END;
 GO
 
 
- --40:
+-- 40. VerifyMedicalLeave: Confirm presence of medical documents before verification.
 CREATE PROCEDURE VerifyMedicalLeave
     @LeaveRequestID INT,
     @DocumentID INT
@@ -858,7 +858,7 @@ BEGIN
 END;
 GO
 
---41:
+-- 41. SyncLeaveBalances: Reconcile entitlements based on an approved request.
 
 CREATE PROCEDURE SyncLeaveBalances
     @LeaveRequestID INT
@@ -879,7 +879,7 @@ GO
 
 
 
---42:
+-- 42. ProcessLeaveCarryForward: Carry forward balances from approved requests in a year.
 CREATE PROCEDURE ProcessLeaveCarryForward
     @Year INT
 AS
@@ -900,7 +900,7 @@ END;
 GO
 
 
---43:
+-- 43. SyncLeaveToAttendance: Create attendance exceptions for approved leave.
 CREATE PROCEDURE SyncLeaveToAttendance
     @LeaveRequestID INT
 AS
@@ -931,7 +931,7 @@ END
 GO
 
 
---44:
+-- 44. UpdateInsuranceBrackets: Adjust insurance contribution totals and coverage ranges.
 CREATE PROCEDURE UpdateInsuranceBrackets
     @BracketID INT,
     @NewMinSalary DECIMAL(10,2),
@@ -958,7 +958,7 @@ END;
 GO
 
 
---45:
+-- 45. ApprovePolicyUpdate: Append approval details to a payroll policy.
 CREATE PROCEDURE ApprovePolicyUpdate
     @PolicyID INT,
     @ApprovedBy INT

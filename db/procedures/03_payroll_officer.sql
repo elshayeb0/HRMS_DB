@@ -1,7 +1,7 @@
 USE HRMS_DB;
 GO
 
--- 1: Payroll Generation and Management
+-- 1. GeneratePayroll: Return payroll runs within a specified date range.
 CREATE PROCEDURE GeneratePayroll
     @StartDate DATE,
     @EndDate DATE
@@ -25,7 +25,7 @@ BEGIN
 END;
 GO
 
--- 2: Adjust Payroll Items
+-- 2. AdjustPayrollItem: Add an allowance or deduction row for a payroll record.
 CREATE PROCEDURE AdjustPayrollItem
     @PayrollID INT,
     @Type VARCHAR(50),
@@ -43,7 +43,7 @@ BEGIN
 END;
 GO
 
--- 3: Calculate Net Salary
+-- 3. CalculateNetSalary: Compute net pay by aggregating payroll fields.
 CREATE PROCEDURE CalculateNetSalary
     @PayrollID INT
 AS
@@ -56,7 +56,7 @@ BEGIN
 END;
 GO
 
--- 4: Apply Payroll Policies
+-- 4. ApplyPayrollPolicy: Link a policy to a payroll and update its metadata.
 CREATE PROCEDURE ApplyPayrollPolicy
     @PolicyID INT,
     @PayrollID INT,
@@ -76,7 +76,7 @@ BEGIN
 END;
 GO
 
--- 5: Monthly Payroll Summary
+-- 5. GetMonthlyPayrollSummary: Sum net salary for a given month and year.
 CREATE PROCEDURE GetMonthlyPayrollSummary
     @Month INT,
     @Year INT
@@ -90,7 +90,7 @@ BEGIN
 END;
 GO
 
--- 6: Add Allowance/Deduction
+-- 6. AddAllowanceDeduction: Add a simple allowance/deduction for a payroll run.
 CREATE PROCEDURE AddAllowanceDeduction
     @PayrollID INT,
     @Type VARCHAR(50),
@@ -106,7 +106,7 @@ BEGIN
 END;
 GO
 
--- 7: Employee Payroll History
+-- 7. GetEmployeePayrollHistory: List payroll records for one employee.
 CREATE PROCEDURE GetEmployeePayrollHistory
     @EmployeeID INT
 AS
@@ -117,7 +117,7 @@ BEGIN
 END;
 GO
 
--- 8: Get Bonus Eligible Employees
+-- 8. GetBonusEligibleEmployees: List employees matching a bonus eligibility rule.
 CREATE PROCEDURE GetBonusEligibleEmployees
     @Eligibility_criteria NVARCHAR(MAX)
 AS
@@ -131,7 +131,7 @@ BEGIN
 END;
 GO
 
--- 9: Update Salary Type
+-- 9. UpdateSalaryType: Update the salary type reference for an employee.
 CREATE PROCEDURE UpdateSalaryType
     @EmployeeID INT,
     @SalaryTypeID INT
@@ -145,7 +145,7 @@ BEGIN
 END;
 GO
 
--- 10: Get Payroll by Department
+-- 10. GetPayrollByDepartment: Aggregate payroll totals per department for a period.
 CREATE PROCEDURE GetPayrollByDepartment
     @DepartmentID INT,
     @Month INT,
@@ -166,7 +166,7 @@ BEGIN
 END;
 GO
 
--- 11: Validate Attendance Before Payroll
+-- 11. ValidateAttendanceBeforePayroll: Flag employees lacking exit times in a payroll period.
 CREATE PROCEDURE ValidateAttendanceBeforePayroll
     @PayrollPeriodID INT
 AS
@@ -181,7 +181,7 @@ BEGIN
 END;
 GO
 
--- 12: Sync Attendance to Payroll
+-- 12. SyncAttendanceToPayroll: Create payroll stubs for attendance on a specific date.
 CREATE PROCEDURE SyncAttendanceToPayroll
     @SyncDate DATE
 AS
@@ -211,7 +211,7 @@ BEGIN
 END;
 GO
 
--- 13: Sync Approved Permissions to Payroll
+-- 13. SyncApprovedPermissionsToPayroll: Add payroll entries for approved workflows in a period.
 CREATE PROCEDURE SyncApprovedPermissionsToPayroll
     @PayrollPeriodID INT
 AS
@@ -238,7 +238,7 @@ BEGIN
 END;
 GO
 
--- 14: Configure Pay Grades
+-- 14. ConfigurePayGrades: Insert a pay grade with salary bounds.
 CREATE PROCEDURE ConfigurePayGrades
     @GradeName VARCHAR(60),
     @MinSalary DECIMAL(11,3),
@@ -252,7 +252,7 @@ BEGIN
 END;
 GO
 
--- 15: Configure Shift Allowances
+-- 15. ConfigureShiftAllowances: Add allowance rows for employees on a shift type.
 CREATE PROCEDURE ConfigureShiftAllowances
     @ShiftType VARCHAR(50),
     @AllowanceName VARCHAR(50),
@@ -268,7 +268,7 @@ BEGIN
 END;
 GO
 
--- 16: Enable Multi-Currency Payroll
+-- 16. EnableMultiCurrencyPayroll: Register a currency with its exchange rate.
 CREATE PROCEDURE EnableMultiCurrencyPayroll
     @CurrencyCode VARCHAR(10),
     @ExchangeRate DECIMAL(10,4)
@@ -281,7 +281,7 @@ BEGIN
 END;
 GO
 
--- 17: Manage Tax Rules
+-- 17. ManageTaxRules: Record tax rule details in the tax form catalog.
 CREATE PROCEDURE ManageTaxRules
     @TaxRuleName VARCHAR(50),
     @CountryCode VARCHAR(10),
@@ -296,7 +296,7 @@ BEGIN
 END;
 GO
 
--- 18: Approve Payroll Configuration Changes
+-- 18. ApprovePayrollConfigChanges: Log approval/rejection for a payroll config item.
 CREATE PROCEDURE ApprovePayrollConfigChanges
     @ConfigID INT,
     @ApproverID INT,
@@ -310,7 +310,7 @@ BEGIN
 END;
 GO
 
--- 19: Configure Signing Bonus
+-- 19. ConfigureSigningBonus: Add a signing bonus allowance for an employee.
 CREATE PROCEDURE ConfigureSigningBonus
     @EmployeeID INT,
     @BonusAmount DECIMAL(10,2),
@@ -326,7 +326,7 @@ BEGIN
 END;
 GO
 
--- 20: Configure Termination/Resignation Benefits
+-- 20. ConfigureTerminationBenefits: Add termination or resignation compensation entries.
 CREATE PROCEDURE ConfigureTerminationBenefits
     @EmployeeID INT,
     @CompensationAmount DECIMAL(10,2),
@@ -343,7 +343,7 @@ BEGIN
 END;
 GO
 
--- 21: Configure Insurance Brackets
+-- 21. ConfigureInsuranceBrackets: Insert a new insurance bracket with contributions.
 CREATE PROCEDURE ConfigureInsuranceBrackets
     @InsuranceType VARCHAR(50),
     @MinSalary DECIMAL(10,2),
@@ -363,7 +363,7 @@ BEGIN
 END;
 GO
 
--- 22: Update Insurance Brackets
+-- 22. UpdateInsuranceBracketss: Update an existing insurance bracket's values.
 CREATE PROCEDURE UpdateInsuranceBracketss
     @BracketID INT,
     @MinSalary DECIMAL(10,2),
@@ -382,7 +382,7 @@ BEGIN
 END;
 GO
 
--- 23: Configure Payroll Policies
+-- 23. ConfigurePayrollPolicies: Insert a payroll policy with type, details, and effective date.
 CREATE PROCEDURE ConfigurePayrollPolicies
     @PolicyType VARCHAR(50),
     @PolicyDetails NVARCHAR(MAX),
@@ -396,7 +396,7 @@ BEGIN
 END;
 GO
 
--- 24: Define Pay Grades
+-- 24. DefinePayGrades: Insert a pay grade with created-by context.
 CREATE PROCEDURE DefinePayGrades
     @GradeName VARCHAR(50),
     @MinSalary DECIMAL(10,2),
@@ -411,7 +411,7 @@ BEGIN
 END;
 GO
 
--- 25: Configure Escalation Workflow
+-- 25. ConfigureEscalationWorkflow: Create an approval workflow for payroll escalation thresholds.
 CREATE PROCEDURE ConfigureEscalationWorkflow
     @ThresholdAmount DECIMAL(11,2),
     @ApproverRole VARCHAR(60),
@@ -425,7 +425,7 @@ BEGIN
 END;
 GO
 
--- 26: Define Pay Type
+-- 26. DefinePayType: Set an employee's salary type by name.
 CREATE PROCEDURE DefinePayType
     @EmployeeID INT,
     @PayType VARCHAR(50),
@@ -444,7 +444,7 @@ BEGIN
 END;
 GO
 
--- 27: Configure Overtime Rules
+-- 27. ConfigureOvertimeRules: Update overtime multipliers and hour caps.
 CREATE PROCEDURE ConfigureOvertimeRules
     @DayType VARCHAR(20),
     @Multiplier DECIMAL(3,2),
@@ -466,7 +466,7 @@ BEGIN
 END;
 GO
 
--- 28: Configure Shift Allowances
+-- 28. ConfigureShiftAllowance: Update allowance amounts for a given shift type.
 GO
 CREATE PROCEDURE ConfigureShiftAllowance
     @ShiftType VARCHAR(20),
@@ -483,7 +483,7 @@ END;
 GO
 
 
---29: Configure Signing Bonus Policy
+-- 29. ConfigureSigningBonusPolicy: Add a signing bonus policy definition.
 GO
 CREATE PROCEDURE ConfigureSigningBonusPolicy
     @BonusType VARCHAR(50),
@@ -498,7 +498,7 @@ BEGIN
 END;
 GO
 
---32: Generate Tax Statement
+-- 32. GenerateTaxStatement: Summarize taxable pay and withholding for a year.
 CREATE PROCEDURE GenerateTaxStatement
     @EmployeeID INT,
     @TaxYear INT
@@ -521,7 +521,7 @@ BEGIN
 END;
 GO
 
---33: Approve Payroll Configuration
+-- 33. ApprovePayrollConfiguration: Mark a payroll configuration log as approved.
 CREATE PROCEDURE ApprovePayrollConfiguration
     @ConfigID INT,
     @ApprovedBy INT
@@ -537,7 +537,7 @@ BEGIN
 END;
 GO
 
---34: Modify Past Payroll Entries
+-- 34. ModifyPastPayroll: Adjust historical payroll fields and log the change.
 CREATE PROCEDURE ModifyPastPayroll
     @PayrollRunID INT,
     @EmployeeID INT,

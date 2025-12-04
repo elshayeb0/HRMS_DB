@@ -1,8 +1,7 @@
-
-
 USE HRMS_DB;
 GO
 
+-- Payroll runs per employee for November 2024.
 INSERT INTO Payroll (employee_id, taxes, period_start, period_end, base_amount, adjustments, contributions, actual_pay, net_salary, payment_date) VALUES
 (1, 8333.333, '2024-11-01', '2024-11-30', 25000.000, 0.000, 1250.000, 25000.000, 15416.667, '2024-11-30'),
 (2, 3166.667, '2024-11-01', '2024-11-30', 9500.000, 500.000, 475.000, 10000.000, 6358.333, '2024-11-30'),
@@ -13,24 +12,29 @@ INSERT INTO Payroll (employee_id, taxes, period_start, period_end, base_amount, 
 (9, 2166.667, '2024-11-01', '2024-11-30', 6500.000, 0.000, 325.000, 6500.000, 4008.333, '2024-11-30'),
 (10, 2833.333, '2024-11-01', '2024-11-30', 8500.000, 0.000, 425.000, 8500.000, 5241.667, '2024-11-30');
 
+-- Allowances and deductions tied to payroll lines.
 INSERT INTO AllowanceDeduction (payroll_id, employee_id, type, amount, currency, duration, timezone) VALUES
 (1, 1, 'Allowance', 1000.000, 'USD', 30, 'EST'),
 (2, 2, 'Allowance', 500.000, 'USD', 30, 'EST'),
 (5, 5, 'Allowance', 200.000, 'USD', 30, 'PST'),
 (5, 5, 'Deduction', 50.000, 'USD', 30, 'PST');
 
+-- Payroll policy headers.
 INSERT INTO PayrollPolicy (effective_date, type, description) VALUES
 ('2024-01-01', 'Overtime', 'Overtime calculation rules'),
 ('2024-01-01', 'Lateness', 'Lateness penalty policy'),
 ('2024-01-01', 'Bonus', 'Performance bonus guidelines'),
 ('2024-01-01', 'Deduction', 'Standard deduction rules');
 
+-- Overtime policy details.
 INSERT INTO OvertimePolicy (policy_id, weekday_rate_multiplier, weekend_rate_multiplier, max_hours_per_month) VALUES
 (1, 1.50, 2.00, 40);
 
+-- Lateness policy details.
 INSERT INTO LatenessPolicy (policy_id, grace_period_mins, deduction_rate) VALUES
 (2, 15, 0.50);
 
+-- Bonus policy definitions.
 INSERT INTO BonusPolicy (policy_id, bonus_type, eligibility_criteria, amount)
 VALUES
     (1, 'Performance Bonus', 'Employees with performance rating above 4.0', 5000.00),
@@ -40,20 +44,24 @@ VALUES
     (5, 'Holiday Bonus', 'All active employees during holiday season', 1500.00);
 
 
+-- Deduction policy definition.
 INSERT INTO DeductionPolicy (policy_id, deduction_reason, calculation_mode) VALUES
 (4, 'Unauthorized Absence', 'Per day rate');
 
+-- Link payroll runs to applicable policies.
 INSERT INTO PayrollPolicy_ID (payroll_id, policy_id) VALUES
 (1, 1),
 (2, 1),
 (5, 2);
 
+-- Audit log of payroll modifications.
 INSERT INTO Payroll_Log (payroll_id, actor, change_date, modification_type) VALUES
 (5, 3, '2024-11-15 10:30:00', 'Adjustment Added'),
 (2, 2, '2024-11-10 14:20:00', 'Bonus Applied');
 
 
 
+-- Payroll period metadata.
 INSERT INTO PayrollPeriod (payroll_id, start_date, end_date, status) VALUES
 (4, '2024-11-01', '2024-11-30', 'Processed'),
 (5, '2024-11-01', '2024-11-30', 'Processed'),
