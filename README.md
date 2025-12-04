@@ -11,24 +11,6 @@ This repository provides a **clean, modular structure** so each team member can 
 
 ---
 
-## 📁 Project Structure
-
-HRMS_DB/
-│── docs/                         # Milestone documents
-│── db/
-│    ├── 00_create_database.sql   # Creates HRMS_DB and sets context
-│    ├── schema/                  # All CREATE TABLE statements
-│    ├── data/                    # All INSERT statements
-│    ├── procedures/              # All stored procedures grouped by role
-│    ├── combined/                # Final submission scripts (schema/data/procedures)
-│    └── tests/                   # End-to-end and smoke testing scripts
-│── deliverables/                 # Final files for submission
-│── .vscode/                      # Shared formatting + SQL execution settings
-│── README.md                     # Project documentation
-│── .gitignore                    # Clean git workflow
-
----
-
 ## 🚀 How to Run the Project
 
 1. Open the folder in **VS Code**
