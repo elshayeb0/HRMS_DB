@@ -1,4 +1,4 @@
-USE HRMS_DB; 
+USE HRMS_DB;
 GO
 
 -- Shift schedule definitions.
@@ -46,10 +46,10 @@ INSERT INTO Device (device_type, terminal_id, latitude, longitude, employee_id) 
 
 -- Map attendance events to capture sources and locations.
 INSERT INTO AttendanceSource (attendance_id, device_id, source_type, latitude, longitude, recorded_at) VALUES
-(1, 1, 'Biometric', 40.712776000, -74.005974000, '2024-11-22 07:55:00'),
-(2, 2, 'Mobile', 42.360081000, -71.058884000, '2024-11-22 08:02:00'),
-(3, 3, 'Biometric', 30.044420000, 31.235712000, '2024-11-22 08:00:00'),
-(4, 4, 'Web', 47.606209000, -122.332069000, '2024-11-22 09:15:00');
+(1, 1, 'Biometric',  4.0712776,  -7.4005974,  '2024-11-22 07:55:00'),
+(2, 2, 'Mobile',     4.2360081,  -7.1058884,  '2024-11-22 08:02:00'),
+(3, 3, 'Biometric',  3.0044420,   3.1235712,  '2024-11-22 08:00:00'),
+(4, 4, 'Web',        4.7606209,  -8.2332069,  '2024-11-22 09:15:00');
 
 INSERT INTO AttendanceLog (attendance_id, actor, timestamp, reason) VALUES
 (2, 2, '2024-11-22 08:02:00', 'Late arrival due to traffic'),
