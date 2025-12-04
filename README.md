@@ -1,6 +1,6 @@
-# HRMS_DB – Milestone 2 (Databases Course – GIU)
+# HR Management System Database
 
-A complete SQL implementation of the HRMS system designed in **Milestone 1**, now extended with:
+A complete SQL implementation of the HRMS system designed and now extended with:
 
 - Full relational schema (DDL)
 - Sample data covering all user story scenarios (DML)
@@ -17,11 +17,10 @@ This repository provides a **clean, modular structure** so each team member can 
 2. Ensure SQL Server extension is installed
 3. Run the scripts in order:
 
-	1.	db/00_create_database.sql
-	2.	db/schema/* (in numeric order)
-	3.	db/data/* (in numeric order)
-	4.	db/procedures/* (in numeric order)
-	5.	db/tests/* (to validate)
+	1.	db/combined/drop_create.sql
+	2.	db/combined/01_full_schema.sql
+	3.	db/combined/02_full_data.sql
+	4.	db/combined/03_full_procedures.sql
 
 ---
 
@@ -44,26 +43,12 @@ Each role owns a single file inside `db/procedures/`:
 
 ---
 
-## 📝 Submission Format
-
-Milestone 2 requires exactly **3 SQL files**:
-
-1. Schema (`Losers_MS2_schema.sql`)
-2. Data (`Losers_MS2_data.sql`)
-3. Procedures (`Losers_MS2_procedures.sql`)
-
-These are generated inside:
-db/combined/
-Then copied to:
-deliverables/
-
----
-
 ## 👥 Team Info
 
-### - Losers
-### - Ziad Elshayeb - Ahmed Saadallah - Hazem Ahmed - Ahmed Dakroury - Yassin Zaki
-### - GIU ID In Order Above: 16002080 - 16008325 - 16005924 - 16004521 - 16005309
-### - Tutorial Number In Order Above: T19 - T18 - T18 - T18 - T19
+- Ziad Elshayeb
+- Ahmed Saadallah
+- Hazem Ahmed
+- Yassin Zaki
+
 
 ---
