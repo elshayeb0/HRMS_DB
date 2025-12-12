@@ -1,6 +1,10 @@
 USE HRMS_DB;
 GO
 
+SELECT Name
+FROM sys.Tables
+ORDER BY Name;
+
 SELECT 'Employee'           AS TableName, COUNT(*) FROM Employee           UNION ALL
 SELECT 'Department',                     COUNT(*) FROM Department         UNION ALL
 SELECT 'Position',                       COUNT(*) FROM Position           UNION ALL

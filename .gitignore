@@ -85,3 +85,4 @@ dist/
 # ASP.NET local config (secrets/connection strings)
 appsettings.Development.json
 appsettings.*.Development.json
+**/appsettings.Development.json
