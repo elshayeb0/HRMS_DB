@@ -1,7 +1,9 @@
 
+-- Core HR schema: employees, positions, departments, roles, skills, and reporting links.
 USE HRMS_DB;
 GO
 
+-- Catalog of defined job positions.
 CREATE TABLE Position (
     position_id INT IDENTITY(1,1) PRIMARY KEY,
     position_title VARCHAR(150) NOT NULL,
@@ -10,6 +12,7 @@ CREATE TABLE Position (
 );
 GO
 
+-- Organizational departments with optional head assignment.
 CREATE TABLE Department (
     department_id INT IDENTITY(1,1) PRIMARY KEY,
     department_name VARCHAR(80) NOT NULL,
@@ -18,6 +21,7 @@ CREATE TABLE Department (
 );
 GO
 
+-- Master employee record with links to organizational and compensation references.
 CREATE TABLE Employee (
     employee_id INT IDENTITY(1,1) PRIMARY KEY,
     first_name VARCHAR(30),
@@ -53,10 +57,12 @@ CREATE TABLE Employee (
 );
 GO
 
+-- Department head back-reference added after Employee exists.
 ALTER TABLE Department
 ADD CONSTRAINT FK_Department_Head FOREIGN KEY (department_head_id) REFERENCES Employee(employee_id);
 GO
 
+-- HR admin privileges tied to specific employees.
 CREATE TABLE HRAdministrator (
     employee_id INT PRIMARY KEY,
     approval_level INT,
@@ -66,6 +72,7 @@ CREATE TABLE HRAdministrator (
 );
 GO
 
+-- System admin privileges scoped per employee.
 CREATE TABLE SystemAdministrator (
     employee_id INT PRIMARY KEY,
     system_privilege_level INT,
@@ -75,6 +82,7 @@ CREATE TABLE SystemAdministrator (
 );
 GO
 
+-- Application roles.
 CREATE TABLE Role (
     role_id INT IDENTITY(1,1) PRIMARY KEY,
     role_name VARCHAR(60) NOT NULL,
@@ -82,6 +90,7 @@ CREATE TABLE Role (
 );
 GO
 
+-- Allowed actions per role.
 CREATE TABLE RolePermission (
     role_id INT,
     permission_name VARCHAR(100),
@@ -91,6 +100,7 @@ CREATE TABLE RolePermission (
 );
 GO
 
+-- Many-to-many between employees and roles.
 CREATE TABLE Employee_Role (
     employee_id INT,
     role_id INT,
@@ -101,6 +111,7 @@ CREATE TABLE Employee_Role (
 );
 GO
 
+-- Employee hierarchy for reporting chains.
 CREATE TABLE EmployeeHierarchy (
     employee_id INT,
     manager_id INT,
@@ -111,6 +122,7 @@ CREATE TABLE EmployeeHierarchy (
 );
 GO
 
+-- Skill catalog.
 CREATE TABLE Skill (
     skill_id INT IDENTITY(1,1) PRIMARY KEY,
     skill_name VARCHAR(100) NOT NULL,
@@ -118,6 +130,7 @@ CREATE TABLE Skill (
 );
 GO
 
+-- Line manager metadata for employees leading teams.
 CREATE TABLE LineManager (
     employee_id INT PRIMARY KEY,
     team_size INT,
@@ -127,6 +140,7 @@ CREATE TABLE LineManager (
 );
 GO
 
+-- Employee skill assignments with proficiency levels.
 CREATE TABLE Employee_Skill (
     employee_id INT,
     skill_id INT,

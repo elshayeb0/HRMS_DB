@@ -1,8 +1,9 @@
 
-
+-- Leave management schema: leave types, policies, requests, and supporting documents.
 USE HRMS_DB;
 GO
 
+-- Base leave types.
 CREATE TABLE Leave (
     leave_id INT IDENTITY(1,1) PRIMARY KEY,
     leave_type VARCHAR(60) NOT NULL,
@@ -10,6 +11,7 @@ CREATE TABLE Leave (
 );
 GO
 
+-- Vacation-specific attributes.
 CREATE TABLE VacationLeave (
     leave_id INT PRIMARY KEY,
     carry_over_days INT,
@@ -18,6 +20,7 @@ CREATE TABLE VacationLeave (
 );
 GO
 
+-- Sick leave with medical documentation requirements.
 CREATE TABLE SickLeave (
     leave_id INT PRIMARY KEY,
     medical_cert_required BIT,
@@ -27,6 +30,7 @@ CREATE TABLE SickLeave (
 GO
 
 
+-- Probation leave eligibility window.
 CREATE TABLE ProbationLeave (
     leave_id INT PRIMARY KEY,
     eligibility_start_date DATE,
@@ -35,6 +39,7 @@ CREATE TABLE ProbationLeave (
 );
 GO
 
+-- Holiday leave tied to recognized occasions.
 CREATE TABLE HolidayLeave (
     leave_id INT PRIMARY KEY,
     holiday_name VARCHAR(90),
@@ -44,6 +49,7 @@ CREATE TABLE HolidayLeave (
 );
 GO
 
+-- Policy definitions that govern leave usage.
 CREATE TABLE LeavePolicy (
     policy_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(100),
@@ -55,6 +61,7 @@ CREATE TABLE LeavePolicy (
 );
 GO
 
+-- Requests submitted by employees against leave types.
 CREATE TABLE LeaveRequest (
     request_id INT IDENTITY(1,1) PRIMARY KEY,
     employee_id INT,
@@ -68,6 +75,7 @@ CREATE TABLE LeaveRequest (
 );
 GO
 
+-- Annual leave entitlement balances by employee and leave type.
 CREATE TABLE LeaveEntitlement (
     employee_id INT,
     leave_type_id INT,
@@ -78,6 +86,7 @@ CREATE TABLE LeaveEntitlement (
 );
 GO
 
+-- Uploaded documents attached to leave requests.
 CREATE TABLE LeaveDocument (
     document_id INT IDENTITY(1,1) PRIMARY KEY,
     leave_request_id INT,

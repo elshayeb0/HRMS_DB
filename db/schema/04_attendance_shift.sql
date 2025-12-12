@@ -1,7 +1,8 @@
-
+-- Attendance and shift tracking schema: schedules, assignments, logs, and devices.
 USE HRMS_DB;
 GO
 
+-- Shift definitions including timing and allowances.
 CREATE TABLE ShiftSchedule (
     shift_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(60),
@@ -16,6 +17,7 @@ CREATE TABLE ShiftSchedule (
 );
 GO
 
+-- Assignment of employees to specific shifts for a date range.
 CREATE TABLE ShiftAssignment (
     assignment_id INT IDENTITY(1,1) PRIMARY KEY,
     employee_id INT,
@@ -28,6 +30,7 @@ CREATE TABLE ShiftAssignment (
 );
 GO
 
+-- Catalog of exceptions (e.g., holidays, outages) affecting attendance.
 CREATE TABLE Exception (
     exception_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(200),
@@ -37,6 +40,7 @@ CREATE TABLE Exception (
 );
 GO
 
+-- Captured attendance per employee and shift with optional exception.
 CREATE TABLE Attendance (
     attendance_id INT IDENTITY(1,1) PRIMARY KEY,
     employee_id INT,
@@ -53,6 +57,7 @@ CREATE TABLE Attendance (
 );
 GO
 
+-- Audit log for attendance changes.
 CREATE TABLE AttendanceLog (
     attendance_log_id INT IDENTITY(1,1) PRIMARY KEY,
     attendance_id INT,
@@ -64,6 +69,7 @@ CREATE TABLE AttendanceLog (
 );
 GO
 
+-- Requests to correct attendance entries.
 CREATE TABLE AttendanceCorrectionRequest (
     request_id INT IDENTITY(1,1) PRIMARY KEY,
     employee_id INT,
@@ -77,6 +83,7 @@ CREATE TABLE AttendanceCorrectionRequest (
 );
 GO
 
+-- Map employees to exceptions that apply to them.
 CREATE TABLE Employee_Exception (
     employee_id INT,
     exception_id INT,
@@ -86,6 +93,7 @@ CREATE TABLE Employee_Exception (
 );
 GO
 
+-- Devices used for clock-in/out tracking.
 CREATE TABLE Device (
     device_id INT IDENTITY(1,1) PRIMARY KEY,
     device_type VARCHAR(60),
@@ -97,6 +105,7 @@ CREATE TABLE Device (
 );
 GO
 
+-- Source data for attendance events, including geolocation.
 CREATE TABLE AttendanceSource (
     attendance_id INT,
     device_id INT,
@@ -110,6 +119,7 @@ CREATE TABLE AttendanceSource (
 );
 GO
 
+-- Shift rotation templates.
 CREATE TABLE ShiftCycle (
     cycle_id INT IDENTITY(1,1) PRIMARY KEY,
     cycle_name VARCHAR(50),
@@ -117,6 +127,7 @@ CREATE TABLE ShiftCycle (
 );
 GO
 
+-- Ordering of shifts within a cycle.
 CREATE TABLE ShiftCycleAssignment (
     cycle_id INT,
     shift_id INT,
