@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="container py-5">
+    <div class="alert alert-warning">
+        <h4 class="alert-heading">Access Denied</h4>
+        <p class="mb-0">You are logged in, but your account does not have the required role for this page.</p>
+    </div>
+
+    <form asp-controller="Account" asp-action="Logout" method="post">
+        @Html.AntiForgeryToken()
+        <button class="btn btn-outline-danger" type="submit">Logout</button>
+    </form>
+</div>

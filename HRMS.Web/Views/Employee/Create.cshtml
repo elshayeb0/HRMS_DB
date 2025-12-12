@@ -1,0 +1,173 @@
+@model HRMS.Web.Models.Employees.AddEmployeeViewModel
+@{
+    ViewData["Title"] = "Create Employee";
+}
+
+<div class="container py-4">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+        <h2 class="mb-0">Create Employee</h2>
+        <a class="btn btn-outline-secondary" asp-controller="Employee" asp-action="Hierarchy">View Hierarchy</a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+            <form asp-action="Create" method="post" novalidate>
+                @Html.AntiForgeryToken()
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="NationalID" class="form-label"></label>
+                        <input asp-for="NationalID" class="form-control" />
+                        <span asp-validation-for="NationalID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="DateOfBirth" class="form-label"></label>
+                        <input asp-for="DateOfBirth" class="form-control" type="date" />
+                        <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="CountryOfBirth" class="form-label"></label>
+                        <input asp-for="CountryOfBirth" class="form-control" />
+                        <span asp-validation-for="CountryOfBirth" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Phone" class="form-label"></label>
+                        <input asp-for="Phone" class="form-control" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="Address" class="form-label"></label>
+                        <input asp-for="Address" class="form-control" />
+                        <span asp-validation-for="Address" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="EmergencyContactName" class="form-label"></label>
+                        <input asp-for="EmergencyContactName" class="form-control" />
+                        <span asp-validation-for="EmergencyContactName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label asp-for="EmergencyContactPhone" class="form-label"></label>
+                        <input asp-for="EmergencyContactPhone" class="form-control" />
+                        <span asp-validation-for="EmergencyContactPhone" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="Relationship" class="form-label"></label>
+                        <input asp-for="Relationship" class="form-control" />
+                        <span asp-validation-for="Relationship" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="DepartmentID" class="form-label"></label>
+                        <input asp-for="DepartmentID" class="form-control" type="number" />
+                        <span asp-validation-for="DepartmentID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="PositionID" class="form-label"></label>
+                        <input asp-for="PositionID" class="form-control" type="number" />
+                        <span asp-validation-for="PositionID" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ManagerID" class="form-label"></label>
+                        <input asp-for="ManagerID" class="form-control" type="number" />
+                        <div class="form-text">Optional (leave empty for top-level).</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="PayGrade" class="form-label"></label>
+                        <input asp-for="PayGrade" class="form-control" />
+                        <span asp-validation-for="PayGrade" class="text-danger small"></span>
+                        <div class="form-text">SP expects VARCHAR(50).</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="HireDate" class="form-label"></label>
+                        <input asp-for="HireDate" class="form-control" type="date" />
+                        <span asp-validation-for="HireDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="col-12">
+                        <label asp-for="Biography" class="form-label"></label>
+                        <textarea asp-for="Biography" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="EmploymentProgress" class="form-label"></label>
+                        <input asp-for="EmploymentProgress" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="AccountStatus" class="form-label"></label>
+                        <input asp-for="AccountStatus" class="form-control" />
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="EmploymentStatus" class="form-label"></label>
+                        <input asp-for="EmploymentStatus" class="form-control" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-check mt-4">
+                            <input asp-for="IsActive" class="form-check-input" />
+                            <label asp-for="IsActive" class="form-check-label"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="ProfileCompletion" class="form-label"></label>
+                        <input asp-for="ProfileCompletion" class="form-control" type="number" min="0" max="100" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="ContractID" class="form-label"></label>
+                        <input asp-for="ContractID" class="form-control" type="number" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="TaxFormID" class="form-label"></label>
+                        <input asp-for="TaxFormID" class="form-control" type="number" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label asp-for="SalaryTypeID" class="form-label"></label>
+                        <input asp-for="SalaryTypeID" class="form-control" type="number" />
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-success">Create Employee</button>
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
