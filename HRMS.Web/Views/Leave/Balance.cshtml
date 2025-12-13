@@ -1,0 +1,21 @@
+@model List<HRMS.Web.Models.Leave.LeaveBalanceRowVM>
+
+<h2>Leave Balance (Employee @ViewBag.EmployeeId)</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Leave Type</th>
+            <th>Remaining Days</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.LeaveType</td>
+            <td>@r.RemainingDays</td>
+        </tr>
+    }
+    </tbody>
+</table>

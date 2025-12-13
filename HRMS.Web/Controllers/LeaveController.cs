@@ -71,5 +71,21 @@ namespace HRMS.Web.Controllers
             return RedirectToAction(nameof(Submit));
         }
 
+        [HttpGet]
+        public async Task<IActionResult> History(int employeeId)
+        {
+            var data = await _leaveService.GetLeaveHistoryAsync(employeeId);
+            ViewBag.EmployeeId = employeeId;
+            return View(data);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Balance(int employeeId)
+        {
+            var data = await _leaveService.GetLeaveBalanceAsync(employeeId);
+            ViewBag.EmployeeId = employeeId;
+            return View(data);
+        }
+
     }
 }

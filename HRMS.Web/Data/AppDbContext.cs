@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using HRMS.Web.Data.Entities;
+using HRMS.Web.Data.Entities.Query;
 using HrmsException = HRMS.Web.Data.Entities.Exception;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,6 +72,8 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Leave> Leaves { get; set; }
 
+    public virtual DbSet<LeaveHistoryRow> LeaveHistoryRows { get; set; }
+    public virtual DbSet<LeaveBalanceRow> LeaveBalanceRows { get; set; }
     public virtual DbSet<LeaveDocument> LeaveDocuments { get; set; }
 
     public virtual DbSet<LeaveEntitlement> LeaveEntitlements { get; set; }

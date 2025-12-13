@@ -1,0 +1,29 @@
+@model List<HRMS.Web.Models.Leave.LeaveHistoryRowVM>
+
+<h2>Leave History (Employee @ViewBag.EmployeeId)</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Request #</th>
+            <th>Type</th>
+            <th>Reason</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Approval Date</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var r in Model)
+    {
+        <tr>
+            <td>@r.RequestId</td>
+            <td>@r.LeaveType</td>
+            <td>@r.Reason</td>
+            <td>@r.DurationDays</td>
+            <td>@r.Status</td>
+            <td>@(r.ApprovalDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+        </tr>
+    }
+    </tbody>
+</table>
