@@ -1,11 +1,13 @@
 using HRMS.Web.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using HRMS.Web.Services.Leave;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // MVC
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ILeaveService, LeaveService>();
 
 // EF Core (scaffolded DbContext)
 builder.Services.AddDbContext<AppDbContext>(options =>
