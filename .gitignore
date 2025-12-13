@@ -61,6 +61,7 @@ x86/
 *.log
 *.bak
 *.tmp
+wwwroot/uploads/*
 
 # ===========================
 # ENV FILES (if needed later)
