@@ -263,5 +263,45 @@ namespace HRMS.Web.Controllers
             TempData["Success"] = "Eligibility rules saved.";
             return RedirectToAction(nameof(Eligibility));
         }
+
+        // ==============================
+        // HR Override Leave Decision
+        // ==============================
+
+        // GET: /HrLeave/OverrideDecision?leaveRequestId=5
+        [HttpGet]
+        public async Task<IActionResult> OverrideDecision(int leaveRequestId)
+        {
+            if (leaveRequestId <= 0) return BadRequest();
+
+            // Optional existence check (keeps UX clean)
+            var exists = await _db.LeaveRequests.AsNoTracking()
+                .AnyAsync(lr => lr.request_id == leaveRequestId);
+
+            if (!exists) return NotFound();
+
+            return View(new OverrideLeaveDecisionVM
+            {
+                LeaveRequestId = leaveRequestId
+            });
+        }
+
+        // POST: /HrLeave/OverrideDecision
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OverrideDecision(OverrideLeaveDecisionVM vm)
+        {
+            if (!ModelState.IsValid)
+                return View(vm);
+
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC OverrideLeaveDecision
+            @LeaveRequestID={vm.LeaveRequestId},
+            @Reason={vm.Reason}
+    ");
+
+            TempData["Success"] = $"Override applied for LeaveRequestID={vm.LeaveRequestId}.";
+            return RedirectToAction(nameof(OverrideDecision), new { leaveRequestId = vm.LeaveRequestId });
+        }
     }
 }

@@ -1,0 +1,30 @@
+@model HRMS.Web.Models.Leave.OverrideLeaveDecisionVM
+
+<h2>Override Leave Decision</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="OverrideDecision" method="post" class="mt-3">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Leave Request ID</label>
+        <input asp-for="LeaveRequestId" class="form-control" readonly />
+        <span asp-validation-for="LeaveRequestId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Reason (max 200 chars)</label>
+        <textarea asp-for="Reason" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Override</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
