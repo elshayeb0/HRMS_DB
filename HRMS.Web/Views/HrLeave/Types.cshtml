@@ -1,0 +1,49 @@
+@model List<HRMS.Web.Data.Entities.Leave>
+
+<h2>Leave Types</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="CreateType">+ New Leave Type</a>
+</p>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">No leave types found.</div>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Type</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.leave_id</td>
+                <td>@t.leave_type</td>
+                <td class="text-end">
+                    <a class="btn btn-sm btn-outline-secondary" asp-action="EditType" asp-route-id="@t.leave_id">Edit</a>
+
+                    <form asp-action="DeleteType" asp-route-id="@t.leave_id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Delete this leave type?');">
+                            Delete
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

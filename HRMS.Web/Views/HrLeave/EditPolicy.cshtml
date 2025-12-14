@@ -1,0 +1,27 @@
+@model HRMS.Web.Models.Leave.UpdateLeavePolicyVM
+
+<h2>Edit Leave Policy (@Model.PolicyId)</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="EditPolicy" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="PolicyId" />
+
+    <div class="mb-3">
+        <label class="form-label">Eligibility Rules</label>
+        <textarea class="form-control" asp-for="EligibilityRules" rows="3"></textarea>
+        <span class="text-danger" asp-validation-for="EligibilityRules"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Notice Period (days)</label>
+        <input class="form-control" asp-for="NoticePeriod" type="number" min="0" />
+        <span class="text-danger" asp-validation-for="NoticePeriod"></span>
+    </div>
+
+    <button class="btn btn-success" type="submit">Update</button>
+</form>

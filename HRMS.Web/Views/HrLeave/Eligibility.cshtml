@@ -1,0 +1,35 @@
+@model HRMS.Web.Models.Leave.ConfigureLeaveEligibilityVM
+
+<h2>Configure Leave Eligibility</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="Eligibility" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Leave Type</label>
+        <select class="form-select" name="LeaveType" required>
+            <option value="">-- Select --</option>
+            @foreach (var lt in ViewBag.LeaveTypes)
+            {
+                <option value="@lt.leave_type">@lt.leave_type</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Minimum Tenure (months)</label>
+        <input class="form-control" type="number" name="MinTenure" min="0" value="@Model.MinTenure" required />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Employee Type</label>
+        <input class="form-control" name="EmployeeType" value="@Model.EmployeeType" placeholder="e.g. FullTime" required />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>

@@ -20,6 +20,9 @@ namespace HRMS.Web.Services.Leave
         Task<bool> ApproveLeaveRequestAsync(int managerId, int leaveRequestId);
         Task<bool> RejectLeaveRequestAsync(int managerId, int leaveRequestId, string reason);
         Task FlagIrregularLeaveAsync(int employeeId, int managerId, string patternDescription);
+
+        Task UpdateLeavePolicyAsync(int policyId, string eligibilityRules, int noticePeriod);
+        Task ConfigureLeaveEligibilityAsync(string leaveType, int minTenure, string employeeType);
     }
 
     public class LeaveService : ILeaveService
@@ -156,6 +159,26 @@ namespace HRMS.Web.Services.Leave
             @EmployeeID={employeeId},
             @ManagerID={managerId},
             @PatternDescription={patternDescription}
+    ");
+        }
+
+        public async Task UpdateLeavePolicyAsync(int policyId, string eligibilityRules, int noticePeriod)
+        {
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC UpdateLeavePolicy
+            @PolicyID={policyId},
+            @EligibilityRules={eligibilityRules},
+            @NoticePeriod={noticePeriod}
+    ");
+        }
+
+        public async Task ConfigureLeaveEligibilityAsync(string leaveType, int minTenure, string employeeType)
+        {
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC ConfigureLeaveEligibility
+            @LeaveType={leaveType},
+            @MinTenure={minTenure},
+            @EmployeeType={employeeType}
     ");
         }
     }

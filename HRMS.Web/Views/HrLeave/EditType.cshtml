@@ -1,0 +1,21 @@
+@model HRMS.Web.Data.Entities.Leave
+
+<h2>Edit Leave Type</h2>
+
+<form asp-action="EditType" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="leave_id" />
+
+    <div class="mb-3">
+        <label class="form-label">Leave Type</label>
+        <input asp-for="leave_type" class="form-control" />
+        <span asp-validation-for="leave_type" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" asp-action="Types">Back</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
