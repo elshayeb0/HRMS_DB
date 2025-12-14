@@ -17,6 +17,8 @@ namespace HRMS.Web.Services.Leave
         Task<List<LeaveHistoryRowVM>> GetLeaveHistoryAsync(int employeeId);
         Task<List<LeaveBalanceRowVM>> GetLeaveBalanceAsync(int employeeId);
         Task<List<PendingLeaveRequestRow>> GetPendingLeaveRequestsAsync(int managerId);
+        Task<bool> ApproveLeaveRequestAsync(int managerId, int leaveRequestId);
+        Task<bool> RejectLeaveRequestAsync(int managerId, int leaveRequestId, string reason);
     }
 
     public class LeaveService : ILeaveService
@@ -98,6 +100,52 @@ namespace HRMS.Web.Services.Leave
                 .FromSqlInterpolated($@"EXEC GetPendingLeaveRequests @ManagerID={managerId}")
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<bool> ApproveLeaveRequestAsync(int managerId, int leaveRequestId)
+        {
+            // Guard: request must belong to manager’s team and be Pending
+            var allowed = await _db.LeaveRequests
+                .AnyAsync(lr =>
+                    lr.request_id == leaveRequestId
+                    && lr.status == "Pending"
+                    && lr.employee != null
+                    && lr.employee.manager_id == managerId);
+
+            if (!allowed) return false;
+
+            // Use your existing stored procedure name (typo included)
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC ApproveLeaveRequestt
+            @LeaveRequestID={leaveRequestId},
+            @ManagerID={managerId}
+    ");
+
+            return true;
+        }
+
+        public async Task<bool> RejectLeaveRequestAsync(int managerId, int leaveRequestId, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(reason))
+                reason = "Rejected by manager.";
+
+            var allowed = await _db.LeaveRequests
+                .AnyAsync(lr =>
+                    lr.request_id == leaveRequestId
+                    && lr.status == "Pending"
+                    && lr.employee != null
+                    && lr.employee.manager_id == managerId);
+
+            if (!allowed) return false;
+
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC RejectLeaveRequest
+            @LeaveRequestID={leaveRequestId},
+            @ManagerID={managerId},
+            @Reason={reason}
+    ");
+
+            return true;
         }
     }
 }

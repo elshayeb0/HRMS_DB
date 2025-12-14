@@ -95,5 +95,31 @@ namespace HRMS.Web.Controllers
             return View(data);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Approve(int managerId, int leaveRequestId)
+        {
+            var ok = await _leaveService.ApproveLeaveRequestAsync(managerId, leaveRequestId);
+            TempData["Success"] = ok ? "Leave request approved." : "Not allowed or not pending.";
+            return RedirectToAction(nameof(Pending), new { managerId });
+        }
+
+        [HttpGet]
+        public IActionResult Reject(int managerId, int leaveRequestId)
+        {
+            ViewBag.ManagerId = managerId;
+            ViewBag.LeaveRequestId = leaveRequestId;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reject(int managerId, int leaveRequestId, string reason)
+        {
+            var ok = await _leaveService.RejectLeaveRequestAsync(managerId, leaveRequestId, reason);
+            TempData["Success"] = ok ? "Leave request rejected." : "Not allowed or not pending.";
+            return RedirectToAction(nameof(Pending), new { managerId });
+        }
+
     }
 }

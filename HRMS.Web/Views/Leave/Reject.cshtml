@@ -1,0 +1,20 @@
+@{
+    ViewBag.Title = "Reject Leave";
+}
+
+<h2>Reject Leave Request</h2>
+
+<form asp-action="Reject" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+    <input type="hidden" name="leaveRequestId" value="@ViewBag.LeaveRequestId" />
+
+    <div class="mb-3">
+        <label class="form-label">Reason</label>
+        <textarea name="reason" class="form-control" rows="3" required></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Confirm Reject</button>
+    <a class="btn btn-secondary" asp-action="Pending" asp-route-managerId="@ViewBag.ManagerId">Cancel</a>
+</form>

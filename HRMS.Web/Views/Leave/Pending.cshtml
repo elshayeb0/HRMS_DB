@@ -8,7 +8,7 @@
 }
 else
 {
-    <table class="table table-striped">
+    <table class="table table-striped align-middle">
         <thead>
             <tr>
                 <th>Request ID</th>
@@ -18,6 +18,7 @@ else
                 <th>Duration</th>
                 <th>Approval Timing</th>
                 <th>Status</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +31,28 @@ else
                 <td>@r.justification</td>
                 <td>@r.duration</td>
                 <td>@(r.approval_timing?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-                <td>@r.status</td>
+                <td>
+                    <span class="badge bg-warning text-dark">@r.status</span>
+                </td>
+                <td>
+                    <!-- APPROVE -->
+                    <form asp-action="Approve" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+                        <input type="hidden" name="leaveRequestId" value="@r.LeaveRequestID" />
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Approve
+                        </button>
+                    </form>
+
+                    <!-- REJECT -->
+                    <a class="btn btn-danger btn-sm ms-1"
+                       asp-action="Reject"
+                       asp-route-managerId="@ViewBag.ManagerId"
+                       asp-route-leaveRequestId="@r.LeaveRequestID">
+                        Reject
+                    </a>
+                </td>
             </tr>
         }
         </tbody>
