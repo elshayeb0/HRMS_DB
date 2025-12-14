@@ -344,5 +344,51 @@ namespace HRMS.Web.Controllers
             TempData["Success"] = "Special leave rules saved.";
             return RedirectToAction(nameof(SpecialLeave));
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> HrApproveAndSync(int leaveRequestId, int approverId)
+        {
+            if (leaveRequestId <= 0) return BadRequest();
+
+            await using var tx = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                // 1) Approve (HR)
+                await _db.Database.ExecuteSqlInterpolatedAsync($@"
+    EXEC ApproveLeaveRequest
+        @LeaveRequestID={leaveRequestId},
+        @ApproverID={approverId},
+        @Status={"Approved"}
+");
+
+                // 2) Sync balances
+                await _db.Database.ExecuteSqlInterpolatedAsync($@"
+    EXEC SyncLeaveBalances
+        @LeaveRequestID={leaveRequestId}
+");
+
+                // 3) Sync attendance
+                await _db.Database.ExecuteSqlInterpolatedAsync($@"
+    EXEC SyncLeaveToattendance
+        @LeaveRequestID={leaveRequestId}
+");
+
+                // 4) Finalize (LAST)
+                await _db.Database.ExecuteSqlInterpolatedAsync($@"
+    EXEC FinalizeLeaveRequest
+        @LeaveRequestID={leaveRequestId}
+");
+
+                await tx.CommitAsync();
+                TempData["Success"] = $"Approved + synced (LeaveRequestID={leaveRequestId}).";
+                return RedirectToAction("PendingHr"); // whatever your HR pending list action is
+            }
+            catch
+            {
+                await tx.RollbackAsync();
+                throw;
+            }
+        }
     }
 }
