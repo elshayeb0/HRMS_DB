@@ -98,6 +98,91 @@ namespace HRMS.Web.Controllers
             return RedirectToAction(nameof(Types));
         }
 
+        // ==============================
+        // HR Leave Entitlements
+        // ==============================
+
+        // GET: /HrLeave/Entitlements
+        [HttpGet]
+        public async Task<IActionResult> Entitlements()
+        {
+            var items = await _db.LeaveEntitlements
+                .AsNoTracking()
+                .Include(x => x.employee)
+                .Include(x => x.leave_type)
+                .OrderBy(x => x.employee_id)
+                .ThenBy(x => x.leave_type.leave_type)
+                .ToListAsync();
+
+            return View(items);
+        }
+
+        // GET: /HrLeave/AssignEntitlement
+        [HttpGet]
+        public async Task<IActionResult> AssignEntitlement()
+        {
+            ViewBag.LeaveTypes = await _db.Leaves.AsNoTracking().OrderBy(l => l.leave_type).ToListAsync();
+            return View();
+        }
+
+        // POST: /HrLeave/AssignEntitlement
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AssignEntitlement(int employeeId, string leaveType, decimal entitlement)
+        {
+            if (employeeId <= 0) ModelState.AddModelError(nameof(employeeId), "EmployeeId must be > 0.");
+            if (string.IsNullOrWhiteSpace(leaveType)) ModelState.AddModelError(nameof(leaveType), "Leave type is required.");
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LeaveTypes = await _db.Leaves.AsNoTracking().OrderBy(l => l.leave_type).ToListAsync();
+                return View();
+            }
+
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC AssignLeaveEntitlement
+            @EmployeeID={employeeId},
+            @LeaveType={leaveType},
+            @Entitlement={entitlement}
+    ");
+
+            TempData["Success"] = "Leave entitlement assigned/updated successfully.";
+            return RedirectToAction(nameof(Entitlements));
+        }
+
+        // GET: /HrLeave/AdjustBalance
+        [HttpGet]
+        public async Task<IActionResult> AdjustBalance()
+        {
+            ViewBag.LeaveTypes = await _db.Leaves.AsNoTracking().OrderBy(l => l.leave_type).ToListAsync();
+            return View();
+        }
+
+        // POST: /HrLeave/AdjustBalance
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AdjustBalance(int employeeId, string leaveType, decimal adjustment)
+        {
+            if (employeeId <= 0) ModelState.AddModelError(nameof(employeeId), "EmployeeId must be > 0.");
+            if (string.IsNullOrWhiteSpace(leaveType)) ModelState.AddModelError(nameof(leaveType), "Leave type is required.");
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LeaveTypes = await _db.Leaves.AsNoTracking().OrderBy(l => l.leave_type).ToListAsync();
+                return View();
+            }
+
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC AdjustLeaveBalance
+            @EmployeeID={employeeId},
+            @LeaveType={leaveType},
+            @Adjustment={adjustment}
+    ");
+
+            TempData["Success"] = "Leave balance adjusted successfully.";
+            return RedirectToAction(nameof(Entitlements));
+        }
+
         // =========================
         // NEW: Leave Policy + Eligibility
         // =========================

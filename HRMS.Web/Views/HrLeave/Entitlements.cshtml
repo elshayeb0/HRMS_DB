@@ -1,0 +1,40 @@
+@model List<HRMS.Web.Data.Entities.LeaveEntitlement>
+
+<h2>Leave Entitlements</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<div class="mb-3">
+    <a class="btn btn-primary" asp-action="AssignEntitlement">Assign / Set Entitlement</a>
+    <a class="btn btn-warning ms-2" asp-action="AdjustBalance">Adjust Balance</a>
+</div>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">No entitlements found.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Leave Type</th>
+                <th>Entitlement</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@(r.employee?.full_name ?? "-") (@r.employee_id)</td>
+                <td>@(r.leave_type?.leave_type ?? "-")</td>
+                <td>@(r.entitlement ?? 0m)</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
