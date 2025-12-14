@@ -303,5 +303,46 @@ namespace HRMS.Web.Controllers
             TempData["Success"] = $"Override applied for LeaveRequestID={vm.LeaveRequestId}.";
             return RedirectToAction(nameof(OverrideDecision), new { leaveRequestId = vm.LeaveRequestId });
         }
+
+        // =========================
+        // Special Leave Types
+        // =========================
+
+        // GET: /HrLeave/SpecialLeave
+        [HttpGet]
+        public async Task<IActionResult> SpecialLeave()
+        {
+            ViewBag.LeaveTypes = await _db.Leaves
+                .AsNoTracking()
+                .OrderBy(l => l.leave_type)
+                .ToListAsync();
+
+            return View(new ConfigureSpecialLeaveVM());
+        }
+
+        // POST: /HrLeave/SpecialLeave
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SpecialLeave(ConfigureSpecialLeaveVM vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.LeaveTypes = await _db.Leaves
+                    .AsNoTracking()
+                    .OrderBy(l => l.leave_type)
+                    .ToListAsync();
+
+                return View(vm);
+            }
+
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC ConfigureSpecialLeave
+            @LeaveType={vm.LeaveType},
+            @Rules={vm.Rules}
+    ");
+
+            TempData["Success"] = "Special leave rules saved.";
+            return RedirectToAction(nameof(SpecialLeave));
+        }
     }
 }

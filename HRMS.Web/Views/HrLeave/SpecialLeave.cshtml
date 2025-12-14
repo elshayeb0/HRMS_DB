@@ -1,0 +1,34 @@
+@model HRMS.Web.Models.Leave.ConfigureSpecialLeaveVM
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using HRMS.Web.Data.Entities
+
+<h1>Configure Special Leave</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="SpecialLeave" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label class="form-label">Leave Type</label>
+
+        <select asp-for="LeaveType"
+                class="form-select"
+                asp-items="@(new SelectList((IEnumerable<Leave>)ViewBag.LeaveTypes, nameof(Leave.leave_type), nameof(Leave.leave_type)))">
+            <option value="">-- select --</option>
+        </select>
+
+        <span asp-validation-for="LeaveType" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Rules (max 200 chars)</label>
+        <input asp-for="Rules" class="form-control" maxlength="200" />
+        <span asp-validation-for="Rules" class="text-danger"></span>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+</form>
