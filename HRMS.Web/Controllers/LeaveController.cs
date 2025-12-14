@@ -87,5 +87,13 @@ namespace HRMS.Web.Controllers
             return View(data);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Pending(int managerId)
+        {
+            var data = await _leaveService.GetPendingLeaveRequestsAsync(managerId);
+            ViewBag.ManagerId = managerId;
+            return View(data);
+        }
+
     }
 }

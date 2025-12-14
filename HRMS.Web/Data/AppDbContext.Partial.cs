@@ -26,6 +26,12 @@ namespace HRMS.Web.Data
                 entity.HasNoKey();
                 entity.ToView(null);
             });
+
+            modelBuilder.Entity<PendingLeaveRequestRow>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToView(null);
+            });
         }
     }
 }

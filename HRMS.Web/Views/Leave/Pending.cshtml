@@ -1,0 +1,38 @@
+@model List<HRMS.Web.Data.Entities.Query.PendingLeaveRequestRow>
+
+<h2>Pending Leave Requests (Manager @ViewBag.ManagerId)</h2>
+
+@if (Model == null || Model.Count == 0)
+{
+    <div class="alert alert-info">No pending leave requests found.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Employee</th>
+                <th>Leave Type</th>
+                <th>Justification</th>
+                <th>Duration</th>
+                <th>Approval Timing</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.LeaveRequestID</td>
+                <td>@r.EmployeeName (@r.EmployeeID)</td>
+                <td>@r.LeaveType</td>
+                <td>@r.justification</td>
+                <td>@r.duration</td>
+                <td>@(r.approval_timing?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+                <td>@r.status</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

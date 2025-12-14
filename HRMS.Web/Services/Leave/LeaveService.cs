@@ -16,6 +16,7 @@ namespace HRMS.Web.Services.Leave
 
         Task<List<LeaveHistoryRowVM>> GetLeaveHistoryAsync(int employeeId);
         Task<List<LeaveBalanceRowVM>> GetLeaveBalanceAsync(int employeeId);
+        Task<List<PendingLeaveRequestRow>> GetPendingLeaveRequestsAsync(int managerId);
     }
 
     public class LeaveService : ILeaveService
@@ -89,6 +90,14 @@ namespace HRMS.Web.Services.Leave
                 LeaveType = r.Leave_Type ?? "-",
                 RemainingDays = r.Remaining_Days ?? 0m     // decimal? -> decimal
             }).ToList();
+        }
+
+        public async Task<List<PendingLeaveRequestRow>> GetPendingLeaveRequestsAsync(int managerId)
+        {
+            return await _db.Set<PendingLeaveRequestRow>()
+                .FromSqlInterpolated($@"EXEC GetPendingLeaveRequests @ManagerID={managerId}")
+                .AsNoTracking()
+                .ToListAsync();
         }
     }
 }
