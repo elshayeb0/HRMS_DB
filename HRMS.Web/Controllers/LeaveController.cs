@@ -121,5 +121,29 @@ namespace HRMS.Web.Controllers
             return RedirectToAction(nameof(Pending), new { managerId });
         }
 
+        [HttpGet]
+        public IActionResult FlagIrregular(int managerId, int employeeId)
+        {
+            ViewBag.ManagerId = managerId;
+            ViewBag.EmployeeId = employeeId;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FlagIrregular(int managerId, int employeeId, string patternDescription)
+        {
+            if (string.IsNullOrWhiteSpace(patternDescription))
+            {
+                TempData["Error"] = "Pattern description is required.";
+                return RedirectToAction(nameof(FlagIrregular), new { managerId, employeeId });
+            }
+
+            await _leaveService.FlagIrregularLeaveAsync(employeeId, managerId, patternDescription.Trim());
+
+            TempData["Success"] = "Irregular leave pattern flagged.";
+            return RedirectToAction(nameof(Pending), new { managerId });
+        }
+
     }
 }

@@ -1,0 +1,29 @@
+@{
+    ViewData["Title"] = "Flag Irregular Leave Pattern";
+}
+
+<h2>Flag Irregular Leave Pattern</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+    <input type="hidden" name="employeeId" value="@ViewBag.EmployeeId" />
+
+    <div class="mb-3">
+        <label class="form-label">Pattern description</label>
+        <textarea name="patternDescription" class="form-control" maxlength="200" rows="4"
+                  placeholder="Example: 3 Mondays in a row, always right before shift start.">@("")</textarea>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Flag Pattern</button>
+</form>

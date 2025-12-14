@@ -19,6 +19,7 @@ namespace HRMS.Web.Services.Leave
         Task<List<PendingLeaveRequestRow>> GetPendingLeaveRequestsAsync(int managerId);
         Task<bool> ApproveLeaveRequestAsync(int managerId, int leaveRequestId);
         Task<bool> RejectLeaveRequestAsync(int managerId, int leaveRequestId, string reason);
+        Task FlagIrregularLeaveAsync(int employeeId, int managerId, string patternDescription);
     }
 
     public class LeaveService : ILeaveService
@@ -146,6 +147,16 @@ namespace HRMS.Web.Services.Leave
     ");
 
             return true;
+        }
+
+        public async Task FlagIrregularLeaveAsync(int employeeId, int managerId, string patternDescription)
+        {
+            await _db.Database.ExecuteSqlInterpolatedAsync($@"
+        EXEC FlagIrregularLeave
+            @EmployeeID={employeeId},
+            @ManagerID={managerId},
+            @PatternDescription={patternDescription}
+    ");
         }
     }
 }

@@ -31,10 +31,20 @@ else
                 <td>@r.justification</td>
                 <td>@r.duration</td>
                 <td>@(r.approval_timing?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
+
+                <!-- STATUS -->
                 <td>
                     <span class="badge bg-warning text-dark">@r.status</span>
                 </td>
+
+                <!-- ACTIONS -->
                 <td>
+                    <!-- FLAG -->
+                    <a class="btn btn-sm btn-warning me-1"
+                       href="/Leave/FlagIrregular?managerId=@ViewBag.ManagerId&employeeId=@r.EmployeeID">
+                        Flag
+                    </a>
+
                     <!-- APPROVE -->
                     <form asp-action="Approve" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
