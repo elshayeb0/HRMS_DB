@@ -1,49 +1,81 @@
 @model List<HRMS.Web.Data.Entities.Leave>
-
-<h2>Leave Types</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
+@{
+    ViewData["Title"] = "Leave Types";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<p>
-    <a class="btn btn-primary" asp-action="CreateType">+ New Leave Type</a>
-</p>
+<!-- MASTER WRAPPER: Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header d-flex justify-content-between align-items-center" style="color: var(--neon-purple);">
+        <span><i class="bi bi-collection-fill me-2"></i>Leave Types</span>
 
-@if (Model == null || Model.Count == 0)
-{
-    <div class="alert alert-info">No leave types found.</div>
-}
-else
-{
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Type</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var t in Model)
+        <!-- Action Button -->
+        <a class="btn btn-sm btn-primary shadow-sm" asp-action="CreateType" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+            <i class="bi bi-plus-lg me-1"></i> New Leave Type
+        </a>
+    </div>
+
+    <div class="cms-card-body">
+
+        @if (TempData["Success"] != null)
         {
-            <tr>
-                <td>@t.leave_id</td>
-                <td>@t.leave_type</td>
-                <td class="text-end">
-                    <a class="btn btn-sm btn-outline-secondary" asp-action="EditType" asp-route-id="@t.leave_id">Edit</a>
-
-                    <form asp-action="DeleteType" asp-route-id="@t.leave_id" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Delete this leave type?');">
-                            Delete
-                        </button>
-                    </form>
-                </td>
-            </tr>
+            <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            </div>
         }
-        </tbody>
-    </table>
-}
+
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-folder-x fs-1 d-block mb-3" style="opacity: 0.3;"></i>
+                No leave types defined in the system.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <!-- NEON TABLE -->
+                <table class="table table-neon align-middle">
+                    <thead>
+                        <tr>
+                            <th style="width: 10%">ID</th>
+                            <th>Leave Type Name</th>
+                            <th class="text-end" style="width: 20%">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">@t.leave_id</td>
+                            <td class="fw-bold text-white">@t.leave_type</td>
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <!-- Edit Button -->
+                                    <a class="btn btn-sm btn-outline-secondary text-white"
+                                       asp-action="EditType"
+                                       asp-route-id="@t.leave_id"
+                                       title="Edit Name">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+
+                                    <!-- Delete Button -->
+                                    <form asp-action="DeleteType" asp-route-id="@t.leave_id" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Are you sure you want to delete the @t.leave_type type?');"
+                                                title="Delete Type">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -1,40 +1,73 @@
 @model List<HRMS.Web.Data.Entities.LeaveEntitlement>
-
-<h2>Leave Entitlements</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
+@{
+    ViewData["Title"] = "Leave Entitlements";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<div class="mb-3">
-    <a class="btn btn-primary" asp-action="AssignEntitlement">Assign / Set Entitlement</a>
-    <a class="btn btn-warning ms-2" asp-action="AdjustBalance">Adjust Balance</a>
-</div>
+<!-- MASTER WRAPPER: Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header d-flex justify-content-between align-items-center" style="color: var(--neon-purple);">
+        <span><i class="bi bi-person-lines-fill me-2"></i>Leave Entitlements</span>
 
-@if (Model == null || Model.Count == 0)
-{
-    <div class="alert alert-info">No entitlements found.</div>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Employee</th>
-                <th>Leave Type</th>
-                <th>Entitlement</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var r in Model)
+        <!-- Action Toolbar -->
+        <div>
+            <a class="btn btn-sm btn-outline-warning me-2" asp-action="AdjustBalance">
+                <i class="bi bi-sliders me-1"></i> Adjust Balance
+            </a>
+            <a class="btn btn-sm btn-primary shadow-sm" asp-action="AssignEntitlement" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+                <i class="bi bi-plus-lg me-1"></i> Set Entitlement
+            </a>
+        </div>
+    </div>
+
+    <div class="cms-card-body">
+
+        @if (TempData["Success"] != null)
         {
-            <tr>
-                <td>@(r.employee?.full_name ?? "-") (@r.employee_id)</td>
-                <td>@(r.leave_type?.leave_type ?? "-")</td>
-                <td>@(r.entitlement ?? 0m)</td>
-            </tr>
+            <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+            </div>
         }
-        </tbody>
-    </table>
-}
+
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-clipboard-data fs-1 d-block mb-3" style="opacity: 0.3;"></i>
+                No entitlements assigned yet.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <!-- NEON TABLE -->
+                <table class="table table-neon align-middle">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Leave Type</th>
+                            <th class="text-center">Annual Entitlement</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold text-white">
+                                @(r.employee?.full_name ?? "Unknown")
+                                <span class="text-muted small ms-1 fw-normal">(ID: @r.employee_id)</span>
+                            </td>
+                            <td class="text-info">@(r.leave_type?.leave_type ?? "-")</td>
+                            <td class="text-center">
+                                <span class="badge" style="background-color: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px solid var(--neon-purple);">
+                                    @(r.entitlement?.ToString("0.##") ?? "0") Days
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

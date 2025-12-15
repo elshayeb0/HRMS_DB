@@ -1,39 +1,88 @@
 @using HRMS.Web.Data.Entities
 @{
+    ViewData["Title"] = "Assign Entitlement";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
+
     var leaveTypes = ViewBag.LeaveTypes as List<Leave> ?? new List<Leave>();
 }
 
-<h2>Assign / Set Leave Entitlement</h2>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-purple); /* Purple focus for "Creation" actions */
+        box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+<div class="row justify-content-center">
+    <div class="col-md-6">
 
-<form asp-action="AssignEntitlement" method="post" class="mt-3">
-    @Html.AntiForgeryToken()
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header" style="color: var(--neon-purple);">
+                <i class="bi bi-person-check-fill me-2"></i> Assign Leave Entitlement
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Employee ID</label>
-        <input name="employeeId" type="number" class="form-control" min="1" required />
+            <div class="cms-card-body">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                    </div>
+                }
+
+                <form asp-action="AssignEntitlement" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Employee ID</label>
+                        <input name="employeeId" type="number" class="form-control" min="1" placeholder="e.g. 101" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Leave Type</label>
+                        <select name="leaveType" class="form-select" required>
+                            <option value="" class="text-dark">-- Select Leave Type --</option>
+                            @foreach (var lt in leaveTypes)
+                            {
+                                <option value="@lt.leave_type" class="text-dark">@lt.leave_type</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Total Entitlement</label>
+                        <div class="input-group">
+                            <input name="entitlement" type="number" step="0.001" class="form-control" placeholder="e.g. 21" required />
+                            <span class="input-group-text bg-dark border-secondary text-white">Days</span>
+                        </div>
+                        <div class="form-text mt-2 text-muted small">
+                            Sets the total yearly allowance for this employee.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a class="btn btn-outline-secondary" asp-action="Entitlements">Cancel</a>
+                        <button type="submit" class="btn btn-primary shadow-sm" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+                            <i class="bi bi-save me-2"></i> Save Entitlement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Leave Type</label>
-        <select name="leaveType" class="form-select" required>
-            <option value="">-- Select --</option>
-            @foreach (var lt in leaveTypes)
-            {
-                <option value="@lt.leave_type">@lt.leave_type</option>
-            }
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Entitlement (days)</label>
-        <input name="entitlement" type="number" step="0.001" class="form-control" required />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a class="btn btn-secondary ms-2" asp-action="Entitlements">Back</a>
-</form>
+</div>

@@ -1,21 +1,65 @@
 @model List<HRMS.Web.Models.Leave.LeaveBalanceRowVM>
+@{
+    ViewData["Title"] = "Leave Balance";
+}
 
-<h2>Leave Balance (Employee @ViewBag.EmployeeId)</h2>
+<!-- MASTER WRAPPER: The Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-wallet2 me-2"></i>Leave Balance (Employee @ViewBag.EmployeeId)</span>
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Leave Type</th>
-            <th>Remaining Days</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var r in Model)
-    {
-        <tr>
-            <td>@r.LeaveType</td>
-            <td>@r.RemainingDays</td>
-        </tr>
-    }
-    </tbody>
-</table>
+        <!-- Quick Action Button -->
+        <a asp-action="Submit" class="btn btn-sm btn-neon-cyan">
+            <i class="bi bi-plus-lg"></i> New Request
+        </a>
+    </div>
+
+    <div class="cms-card-body">
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="alert alert-info bg-transparent border-info text-info text-center py-4">
+                <i class="bi bi-info-circle me-2"></i> No balance records found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <!-- Applied table-neon class instead of table-bordered for the theme -->
+                <table class="table table-neon align-middle">
+                    <thead>
+                        <tr>
+                            <th>Leave Type</th>
+                            <th class="text-center">Remaining Days</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-white">@r.LeaveType</td>
+                                <td class="text-center">
+                                    <!-- Added badge logic for better visualization -->
+                                    @if(r.RemainingDays < 0)
+                                    {
+                                        <span class="badge bg-danger">@r.RemainingDays</span>
+                                    }
+                                    else if(r.RemainingDays <= 2)
+                                    {
+                                         <span class="badge bg-warning text-dark">@r.RemainingDays</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge" style="background-color: var(--neon-cyan); color: #000; box-shadow: 0 0 5px var(--neon-cyan);">
+                                            @r.RemainingDays
+                                        </span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

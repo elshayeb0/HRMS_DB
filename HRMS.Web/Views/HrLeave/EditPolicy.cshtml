@@ -1,27 +1,83 @@
 @model HRMS.Web.Models.Leave.UpdateLeavePolicyVM
-
-<h2>Edit Leave Policy (@Model.PolicyId)</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
+@{
+    ViewData["Title"] = "Edit Policy";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<form asp-action="EditPolicy" method="post">
-    @Html.AntiForgeryToken()
-    <input type="hidden" asp-for="PolicyId" />
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-purple); /* Purple focus for Config actions */
+        box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-    <div class="mb-3">
-        <label class="form-label">Eligibility Rules</label>
-        <textarea class="form-control" asp-for="EligibilityRules" rows="3"></textarea>
-        <span class="text-danger" asp-validation-for="EligibilityRules"></span>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header" style="color: var(--neon-purple);">
+                <i class="bi bi-file-earmark-medical-fill me-2"></i> Edit Leave Policy <span class="text-muted ms-2 small">#@Model.PolicyId</span>
+            </div>
+
+            <div class="cms-card-body">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                    </div>
+                }
+
+                <form asp-action="EditPolicy" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="PolicyId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Eligibility Rules</label>
+                        <textarea class="form-control" asp-for="EligibilityRules" rows="4" placeholder="Define who can apply for this leave..."></textarea>
+                        <span class="text-danger small" asp-validation-for="EligibilityRules"></span>
+                        <div class="form-text text-muted small mt-1">
+                            Specific conditions required for employee eligibility.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Notice Period</label>
+                        <div class="input-group">
+                            <input class="form-control" asp-for="NoticePeriod" type="number" min="0" placeholder="0" />
+                            <span class="input-group-text bg-dark border-secondary text-white">Days</span>
+                        </div>
+                        <span class="text-danger small" asp-validation-for="NoticePeriod"></span>
+                        <div class="form-text text-muted small mt-1">
+                            Minimum days in advance the request must be submitted.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <!-- Assuming there is a generic policy list page to go back to, usually Types or a Policy Index -->
+                        <a class="btn btn-outline-secondary" asp-action="Types">Cancel</a>
+
+                        <button type="submit" class="btn btn-primary shadow-sm" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+                            <i class="bi bi-save me-1"></i> Update Policy
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Notice Period (days)</label>
-        <input class="form-control" asp-for="NoticePeriod" type="number" min="0" />
-        <span class="text-danger" asp-validation-for="NoticePeriod"></span>
-    </div>
-
-    <button class="btn btn-success" type="submit">Update</button>
-</form>
+</div>

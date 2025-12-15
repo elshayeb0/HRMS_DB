@@ -1,0 +1,182 @@
+@using Microsoft.AspNetCore.Identity
+@{
+    // Helper to determine active state
+    string IsActive(string controller, string action)
+    {
+        var routeData = ViewContext.RouteData.Values;
+        var currentController = routeData["controller"]?.ToString();
+        var currentAction = routeData["action"]?.ToString();
+        return (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase))
+                ? "active" : "";
+    }
+}
+
+<!-- Local style for the header hover effect -->
+<style>
+    .cms-sidebar-header {
+        transition: all 0.3s ease;
+        text-decoration: none !important;
+    }
+    .cms-sidebar-header:hover {
+        background: linear-gradient(90deg, rgba(252, 238, 10, 0.15), transparent); /* Stronger yellow gradient */
+        cursor: pointer;
+    }
+    .cms-sidebar-header:hover .brand-text {
+        text-shadow: 0 0 20px rgba(252, 238, 10, 0.8);
+        transform: scale(1.02);
+        transition: all 0.3s;
+    }
+
+    /* --- NEW INFO PILLS STYLES --- */
+    .sidebar-info-panel {
+        padding: 0 1.5rem 2rem 1.5rem;
+        margin-top: auto; /* Pushes to bottom of sidebar */
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: linear-gradient(180deg, transparent, rgba(0,0,0,0.3));
+    }
+
+    .info-pill {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px; /* Full pill shape */
+        padding: 0.7rem 1.2rem;
+        margin-top: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+        animation: pill-float 5s ease-in-out infinite;
+        position: relative;
+    }
+
+    /* Cyan Variant (System) */
+    .info-pill.cyan {
+        border-color: rgba(0, 240, 255, 0.3);
+        box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+    }
+    .info-pill.cyan:hover {
+        border-color: var(--cp-cyan);
+        box-shadow: 0 0 25px rgba(0, 240, 255, 0.5); /* Pop out glow */
+        background: rgba(0, 240, 255, 0.05);
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    /* Purple Variant (Security) */
+    .info-pill.purple {
+        border-color: rgba(185, 103, 255, 0.3);
+        box-shadow: 0 0 10px rgba(185, 103, 255, 0.1);
+        animation-delay: 2.5s; /* Sync offset for organic feel */
+    }
+    .info-pill.purple:hover {
+        border-color: var(--cp-purple);
+        box-shadow: 0 0 25px rgba(185, 103, 255, 0.5); /* Pop out glow */
+        background: rgba(185, 103, 255, 0.05);
+        transform: translateY(-2px) scale(1.02);
+    }
+
+    .pill-label {
+        font-size: 0.65rem;
+        color: rgba(255,255,255,0.7);
+        letter-spacing: 1px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .pill-value {
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #fff;
+        text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    }
+
+    @@keyframes pill-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-4px); } /* Levitating effect */
+    }
+</style>
+
+<nav class="cms-sidebar">
+    <!-- HEADER: WRAPPED IN ANCHOR TAG TO LINK TO DASHBOARD -->
+    <a asp-controller="Home" asp-action="Index" class="cms-sidebar-header">
+        <div class="brand-text">HRMS</div>
+        <div class="brand-sub">NEON // OS_2077</div>
+    </a>
+
+    <div class="cms-nav-scroll">
+
+        <!-- MODULE 1: LEAVE OPS -->
+        <div class="nav-section-header">
+            LEAVE OPS <i class="bi bi-cpu"></i>
+        </div>
+        <a asp-controller="Leave" asp-action="Submit" class="cms-nav-link @IsActive("Leave", "Submit")">
+            <i class="bi bi-send me-3"></i> Submit Request
+        </a>
+        <a asp-controller="Leave" asp-action="Balance" class="cms-nav-link @IsActive("Leave", "Balance")">
+            <i class="bi bi-wallet2 me-3"></i> My Balance
+        </a>
+        <a asp-controller="Leave" asp-action="History" class="cms-nav-link @IsActive("Leave", "History")">
+            <i class="bi bi-clock-history me-3"></i> History Log
+        </a>
+
+        <!-- MODULE 2: MANAGER (Role Gated) -->
+        @if (User.IsInRole("LineManager") || User.IsInRole("SystemAdmin") || User.IsInRole("HRAdmin"))
+        {
+            <div class="nav-section-header">
+                MANAGER PROTOCOLS <i class="bi bi-shield-lock"></i>
+            </div>
+            <a asp-controller="Leave" asp-action="Pending" class="cms-nav-link @IsActive("Leave", "Pending")">
+                <i class="bi bi-hourglass-split me-3"></i> Pending Approvals
+            </a>
+            <a asp-controller="Leave" asp-action="FlagIrregular" class="cms-nav-link @IsActive("Leave", "FlagIrregular")">
+                <i class="bi bi-flag-fill me-3"></i> Flag Patterns
+            </a>
+            <a asp-controller="Leave" asp-action="Reject" class="cms-nav-link @IsActive("Leave", "Reject")">
+                <i class="bi bi-x-octagon me-3"></i> Rejection Log
+            </a>
+        }
+
+        <!-- MODULE 3: HR ADMIN (Role Gated) -->
+        @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+        {
+            <div class="nav-section-header">
+                SYS ADMIN <i class="bi bi-terminal"></i>
+            </div>
+            <a asp-controller="Employee" asp-action="Create" class="cms-nav-link @IsActive("Employee", "Create")">
+                <i class="bi bi-person-plus-fill me-3"></i> Onboard Unit
+            </a>
+            <a asp-controller="HrLeave" asp-action="Types" class="cms-nav-link @IsActive("HrLeave", "Types")">
+                <i class="bi bi-list-check me-3"></i> Leave Types
+            </a>
+            <a asp-controller="HrLeave" asp-action="EditPolicy" class="cms-nav-link @IsActive("HrLeave", "EditPolicy")">
+                <i class="bi bi-file-earmark-lock me-3"></i> Policies
+            </a>
+            <a asp-controller="HrLeave" asp-action="Eligibility" class="cms-nav-link @IsActive("HrLeave", "Eligibility")">
+                <i class="bi bi-person-check me-3"></i> Eligibility
+            </a>
+            <a asp-controller="HrLeave" asp-action="Entitlements" class="cms-nav-link @IsActive("HrLeave", "Entitlements")">
+                <i class="bi bi-archive me-3"></i> Entitlements
+            </a>
+        }
+    </div>
+
+    <!-- SYSTEM INFO PILLS (Levitating) -->
+    <div class="sidebar-info-panel">
+        <div class="info-pill cyan" title="Current Server CPU Load">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-activity me-2" style="color: var(--cp-cyan);"></i>
+                <span class="pill-label">SYS_LOAD</span>
+            </div>
+            <span class="pill-value">12%</span>
+        </div>
+
+        <div class="info-pill purple" title="Security Protocol Level">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check me-2" style="color: var(--cp-purple);"></i>
+                <span class="pill-label">SEC_LEVEL</span>
+            </div>
+            <span class="pill-value">MAX</span>
+        </div>
+    </div>
+</nav>

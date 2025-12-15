@@ -1,53 +1,91 @@
 @model HRMS.Web.Models.Employees.UpdateEmployeeInfoViewModel
 @{
     ViewData["Title"] = "Edit Employee Info";
+    // Force CMS layout to ensure dark theme applies
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<div class="container py-4">
-    <h2 class="mb-3">Edit Employee Info (HR Admin)</h2>
-
-    @if (!string.IsNullOrWhiteSpace(Model.Message))
-    {
-        <div class="alert alert-success">@Model.Message</div>
+<!-- Local Styling for Dark Form Inputs (Matches Submit.cshtml) -->
+<style>
+    .form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
     }
+    .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <form asp-action="EditInfo" method="post" novalidate>
-                @Html.AntiForgeryToken()
+<div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label asp-for="EmployeeID" class="form-label"></label>
-                        <input asp-for="EmployeeID" class="form-control" type="number" />
-                        <span asp-validation-for="EmployeeID" class="text-danger small"></span>
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header">
+                <i class="bi bi-person-gear me-2"></i> Edit Employee Info
+            </div>
+
+            <div class="cms-card-body">
+
+                @if (!string.IsNullOrWhiteSpace(Model.Message))
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @Model.Message
+                    </div>
+                }
+
+                <form asp-action="EditInfo" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-4">
+                        <!-- Employee ID (Read Only usually, but editable here based on model) -->
+                        <div class="col-md-4">
+                            <label asp-for="EmployeeID" class="form-label"></label>
+                            <input asp-for="EmployeeID" class="form-control" type="number" />
+                            <span asp-validation-for="EmployeeID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" placeholder="name@company.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="Phone" class="form-label"></label>
+                            <input asp-for="Phone" class="form-control" placeholder="+20 1xx xxxx xxx" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="Address" class="form-label"></label>
+                            <input asp-for="Address" class="form-control" placeholder="Street, City, Country" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
                     </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    <!-- Actions -->
+                    <div class="mt-5 d-flex justify-content-end gap-3">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-neon-cyan px-4">
+                            <i class="bi bi-save me-2"></i> Update Profile
+                        </button>
                     </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="Phone" class="form-label"></label>
-                        <input asp-for="Phone" class="form-control" />
-                        <span asp-validation-for="Phone" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-12">
-                        <label asp-for="Address" class="form-label"></label>
-                        <input asp-for="Address" class="form-control" />
-                        <span asp-validation-for="Address" class="text-danger small"></span>
-                    </div>
-                </div>
-
-                <div class="mt-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary">Update</button>
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back</a>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
+
     </div>
 </div>
 

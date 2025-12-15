@@ -1,0 +1,241 @@
+@using Microsoft.AspNetCore.Identity
+
+@{
+    // Helper to determine active state
+    string IsActive(string controller, string action)
+    {
+        var routeData = ViewContext.RouteData.Values;
+        var currentController = routeData["controller"]?.ToString();
+        var currentAction = routeData["action"]?.ToString();
+
+        return (string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase))
+                ? "active" : "";
+    }
+}
+
+<!-- LOCAL STYLES FOR HUD ELEMENTS -->
+<style>
+    /* 1. HUD ITEM WRAPPER (Link + Text) */
+    .hud-item-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        margin-right: 24px; /* Increased breathing room between modules */
+        transition: all 0.3s ease;
+    }
+
+    /* The Square Button */
+    .hud-btn {
+        width: 42px; /* Slightly more compact */
+        height: 42px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px; /* Sharper radius for tech feel */
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 1.2rem; /* Refined icon size */
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        /* overflow: hidden; Removed to allow glow to spill out */
+    }
+
+    /* The Label Underneath */
+    .hud-label {
+        font-size: 0.65rem; /* Slightly clearer text */
+        font-weight: 700;
+        letter-spacing: 1px;
+        margin-top: 5px; /* Tighter gap */
+        color: rgba(255, 255, 255, 0.4);
+        transition: all 0.3s;
+        text-transform: uppercase;
+    }
+
+    /* --- CYAN THEME (Dashboard) --- */
+    .hud-item-link.cyan:hover .hud-btn,
+    .hud-item-link.cyan.active .hud-btn {
+        border-color: var(--cp-cyan);
+        color: #000;
+        background: var(--cp-cyan);
+        /* MASSIVE POP OUT GLOW */
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 60px rgba(0, 240, 255, 0.4);
+        transform: translateY(-3px) scale(1.05);
+        z-index: 10;
+    }
+    .hud-item-link.cyan:hover .hud-label,
+    .hud-item-link.cyan.active .hud-label {
+        color: var(--cp-cyan);
+        text-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+        opacity: 1;
+    }
+
+    /* --- YELLOW THEME (Org Chart) --- */
+    .hud-item-link.yellow:hover .hud-btn,
+    .hud-item-link.yellow.active .hud-btn {
+        border-color: var(--cp-yellow);
+        color: #000;
+        background: var(--cp-yellow);
+        /* MASSIVE POP OUT GLOW */
+        box-shadow: 0 0 30px rgba(252, 238, 10, 0.6), 0 0 60px rgba(252, 238, 10, 0.4);
+        transform: translateY(-3px) scale(1.05);
+        z-index: 10;
+    }
+    .hud-item-link.yellow:hover .hud-label,
+    .hud-item-link.yellow.active .hud-label {
+        color: var(--cp-yellow);
+        text-shadow: 0 0 15px rgba(252, 238, 10, 0.8);
+        opacity: 1;
+    }
+
+    /* 2. PROFILE SECTION (Right Side) */
+    .profile-chip {
+        display: flex;
+        align-items: center;
+        padding: 6px 14px 6px 18px; /* Balanced padding */
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        height: 46px; /* Consistent height with buttons */
+    }
+
+    .profile-chip:hover {
+        border-color: var(--cp-purple);
+        background: rgba(185, 103, 255, 0.1);
+        box-shadow: 0 0 20px rgba(185, 103, 255, 0.15);
+    }
+
+    .profile-avatar {
+        width: 34px;
+        height: 34px;
+        background: var(--cp-purple);
+        color: #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        margin-left: 12px;
+        box-shadow: 0 0 10px rgba(185, 103, 255, 0.4);
+    }
+
+    /* 3. SHUTDOWN SWITCH */
+    .shutdown-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-left: 20px;
+        cursor: pointer;
+    }
+
+    .btn-power {
+        width: 38px; /* Matched to be slightly smaller than nav icons */
+        height: 38px;
+        border-radius: 8px;
+        border: 1px solid var(--cp-red);
+        background: rgba(255, 0, 60, 0.1);
+        color: var(--cp-red);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        transition: all 0.2s;
+    }
+
+    .shutdown-wrapper:hover .btn-power {
+        background: var(--cp-red);
+        color: #fff;
+        box-shadow: 0 0 25px var(--cp-red);
+        transform: scale(1.05);
+    }
+
+    .shutdown-label {
+        font-size: 0.55rem;
+        color: var(--cp-red);
+        margin-top: 5px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        transition: all 0.2s;
+    }
+
+    .shutdown-wrapper:hover .shutdown-label {
+        color: #fff;
+        text-shadow: 0 0 5px var(--cp-red);
+    }
+</style>
+
+<header class="cms-topbar">
+    <!-- LEFT: QUICK DOCK -->
+    <div class="d-flex align-items-center">
+
+        <!-- Dashboard (Cyan) -->
+        <a asp-controller="Home" asp-action="Index"
+           class="hud-item-link cyan @IsActive("Home", "Index")"
+           title="Go to Dashboard">
+            <div class="hud-btn">
+                <i class="bi bi-grid-fill"></i>
+            </div>
+            <span class="hud-label">DASHBOARD</span>
+        </a>
+
+        <!-- Org Chart (Yellow) -->
+        <a asp-controller="Employee" asp-action="Hierarchy"
+           class="hud-item-link yellow @IsActive("Employee", "Hierarchy")"
+           title="View Organization">
+            <div class="hud-btn">
+                <i class="bi bi-diagram-3-fill"></i>
+            </div>
+            <span class="hud-label">HIERARCHY</span>
+        </a>
+
+        <!-- Vertical Divider -->
+        <div style="height: 32px; width: 1px; background: rgba(255,255,255,0.15); margin: 0 20px;"></div>
+
+        <!-- Page Title Breadcrumb -->
+        <div class="d-flex flex-column justify-content-center">
+            <span class="text-white text-uppercase" style="letter-spacing: 2px; font-weight: 800; font-size: 1rem; text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);">
+                @ViewData["Title"]
+            </span>
+            <span class="text-muted small" style="font-size: 0.6rem; letter-spacing: 1px; opacity: 0.7;">SYSTEM_MODULE_ACTIVE</span>
+        </div>
+    </div>
+
+    <!-- RIGHT: IDENTITY & POWER -->
+    <div class="d-flex align-items-center">
+
+        <!-- PROFILE CHIP (Clickable) -->
+        <a asp-controller="Employee" asp-action="EditInfo" class="profile-chip" title="EDIT_PROFILE">
+            <div class="text-end">
+                <div class="text-white fw-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">
+                    @User.Identity?.Name
+                </div>
+                <div style="font-size: 0.6rem; color: var(--cp-purple); letter-spacing: 1px; text-transform: uppercase;">
+                    @if (User.IsInRole("SystemAdmin")) { <span>NETRUNNER</span> }
+                    else if (User.IsInRole("HRAdmin")) { <span>HR_ADMIN</span> }
+                    else { <span>OPERATIVE</span> }
+                </div>
+            </div>
+            <div class="profile-avatar">
+                <i class="bi bi-person-fill"></i>
+            </div>
+        </a>
+
+        <!-- SHUTDOWN CONTROL -->
+        <form class="form-inline mb-0" asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+            <button type="submit" class="bg-transparent border-0 p-0">
+                <div class="shutdown-wrapper">
+                    <div class="btn-power">
+                        <i class="bi bi-power"></i>
+                    </div>
+                    <span class="shutdown-label">LOGOUT</span>
+                </div>
+            </button>
+        </form>
+    </div>
+</header>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HRMS 2077</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- CYBERPUNK FONT: Oxanium (Tech/Square) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="cms-body">
+
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <script>window.location.href = '/Account/Login';</script>
+    }
+
+    <!-- 1. FLOATING MONOLITH SIDEBAR -->
+    <partial name="_Sidebar" />
+
+    <!-- 2. HUD TOPBAR -->
+    <partial name="_Topbar" />
+
+    <!-- 3. MAIN CONTENT -->
+    <main class="cms-main">
+        <div class="container-fluid">
+
+            <!-- ALERTS (Styled as System Notifications) -->
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert alert-success bg-transparent border-success text-success fade show" role="alert" style="border-radius: 0; border-left: 5px solid #30D158;">
+                    <i class="bi bi-check-square-fill me-2"></i> @TempData["Success"]
+                </div>
+            }
+            @if (TempData["Error"] != null)
+            {
+                <div class="alert alert-danger bg-transparent border-danger text-danger fade show" role="alert" style="border-radius: 0; border-left: 5px solid #FF453A;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+                </div>
+            }
+
+            @RenderBody()
+        </div>
+    </main>
+
+    <!-- 4. FLOATING FOOTER HUD (Fixed Bottom Right) -->
+    <div class="cms-footer-container">
+        <div class="cms-footer-pill">
+            <div class="d-flex align-items-center">
+                <span class="text-white fw-bold me-2">NET</span> <span style="color: var(--cp-yellow)">STATUS</span>
+            </div>
+            <div>
+                v2.77 <span style="opacity:0.3; color: var(--cp-red)" class="mx-2">|</span> SECURE
+            </div>
+            <div class="d-flex align-items-center">
+                <div style="width: 8px; height: 8px; background: var(--cp-cyan); margin-right: 8px; box-shadow: 0 0 10px var(--cp-cyan);"></div>
+                ONLINE
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

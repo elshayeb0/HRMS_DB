@@ -1,52 +1,79 @@
 @model List<HRMS.Web.Models.Employees.OrgHierarchyRow>
 @{
     ViewData["Title"] = "Organization Hierarchy";
+    // FIX: Force the CMS Layout to get the dark background, sidebar, and topbar
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <h2 class="mb-0">Organization Hierarchy</h2>
-        <a class="btn btn-outline-secondary" asp-controller="Employee" asp-action="Create">Add Employee</a>
+<!-- MASTER WRAPPER: The Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-diagram-3 me-2"></i>Organization Hierarchy</span>
+
+        <!-- Upgraded Action Button -->
+        <a class="btn btn-sm btn-neon-cyan" asp-controller="Employee" asp-action="Create">
+            <i class="bi bi-person-plus-fill me-1"></i> Add Employee
+        </a>
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
+    <div class="cms-card-body">
+        <div class="table-responsive">
+            <!-- Neon Table Styling -->
+            <table class="table table-neon align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Employee Name</th>
+                        <th>Manager Name</th>
+                        <th>Department</th>
+                        <th>Position</th>
+                        <th class="text-center">Level</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model == null || Model.Count == 0)
+                    {
                         <tr>
-                            <th>Employee ID</th>
-                            <th>Employee Name</th>
-                            <th>Manager Name</th>
-                            <th>Department</th>
-                            <th>Position</th>
-                            <th>Hierarchy Level</th>
+                            <td colspan="6" class="text-center text-muted py-5">
+                                <i class="bi bi-diagram-2 fs-1 d-block mb-3" style="opacity: 0.3;"></i>
+                                No hierarchy data found in the system.
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model == null || Model.Count == 0)
+                    }
+                    else
+                    {
+                        foreach (var row in Model)
                         {
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-4">No hierarchy data found.</td>
+                                <td class="text-muted small">@row.EmployeeID</td>
+                                <td class="fw-bold text-white">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-person-circle me-2 text-muted"></i>
+                                        @row.EmployeeName
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(row.ManagerName))
+                                    {
+                                        <span class="text-info">@row.ManagerName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary" style="opacity: 0.5;">Root</span>
+                                    }
+                                </td>
+                                <td>@row.Department</td>
+                                <td>@row.Position</td>
+                                <td class="text-center">
+                                    <span class="badge" style="background-color: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px solid var(--neon-purple);">
+                                        Lvl @(row.HierarchyLevel?.ToString() ?? "0")
+                                    </span>
+                                </td>
                             </tr>
                         }
-                        else
-                        {
-                            foreach (var row in Model)
-                            {
-                                <tr>
-                                    <td>@row.EmployeeID</td>
-                                    <td>@row.EmployeeName</td>
-                                    <td>@row.ManagerName</td>
-                                    <td>@row.Department</td>
-                                    <td>@row.Position</td>
-                                    <td>@(row.HierarchyLevel?.ToString() ?? "-")</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

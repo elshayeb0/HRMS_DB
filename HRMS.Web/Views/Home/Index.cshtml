@@ -1,8 +1,310 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Command Center";
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* --- DASHBOARD SPECIFIC PHYSICS --- */
+
+    /* 1. THE STAT PILLS (Top Row) */
+    .stat-pill {
+        background: rgba(20, 20, 30, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        backdrop-filter: blur(20px);
+        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        animation: float-pill 6s ease-in-out infinite;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Staggered Animation for organic feel */
+    .stat-pill:nth-child(1) { animation-delay: 0s; }
+    .stat-pill:nth-child(2) { animation-delay: 1s; }
+    .stat-pill:nth-child(3) { animation-delay: 2s; }
+    .stat-pill:nth-child(4) { animation-delay: 3s; }
+
+    .stat-pill:hover {
+        transform: translateY(-10px) scale(1.05);
+        border-color: var(--cp-cyan);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.05);
+        z-index: 10;
+    }
+
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        color: var(--cp-cyan);
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s;
+    }
+
+    .stat-pill:hover .stat-icon {
+        background: var(--cp-cyan);
+        color: #000;
+        box-shadow: 0 0 20px var(--cp-cyan);
+    }
+
+    .stat-value { font-size: 2rem; font-weight: 800; line-height: 1; color: #fff; }
+    .stat-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 5px; }
+
+    /* 2. THE MAIN MODULES (Cards) */
+    .dash-card {
+        height: 100%;
+        background: rgba(15, 15, 20, 0.7);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        padding: 2rem;
+        position: relative;
+        backdrop-filter: blur(30px);
+        transition: all 0.4s ease;
+    }
+
+    .dash-card:hover {
+        border-color: var(--cp-purple);
+        box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5), 0 0 0 1px var(--cp-purple);
+        transform: translateY(-5px);
+    }
+
+    .card-title-neo {
+        font-size: 1.2rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        color: #fff;
+    }
+    .card-title-neo i { margin-right: 10px; color: var(--cp-yellow); }
+
+    /* 3. QUICK ACTION LAUNCHPADS */
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+    .action-btn-large {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s;
+        height: 140px;
+    }
+
+    .action-btn-large i { font-size: 2rem; margin-bottom: 10px; color: var(--cp-cyan); transition: all 0.3s; }
+    .action-btn-large span { font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; color: #fff; text-transform: uppercase; }
+
+    .action-btn-large:hover {
+        background: rgba(0, 240, 255, 0.1);
+        border-color: var(--cp-cyan);
+        box-shadow: 0 0 30px rgba(0, 240, 255, 0.2);
+    }
+    .action-btn-large:hover i { transform: scale(1.2); text-shadow: 0 0 10px var(--cp-cyan); }
+
+    /* 4. SYSTEM REACTOR (Pulse Animation) */
+    .reactor-ring {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 2px solid rgba(48, 209, 88, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+        box-shadow: 0 0 30px rgba(48, 209, 88, 0.1);
+    }
+
+    .reactor-core {
+        width: 80px;
+        height: 80px;
+        background: #30D158;
+        border-radius: 50%;
+        box-shadow: 0 0 50px #30D158;
+        animation: pulse-green 3s infinite;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #000;
+    }
+
+    @@keyframes pulse-green {
+        0% { box-shadow: 0 0 20px #30D158; transform: scale(0.95); }
+        50% { box-shadow: 0 0 60px #30D158, 0 0 100px rgba(48, 209, 88, 0.5); transform: scale(1.05); }
+        100% { box-shadow: 0 0 20px #30D158; transform: scale(0.95); }
+    }
+
+    @@keyframes float-pill {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+</style>
+
+<!-- HERO HEADER -->
+<div class="row mb-5 mt-3">
+    <div class="col-12">
+        <h1 class="display-4 fw-bold text-white mb-2" style="text-shadow: 0 0 30px rgba(0, 240, 255, 0.3); font-family: 'Oxanium', sans-serif;">
+            WELCOME, <span style="color: var(--cp-cyan)">@User.Identity?.Name?.ToUpper()</span>
+        </h1>
+        <p class="text-muted" style="letter-spacing: 1px;">SYSTEM READY. ALL MODULES OPERATIONAL.</p>
+    </div>
+</div>
+
+<!-- 1. STATS ROW (Levitating Pills) -->
+<div class="row g-4 mb-5">
+    <!-- Active Employees -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-pill">
+            <div>
+                <div class="stat-value">124</div>
+                <div class="stat-label">Active Units</div>
+            </div>
+            <div class="stat-icon">
+                <i class="bi bi-people-fill"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Requests -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-pill" style="border-color: rgba(252, 238, 10, 0.3);">
+            <div>
+                <div class="stat-value" style="color: var(--cp-yellow);">8</div>
+                <div class="stat-label">Pending Ops</div>
+            </div>
+            <div class="stat-icon" style="color: var(--cp-yellow);">
+                <i class="bi bi-hourglass-split"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Load -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-pill" style="border-color: rgba(185, 103, 255, 0.3);">
+            <div>
+                <div class="stat-value" style="color: var(--cp-purple);">12%</div>
+                <div class="stat-label">CPU Load</div>
+            </div>
+            <div class="stat-icon" style="color: var(--cp-purple);">
+                <i class="bi bi-cpu"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Network Status -->
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-pill" style="border-color: rgba(48, 209, 88, 0.3);">
+            <div>
+                <div class="stat-value" style="color: #30D158;">SECURE</div>
+                <div class="stat-label">Network</div>
+            </div>
+            <div class="stat-icon" style="color: #30D158;">
+                <i class="bi bi-shield-check"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. MAIN MODULES GRID -->
+<div class="row g-4">
+
+    <!-- LEFT: QUICK ACTIONS (Launchpad) -->
+    <div class="col-lg-5">
+        <div class="dash-card">
+            <div class="card-title-neo">
+                <i class="bi bi-lightning-charge-fill"></i> Quick Launch
+            </div>
+            <div class="action-grid">
+                <a asp-controller="Leave" asp-action="Submit" class="action-btn-large">
+                    <i class="bi bi-send-plus-fill"></i>
+                    <span>Request Leave</span>
+                </a>
+                <a asp-controller="Leave" asp-action="Balance" class="action-btn-large">
+                    <i class="bi bi-wallet2"></i>
+                    <span>Check Balance</span>
+                </a>
+                <a asp-controller="Employee" asp-action="Hierarchy" class="action-btn-large">
+                    <i class="bi bi-diagram-3"></i>
+                    <span>Org Chart</span>
+                </a>
+                <a asp-controller="Employee" asp-action="EditInfo" class="action-btn-large">
+                    <i class="bi bi-person-gear"></i>
+                    <span>My Profile</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MIDDLE: SYSTEM REACTOR -->
+    <div class="col-lg-4">
+        <div class="dash-card text-center d-flex flex-column justify-content-center align-items-center">
+            <div class="card-title-neo mb-4">
+                <i class="bi bi-activity"></i> System Core
+            </div>
+
+            <div class="reactor-ring mb-4">
+                <div class="reactor-core">
+                    <i class="bi bi-check-lg"></i>
+                </div>
+            </div>
+
+            <h4 class="text-white fw-bold mb-1">OPERATIONAL</h4>
+            <p class="text-muted small mb-0">Uptime: 42d 12h 08m</p>
+
+            <div class="mt-4 w-100 px-4">
+                <div class="d-flex justify-content-between text-muted small mb-1">
+                    <span>Server Load</span>
+                    <span>34%</span>
+                </div>
+                <div class="progress" style="height: 4px; background: rgba(255,255,255,0.1);">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 34%; box-shadow: 0 0 10px #30D158;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: DOCS & ALERTS -->
+    <div class="col-lg-3">
+        <div class="dash-card">
+            <div class="card-title-neo">
+                <i class="bi bi-broadcast"></i> Updates
+            </div>
+
+            <div class="d-flex align-items-start mb-4">
+                <i class="bi bi-info-circle-fill text-info me-3 mt-1"></i>
+                <div>
+                    <h6 class="text-white mb-1 small fw-bold">Policy Update v2.4</h6>
+                    <p class="text-muted small mb-0" style="font-size: 0.7rem;">New remote work guidelines active.</p>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-start mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-warning me-3 mt-1"></i>
+                <div>
+                    <h6 class="text-white mb-1 small fw-bold">Maintenance</h6>
+                    <p class="text-muted small mb-0" style="font-size: 0.7rem;">Scheduled downtime: Sat 02:00 AM.</p>
+                </div>
+            </div>
+
+            <a href="#" class="btn btn-outline-light w-100 btn-sm text-uppercase fw-bold" style="border-radius: 50px; letter-spacing: 1px;">
+                View All Logs
+            </a>
+        </div>
+    </div>
 </div>
