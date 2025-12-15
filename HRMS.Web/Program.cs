@@ -14,6 +14,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// 1. REGISTER SESSION SERVICES
+// ============================================================
+builder.Services.AddDistributedMemoryCache(); // <--- ADD THIS
+builder.Services.AddSession(options =>        // <--- ADD THIS
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+// ============================================================
+
 // Cookie Auth (required for Login/Logout + [Authorize])
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -41,6 +52,11 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// 2. ENABLE SESSION MIDDLEWARE
+// ============================================================
+app.UseSession(); // <--- ADD THIS (Must be after UseRouting and before MapControllerRoute)
+// ============================================================
 
 // IMPORTANT ORDER
 app.UseAuthentication();
