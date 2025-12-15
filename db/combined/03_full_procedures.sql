@@ -2083,7 +2083,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     UPDATE Mission
-    SET status = 'Completed'
+    SET status = 'Approved'
     WHERE mission_id = @MissionID
       AND manager_id = @ManagerID;
     INSERT INTO ManagerNotes (employee_id, manager_id, note_content, created_at)
