@@ -1,19 +1,65 @@
 @model HRMS.Web.Data.Entities.Leave
+@{
+    ViewData["Title"] = "Create Leave Type";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
+}
 
-<h2>Create Leave Type</h2>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-purple); /* Purple focus for Config actions */
+        box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-<form asp-action="CreateType" method="post">
-    @Html.AntiForgeryToken()
+<div class="row justify-content-center">
+    <div class="col-md-5">
 
-    <div class="mb-3">
-        <label class="form-label">Leave Type</label>
-        <input asp-for="leave_type" class="form-control" />
-        <span asp-validation-for="leave_type" class="text-danger"></span>
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header" style="color: var(--neon-purple);">
+                <i class="bi bi-gear-wide-connected me-2"></i> Create Leave Type
+            </div>
+
+            <div class="cms-card-body">
+
+                <p class="text-muted small mb-4">
+                    Define a new category of leave (e.g., "Sick Leave", "Annual", "Maternity").
+                </p>
+
+                <form asp-action="CreateType" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label class="form-label">Leave Type Name</label>
+                        <input asp-for="leave_type" class="form-control" placeholder="e.g. Remote Work" />
+                        <span asp-validation-for="leave_type" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a class="btn btn-outline-secondary" asp-action="Types">Cancel</a>
+                        <button type="submit" class="btn btn-primary shadow-sm" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+                            <i class="bi bi-plus-lg me-1"></i> Create Type
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <button class="btn btn-primary" type="submit">Create</button>
-    <a class="btn btn-secondary" asp-action="Types">Back</a>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -1,51 +1,328 @@
 @model HRMS.Web.Models.Auth.LoginViewModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "System Login";
+    Layout = null; // Standalone layout
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-7 col-lg-5">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
-                    <h3 class="mb-1">HRMS Login</h3>
-                    <p class="text-muted mb-4">Sign in to access the General Component.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HRMS 2077</title>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
-                    {
-                        <div class="alert alert-danger">@Model.ErrorMessage</div>
-                    }
+    <!-- 1. BOOTSTRAP -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-                    <form asp-action="Login" method="post" novalidate>
-                        @Html.AntiForgeryToken()
+    <!-- 2. GLOBAL THEME -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" placeholder="name@company.com" />
-                            <span asp-validation-for="Email" class="text-danger small"></span>
-                        </div>
+    <!-- 3. CYBERPUNK FONT -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label">Password</label>
-                            <input asp-for="Password" class="form-control" placeholder="For Milestone 3: National ID" />
-                            <span asp-validation-for="Password" class="text-danger small"></span>
-                            <div class="form-text">
-                                Milestone note: since the database has no password field, the system authenticates using <strong>National ID</strong>.
-                            </div>
-                        </div>
+    <!-- 4. ICONS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-                        <button type="submit" class="btn btn-primary w-100">Login</button>
-                    </form>
+    <style>
+        /* --- 1. THE WARP SPEED BACKGROUND --- */
+        body.cms-body {
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Oxanium', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* The Moving Grid/Plasma Mesh */
+        .warp-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            width: 200%;
+            height: 200%;
+            background:
+                radial-gradient(circle at 50% 50%, transparent 20%, #000 120%),
+                conic-gradient(from 0deg at 50% 50%, #000000 0deg, #1a0b2e 60deg, #000000 120deg, #0d3b66 180deg, #000000 240deg, #2b1055 300deg, #000000 360deg);
+            filter: blur(60px);
+            animation: warp-spin 20s linear infinite;
+            z-index: 1;
+            opacity: 0.8;
+        }
+
+        /* High-speed streaks */
+        .warp-stars {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: warp-zoom 4s linear infinite;
+            opacity: 0.3;
+            z-index: 2;
+        }
+
+        @@keyframes warp-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @@keyframes warp-zoom {
+            0% { transform: scale(1); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        /* --- 2. THE HYPER-GLASS CARD --- */
+        .login-card-wrapper {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .hyper-glass-card {
+            position: relative;
+            background: rgba(10, 10, 12, 0.65); /* Dark semi-transparent */
+            border-radius: 20px;
+            padding: 3.5rem;
+
+            /* THE MASSIVE BLUR */
+            backdrop-filter: blur(50px) saturate(200%);
+            -webkit-backdrop-filter: blur(50px) saturate(200%);
+
+            /* THE EDGES POP */
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            border-top: 1px solid rgba(0, 240, 255, 0.8); /* Brighter top edge */
+            border-bottom: 1px solid rgba(185, 103, 255, 0.5); /* Purple bottom hint */
+
+            /* THE GLOW ENGINE */
+            box-shadow:
+                0 0 0 1px rgba(0, 0, 0, 0.5), /* Inner hard line */
+                0 20px 60px rgba(0,0,0, 0.9),  /* Deep shadow */
+                0 0 40px rgba(0, 240, 255, 0.2), /* Cyan Ambient */
+                inset 0 0 40px rgba(0, 240, 255, 0.05); /* Inner Depth */
+
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: float-card 6s ease-in-out infinite;
+        }
+
+        /* HOVER STATE: EXPLOSIVE GLOW */
+        .hyper-glass-card:hover {
+            transform: scale(1.02) translateY(-5px);
+            border-color: var(--cp-cyan);
+            box-shadow:
+                0 0 0 2px rgba(0, 240, 255, 0.5), /* Sharp Rim */
+                0 30px 80px rgba(0,0,0, 1),
+                0 0 80px rgba(0, 240, 255, 0.4), /* Massive Outer Glow */
+                inset 0 0 50px rgba(0, 240, 255, 0.1);
+        }
+
+        @@keyframes float-card {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* --- 3. INPUTS: PILL & POP --- */
+        .cyber-input-group {
+            position: relative;
+            margin-bottom: 35px; /* Increased spacing between groups */
+            margin-top: 15px; /* Ensure space for the floating label */
+        }
+
+        .input-pill {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            padding: 8px;
+            transition: all 0.2s ease-out; /* Faster transition for responsive feel */
+        }
+
+        /* FIX: HOVER STATE ADDED HERE */
+        .input-pill:hover {
+            border-color: rgba(0, 240, 255, 0.6); /* Cyan hint on hover */
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15); /* Soft outer glow */
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .input-pill:focus-within {
+            border-color: var(--cp-cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); /* Stronger glow on focus */
+            background: rgba(0, 0, 0, 0.8);
+            transform: scale(1.02);
+        }
+
+        .icon-bubble {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--cp-cyan);
+            font-size: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.3s;
+            margin-right: 15px; /* ADDED MARGIN to prevent overlap */
+            flex-shrink: 0; /* Prevent icon from shrinking */
+        }
+
+        /* Icon also lights up on hover */
+        .input-pill:hover .icon-bubble {
+            border-color: rgba(0, 240, 255, 0.3);
+            color: #fff;
+            background: rgba(0, 240, 255, 0.1);
+        }
+
+        .input-pill:focus-within .icon-bubble {
+            background: var(--cp-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--cp-cyan);
+            border-color: var(--cp-cyan);
+        }
+
+        .cyber-control {
+            background: transparent !important;
+            border: none !important;
+            color: #fff !important;
+            padding-left: 0; /* Removed padding since we have margin on the icon now */
+            font-size: 1rem;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cyber-control:focus {
+            box-shadow: none !important;
+        }
+
+        .label-float {
+            position: absolute;
+            top: -28px; /* LIFTED HIGHER to clear the border glow */
+            left: 20px;
+            font-size: 0.75rem;
+            color: var(--cp-yellow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+
+        /* --- 4. BUTTON --- */
+        .btn-initiate {
+            background: var(--cp-cyan);
+            color: #000;
+            font-weight: 800;
+            letter-spacing: 2px;
+            border-radius: 50px;
+            padding: 1.2rem;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+
+        .btn-initiate:hover {
+            background: #fff;
+            box-shadow: 0 0 50px var(--cp-cyan);
+            transform: translateY(-3px);
+            color: #000;
+        }
+    </style>
+</head>
+<body class="cms-body">
+
+    <!-- THE BACKGROUND LAYERS -->
+    <div class="warp-bg"></div>
+    <div class="warp-stars"></div>
+
+    <div class="container d-flex justify-content-center">
+        <div class="login-card-wrapper">
+
+            <div class="hyper-glass-card">
+
+                <div class="text-center mb-5">
+                    <h1 class="display-4 fw-bold text-white mb-0" style="text-shadow: 0 0 20px rgba(255,255,255,0.5); letter-spacing: -2px;">
+                        HRMS <span style="color: var(--cp-cyan); text-shadow: 0 0 20px var(--cp-cyan);">NEON</span>
+                    </h1>
+                    <div class="mt-2" style="color: var(--cp-yellow); letter-spacing: 4px; font-size: 0.8rem; font-weight: 700;">
+                        SECURE GATEWAY v2.8
+                    </div>
                 </div>
-            </div>
 
-            <div class="text-center mt-3 text-muted small">
-                If you get “Access Denied”, your account is not assigned the required role table (SystemAdministrator / HRAdministrator / etc.).
+                @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+                {
+                    <div class="alert alert-danger text-center border-0 mb-4" style="background: rgba(255, 0, 60, 0.2); color: #ff5c7c; border-left: 4px solid var(--cp-red) !important; backdrop-filter: blur(10px);">
+                        <i class="bi bi-radioactive me-2"></i> @Model.ErrorMessage
+                    </div>
+                }
+
+                <form asp-action="Login" method="post" novalidate>
+                    @Html.AntiForgeryToken()
+
+                    <!-- IDENTITY INPUT -->
+                    <div class="cyber-input-group">
+                        <span class="label-float">Net Identity</span>
+                        <div class="input-pill">
+                            <div class="icon-bubble">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            <input asp-for="Email" class="form-control cyber-control" placeholder="user@corp.net" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small mt-2 d-block text-center"></span>
+                    </div>
+
+                    <!-- PASSWORD INPUT -->
+                    <div class="cyber-input-group mt-5">
+                        <span class="label-float" style="color: var(--cp-red);">Access Key</span>
+                        <div class="input-pill">
+                            <div class="icon-bubble" style="color: var(--cp-red);">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <input asp-for="Password" type="password" class="form-control cyber-control" placeholder="••••••••" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small mt-2 d-block text-center"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between px-3 mt-3 mb-5">
+                        <span class="small text-muted">Protocol: <span class="text-white">National ID</span></span>
+                        <a href="#" class="small text-decoration-none" style="color: var(--cp-cyan); text-shadow: 0 0 8px var(--cp-cyan);">Reset Uplink?</a>
+                    </div>
+
+                    <button type="submit" class="btn-initiate">
+                        <i class="bi bi-cpu-fill me-2"></i> INITIATE LINK
+                    </button>
+
+                    <div class="text-center mt-5">
+                        <span class="text-muted small" style="letter-spacing: 2px; font-size: 0.7rem; text-transform: uppercase;">
+                            Shayeb Systems &copy; @DateTime.Now.Year
+                        </span>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
-</div>
 
-@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <partial name="_ValidationScriptsPartial" />
-}
+</body>
+</html>

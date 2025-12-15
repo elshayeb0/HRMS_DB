@@ -1,61 +1,126 @@
 @model HRMS.Web.Models.Leave.SubmitLeaveRequestVM
 @{
+    ViewData["Title"] = "Submit Leave";
+    // Forcing the layout here ensures it works even if _ViewStart is having issues
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
+
     var leaveTypes = ViewBag.LeaveTypes as IEnumerable<HRMS.Web.Data.Entities.Leave>;
 }
 
-<h2>Submit Leave Request</h2>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    /* Overriding Bootstrap inputs for Neon Theme */
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.9rem;
+        letter-spacing: 0.5px;
+    }
+    /* File input fix */
+    input[type=file]::file-selector-button {
+        background-color: var(--neon-bg-panel);
+        color: var(--neon-cyan);
+        border: 1px solid var(--neon-cyan);
+    }
+</style>
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+<div class="row justify-content-center">
+    <div class="col-md-8">
 
-<form asp-action="Submit" method="post" enctype="multipart/form-data">
-    @Html.AntiForgeryToken()
+        <!-- CMS Card Container -->
+        <div class="cms-card">
+            <div class="cms-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-send me-2"></i>Submit Leave Request</span>
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Employee ID</label>
-        <input asp-for="EmployeeId" class="form-control" />
-        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+            <div class="cms-card-body">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success">
+                        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                    </div>
+                }
+
+                <form asp-action="Submit" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <!-- Employee ID (Usually readonly or auto-filled in real scenarios, keeping as requested) -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Employee ID</label>
+                            <input asp-for="EmployeeId" class="form-control" placeholder="E.g. EMP-102" />
+                            <span asp-validation-for="EmployeeId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Leave Type -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Leave Type</label>
+                            <select asp-for="LeaveTypeId" class="form-select">
+                                <option value="" class="text-dark">-- Select Type --</option>
+                                @foreach (var lt in leaveTypes ?? Enumerable.Empty<HRMS.Web.Data.Entities.Leave>())
+                                {
+                                    <option value="@lt.leave_id" class="text-dark">@lt.leave_type</option>
+                                }
+                            </select>
+                            <span asp-validation-for="LeaveTypeId" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Start Date -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input asp-for="StartDate" type="date" class="form-control" />
+                            <span asp-validation-for="StartDate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- End Date -->
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Date</label>
+                            <input asp-for="EndDate" type="date" class="form-control" />
+                            <span asp-validation-for="EndDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Reason -->
+                    <div class="mb-3">
+                        <label class="form-label">Reason / Comments</label>
+                        <textarea asp-for="Reason" class="form-control" rows="3" placeholder="Briefly describe why..."></textarea>
+                        <span asp-validation-for="Reason" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Attachments -->
+                    <div class="mb-4">
+                        <label class="form-label">Attachments (Optional)</label>
+                        <input asp-for="Attachments" type="file" multiple class="form-control" />
+                        <div class="form-text text-muted" style="opacity: 0.6; font-size: 0.8rem;">
+                            Accepted formats: PDF, JPG, PNG.
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-neon-cyan px-4">
+                            Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Leave Type</label>
-        <select asp-for="LeaveTypeId" class="form-select">
-            <option value="">-- Select --</option>
-            @foreach (var lt in leaveTypes ?? Enumerable.Empty<HRMS.Web.Data.Entities.Leave>())
-            {
-                <option value="@lt.leave_id">@lt.leave_type</option>
-            }
-        </select>
-        <span asp-validation-for="LeaveTypeId" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Start Date</label>
-        <input asp-for="StartDate" type="date" class="form-control" />
-        <span asp-validation-for="StartDate" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">End Date</label>
-        <input asp-for="EndDate" type="date" class="form-control" />
-        <span asp-validation-for="EndDate" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Reason</label>
-        <input asp-for="Reason" class="form-control" />
-        <span asp-validation-for="Reason" class="text-danger"></span>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Attachments</label>
-        <input asp-for="Attachments" type="file" multiple class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

@@ -1,20 +1,71 @@
 @{
-    ViewBag.Title = "Reject Leave";
+    ViewData["Title"] = "Reject Leave Request";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<h2>Reject Leave Request</h2>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: #dc3545; /* Red border for rejection focus */
+        box-shadow: 0 0 10px rgba(220, 53, 69, 0.3);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-<form asp-action="Reject" method="post">
-    @Html.AntiForgeryToken()
+<div class="row justify-content-center">
+    <div class="col-md-6">
 
-    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
-    <input type="hidden" name="leaveRequestId" value="@ViewBag.LeaveRequestId" />
+        <!-- MASTER WRAPPER: Neon Card (Danger Theme) -->
+        <div class="cms-card" style="border-color: rgba(220, 53, 69, 0.4);">
+            <div class="cms-card-header text-danger">
+                <i class="bi bi-x-circle-fill me-2"></i> Reject Leave Request
+            </div>
 
-    <div class="mb-3">
-        <label class="form-label">Reason</label>
-        <textarea name="reason" class="form-control" rows="3" required></textarea>
+            <div class="cms-card-body">
+
+                <div class="alert alert-danger bg-transparent border-danger text-danger mb-4">
+                    <i class="bi bi-exclamation-octagon me-2"></i>
+                    <strong>Action Required:</strong> You are about to reject this leave request. Please provide a clear reason for the employee.
+                </div>
+
+                <form asp-action="Reject" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+                    <input type="hidden" name="leaveRequestId" value="@ViewBag.LeaveRequestId" />
+
+                    <div class="mb-4">
+                        <label class="form-label">Rejection Reason</label>
+                        <textarea name="reason" class="form-control" rows="4"
+                                  placeholder="e.g., 'Due to critical project deadline overlap...'" required></textarea>
+                        <div class="form-text text-muted small mt-1">
+                            This reason will be visible to the employee.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a class="btn btn-outline-secondary" asp-action="Pending" asp-route-managerId="@ViewBag.ManagerId">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger shadow-sm">
+                            <i class="bi bi-x-lg me-1"></i> Confirm Reject
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
-
-    <button type="submit" class="btn btn-danger">Confirm Reject</button>
-    <a class="btn btn-secondary" asp-action="Pending" asp-route-managerId="@ViewBag.ManagerId">Cancel</a>
-</form>
+</div>

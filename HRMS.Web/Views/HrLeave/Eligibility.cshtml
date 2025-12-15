@@ -1,35 +1,96 @@
 @model HRMS.Web.Models.Leave.ConfigureLeaveEligibilityVM
-
-<h2>Configure Leave Eligibility</h2>
-
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
+@{
+    ViewData["Title"] = "Configure Eligibility";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<form asp-action="Eligibility" method="post">
-    @Html.AntiForgeryToken()
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-purple); /* Purple focus for Config actions */
+        box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-    <div class="mb-3">
-        <label class="form-label">Leave Type</label>
-        <select class="form-select" name="LeaveType" required>
-            <option value="">-- Select --</option>
-            @foreach (var lt in ViewBag.LeaveTypes)
-            {
-                <option value="@lt.leave_type">@lt.leave_type</option>
-            }
-        </select>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header" style="color: var(--neon-purple);">
+                <i class="bi bi-shield-lock-fill me-2"></i> Configure Leave Eligibility
+            </div>
+
+            <div class="cms-card-body">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                    </div>
+                }
+
+                <form asp-action="Eligibility" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label class="form-label">Leave Type</label>
+                        <select class="form-select" name="LeaveType" required>
+                            <option value="" class="text-dark">-- Select Leave Type --</option>
+                            @if (ViewBag.LeaveTypes != null)
+                            {
+                                foreach (var lt in ViewBag.LeaveTypes)
+                                {
+                                    <option value="@lt.leave_type" class="text-dark">@lt.leave_type</option>
+                                }
+                            }
+                        </select>
+                        <div class="form-text text-muted small mt-1">
+                            Select the leave type to apply these rules to.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Minimum Tenure</label>
+                        <div class="input-group">
+                            <input class="form-control" type="number" name="MinTenure" min="0" value="@Model.MinTenure" required placeholder="0" />
+                            <span class="input-group-text bg-dark border-secondary text-white">Months</span>
+                        </div>
+                        <div class="form-text text-muted small mt-1">
+                            Employee must work this many months before being eligible.
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Employee Type</label>
+                        <input class="form-control" name="EmployeeType" value="@Model.EmployeeType" placeholder="e.g. FullTime, PartTime" required />
+                        <div class="form-text text-muted small mt-1">
+                            Restricts this leave to specific employment contracts.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <!-- Assuming generic back link to Types or Index -->
+                        <a class="btn btn-outline-secondary" asp-action="Types">Cancel</a>
+                        <button type="submit" class="btn btn-primary shadow-sm" style="background-color: var(--neon-purple); border-color: var(--neon-purple);">
+                            <i class="bi bi-save me-2"></i> Save Rules
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div class="mb-3">
-        <label class="form-label">Minimum Tenure (months)</label>
-        <input class="form-control" type="number" name="MinTenure" min="0" value="@Model.MinTenure" required />
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Employee Type</label>
-        <input class="form-control" name="EmployeeType" value="@Model.EmployeeType" placeholder="e.g. FullTime" required />
-    </div>
-
-    <button class="btn btn-primary" type="submit">Save</button>
-</form>
+</div>

@@ -1,15 +1,153 @@
 @{
     ViewData["Title"] = "Access Denied";
+    Layout = null; // Standalone layout for security alerts
 }
 
-<div class="container py-5">
-    <div class="alert alert-warning">
-        <h4 class="alert-heading">Access Denied</h4>
-        <p class="mb-0">You are logged in, but your account does not have the required role for this page.</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - HRMS Security</title>
+
+    <!-- Core Styles -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--neon-bg-dark);
+            color: var(--neon-text-main);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 85, 0.05) 0%, transparent 60%);
+        }
+
+        .error-card {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--neon-bg-panel);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(255, 0, 85, 0.15);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        /* Top decorative line - Red for Error */
+        .error-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #ff0055, var(--neon-purple));
+            box-shadow: 0 0 15px #ff0055;
+        }
+
+        .icon-security {
+            font-size: 3.5rem;
+            color: #ff0055;
+            margin-bottom: 1rem;
+            animation: pulse 2s infinite;
+        }
+
+        @@keyframes pulse {
+            0% { text-shadow: 0 0 0 rgba(255, 0, 85, 0.4); }
+            70% { text-shadow: 0 0 20px rgba(255, 0, 85, 0); }
+            100% { text-shadow: 0 0 0 rgba(255, 0, 85, 0); }
+        }
+
+        .btn-outline-neon {
+            border: 1px solid var(--neon-text-muted);
+            color: var(--neon-text-main);
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-neon:hover {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            background: transparent;
+        }
+
+        .btn-danger-glow {
+            background: transparent;
+            border: 1px solid #ff0055;
+            color: #ff0055;
+            padding: 0.6rem 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .btn-danger-glow:hover {
+            background: #ff0055;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+        }
+
+        .system-code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--neon-text-muted);
+            opacity: 0.6;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="error-card p-5">
+
+                <div class="icon-security">
+                    <i class="bi bi-shield-x"></i>
+                </div>
+
+                <h2 class="fw-bold text-white mb-2">ACCESS DENIED</h2>
+                <p class="text-muted mb-4">
+                    You do not have the required role clearance to view this sector.
+                    <br><small>Please contact your System Administrator.</small>
+                </p>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <!-- Back to Safety -->
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-neon">
+                        <i class="bi bi-arrow-left me-2"></i>Dashboard
+                    </a>
+
+                    <!-- Force Logout -->
+                    <form asp-controller="Account" asp-action="Logout" method="post">
+                        @Html.AntiForgeryToken()
+                        <button class="btn btn-danger-glow" type="submit">
+                            <i class="bi bi-power me-2"></i>Logout
+                        </button>
+                    </form>
+                </div>
+
+                <div class="system-code">
+                    ERROR_CODE: 403_FORBIDDEN <br>
+                    IDENTITY: @(User.Identity?.Name ?? "UNKNOWN_USER")
+                </div>
+
+            </div>
+        </div>
     </div>
 
-    <form asp-controller="Account" asp-action="Logout" method="post">
-        @Html.AntiForgeryToken()
-        <button class="btn btn-outline-danger" type="submit">Logout</button>
-    </form>
-</div>
+    <!-- Scripts -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

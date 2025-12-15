@@ -1,29 +1,86 @@
 @model List<HRMS.Web.Models.Leave.LeaveHistoryRowVM>
 
-<h2>Leave History (Employee @ViewBag.EmployeeId)</h2>
+@{
+    ViewData["Title"] = "Leave History";
+}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Request #</th>
-            <th>Type</th>
-            <th>Reason</th>
-            <th>Duration</th>
-            <th>Status</th>
-            <th>Approval Date</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var r in Model)
-    {
-        <tr>
-            <td>@r.RequestId</td>
-            <td>@r.LeaveType</td>
-            <td>@r.Reason</td>
-            <td>@r.DurationDays</td>
-            <td>@r.Status</td>
-            <td>@(r.ApprovalDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-        </tr>
-    }
-    </tbody>
-</table>
+<!-- MASTER WRAPPER: The Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header">
+        <!-- Kept your Employee ID logic here in the header -->
+        <span><i class="bi bi-clock-history me-2"></i>Leave History (Employee @ViewBag.EmployeeId)</span>
+    </div>
+
+    <div class="cms-card-body">
+
+        <!-- Empty State Check (Good UX) -->
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-muted text-center py-4">
+                <i class="bi bi-inbox fs-4 d-block mb-2"></i>
+                No history records found.
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <!-- APPLIED: table-neon class -->
+                <table class="table table-neon align-middle">
+                    <thead>
+                        <tr>
+                            <th>Request #</th>
+                            <th>Type</th>
+                            <th>Reason</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th>Approval Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">#@r.RequestId</td>
+                            <td class="fw-bold text-white">@r.LeaveType</td>
+
+                            <!-- Limit reason length for cleaner table -->
+                            <td title="@r.Reason">
+                                @if(!string.IsNullOrEmpty(r.Reason) && r.Reason.Length > 30)
+                                {
+                                    @r.Reason.Substring(0, 30)<span class="text-muted">...</span>
+                                }
+                                else
+                                {
+                                    @r.Reason
+                                }
+                            </td>
+
+                            <td>@r.DurationDays days</td>
+
+                            <!-- Badges for Status -->
+                            <td>
+                                @if (r.Status?.ToLower() == "approved")
+                                {
+                                    <span class="badge bg-success" style="background-color: var(--neon-cyan) !important; color: #000;">Approved</span>
+                                }
+                                else if (r.Status?.ToLower() == "rejected")
+                                {
+                                    <span class="badge bg-danger">Rejected</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">@r.Status</span>
+                                }
+                            </td>
+
+                            <td class="text-muted small">
+                                @(r.ApprovalDate?.ToString("yyyy-MM-dd HH:mm") ?? "-")
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

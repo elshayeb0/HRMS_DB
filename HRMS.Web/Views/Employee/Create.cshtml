@@ -1,169 +1,228 @@
 @model HRMS.Web.Models.Employees.AddEmployeeViewModel
 @{
     ViewData["Title"] = "Create Employee";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <h2 class="mb-0">Create Employee</h2>
-        <a class="btn btn-outline-secondary" asp-controller="Employee" asp-action="Hierarchy">View Hierarchy</a>
-    </div>
-
-    @if (TempData["Success"] != null)
-    {
-        <div class="alert alert-success">@TempData["Success"]</div>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control, .form-select {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
     }
+    .form-control:focus, .form-select:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+    .form-text {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.75rem;
+    }
+    .form-check-input {
+        background-color: rgba(0, 0, 0, 0.3);
+        border-color: var(--neon-border);
+    }
+    .form-check-input:checked {
+        background-color: var(--neon-cyan);
+        border-color: var(--neon-cyan);
+    }
+</style>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-4">
-            <form asp-action="Create" method="post" novalidate>
-                @Html.AntiForgeryToken()
+<div class="row justify-content-center">
+    <div class="col-12">
 
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label asp-for="FullName" class="form-label"></label>
-                        <input asp-for="FullName" class="form-control" />
-                        <span asp-validation-for="FullName" class="text-danger small"></span>
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-plus-fill me-2"></i>Create New Employee</span>
+                <a class="btn btn-sm btn-outline-secondary text-white" asp-controller="Employee" asp-action="Hierarchy" style="border-color: var(--neon-text-muted);">
+                    <i class="bi bi-diagram-3 me-1"></i> View Hierarchy
+                </a>
+            </div>
+
+            <div class="cms-card-body">
+
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+                        <i class="bi bi-check-circle-fill me-2"></i>@TempData["Success"]
                     </div>
+                }
 
-                    <div class="col-md-6">
-                        <label asp-for="NationalID" class="form-label"></label>
-                        <input asp-for="NationalID" class="form-control" />
-                        <span asp-validation-for="NationalID" class="text-danger small"></span>
-                    </div>
+                <form asp-action="Create" method="post" novalidate>
+                    @Html.AntiForgeryToken()
 
-                    <div class="col-md-4">
-                        <label asp-for="DateOfBirth" class="form-label"></label>
-                        <input asp-for="DateOfBirth" class="form-control" type="date" />
-                        <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
-                    </div>
+                    <h6 class="text-white mb-3 pb-2 border-bottom" style="border-color: var(--neon-border) !important;">
+                        <span style="color: var(--neon-cyan)">01.</span> Personal Information
+                    </h6>
 
-                    <div class="col-md-4">
-                        <label asp-for="CountryOfBirth" class="form-label"></label>
-                        <input asp-for="CountryOfBirth" class="form-control" />
-                        <span asp-validation-for="CountryOfBirth" class="text-danger small"></span>
-                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="FullName" class="form-label">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="John Doe" />
+                            <span asp-validation-for="FullName" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Phone" class="form-label"></label>
-                        <input asp-for="Phone" class="form-control" />
-                        <span asp-validation-for="Phone" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-6">
+                            <label asp-for="NationalID" class="form-label">National ID</label>
+                            <input asp-for="NationalID" class="form-control" placeholder="14-digit ID" />
+                            <span asp-validation-for="NationalID" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" />
-                        <span asp-validation-for="Email" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-4">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" class="form-control" type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="Address" class="form-label"></label>
-                        <input asp-for="Address" class="form-control" />
-                        <span asp-validation-for="Address" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-4">
+                            <label asp-for="CountryOfBirth" class="form-label">Country of Birth</label>
+                            <input asp-for="CountryOfBirth" class="form-control" />
+                            <span asp-validation-for="CountryOfBirth" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="EmergencyContactName" class="form-label"></label>
-                        <input asp-for="EmergencyContactName" class="form-control" />
-                        <span asp-validation-for="EmergencyContactName" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-4">
+                            <label asp-for="Phone" class="form-label">Phone Number</label>
+                            <input asp-for="Phone" class="form-control" />
+                            <span asp-validation-for="Phone" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-6">
-                        <label asp-for="EmergencyContactPhone" class="form-label"></label>
-                        <input asp-for="EmergencyContactPhone" class="form-control" />
-                        <span asp-validation-for="EmergencyContactPhone" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-6">
+                            <label asp-for="Email" class="form-label">Email Address</label>
+                            <input asp-for="Email" class="form-control" type="email" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="Relationship" class="form-label"></label>
-                        <input asp-for="Relationship" class="form-control" />
-                        <span asp-validation-for="Relationship" class="text-danger small"></span>
-                    </div>
+                        <div class="col-md-6">
+                            <label asp-for="Address" class="form-label">Residential Address</label>
+                            <input asp-for="Address" class="form-control" />
+                            <span asp-validation-for="Address" class="text-danger small"></span>
+                        </div>
 
-                    <div class="col-md-4">
-                        <label asp-for="DepartmentID" class="form-label"></label>
-                        <input asp-for="DepartmentID" class="form-control" type="number" />
-                        <span asp-validation-for="DepartmentID" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="PositionID" class="form-label"></label>
-                        <input asp-for="PositionID" class="form-control" type="number" />
-                        <span asp-validation-for="PositionID" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="ManagerID" class="form-label"></label>
-                        <input asp-for="ManagerID" class="form-control" type="number" />
-                        <div class="form-text">Optional (leave empty for top-level).</div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="PayGrade" class="form-label"></label>
-                        <input asp-for="PayGrade" class="form-control" />
-                        <span asp-validation-for="PayGrade" class="text-danger small"></span>
-                        <div class="form-text">SP expects VARCHAR(50).</div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="HireDate" class="form-label"></label>
-                        <input asp-for="HireDate" class="form-control" type="date" />
-                        <span asp-validation-for="HireDate" class="text-danger small"></span>
-                    </div>
-
-                    <div class="col-12">
-                        <label asp-for="Biography" class="form-label"></label>
-                        <textarea asp-for="Biography" class="form-control" rows="3"></textarea>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="EmploymentProgress" class="form-label"></label>
-                        <input asp-for="EmploymentProgress" class="form-control" />
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="AccountStatus" class="form-label"></label>
-                        <input asp-for="AccountStatus" class="form-control" />
-                    </div>
-
-                    <div class="col-md-4">
-                        <label asp-for="EmploymentStatus" class="form-label"></label>
-                        <input asp-for="EmploymentStatus" class="form-control" />
-                    </div>
-
-                    <div class="col-md-3">
-                        <div class="form-check mt-4">
-                            <input asp-for="IsActive" class="form-check-input" />
-                            <label asp-for="IsActive" class="form-check-label"></label>
+                        <div class="col-12">
+                            <label asp-for="Biography" class="form-label">Biography / Notes</label>
+                            <textarea asp-for="Biography" class="form-control" rows="2"></textarea>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <label asp-for="ProfileCompletion" class="form-label"></label>
-                        <input asp-for="ProfileCompletion" class="form-control" type="number" min="0" max="100" />
+                    <h6 class="text-white mb-3 pb-2 border-bottom" style="border-color: var(--neon-border) !important;">
+                        <span style="color: var(--neon-purple)">02.</span> Employment Details
+                    </h6>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label asp-for="DepartmentID" class="form-label">Department ID</label>
+                            <input asp-for="DepartmentID" class="form-control" type="number" />
+                            <span asp-validation-for="DepartmentID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="PositionID" class="form-label">Position ID</label>
+                            <input asp-for="PositionID" class="form-control" type="number" />
+                            <span asp-validation-for="PositionID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="ManagerID" class="form-label">Manager ID</label>
+                            <input asp-for="ManagerID" class="form-control" type="number" />
+                            <div class="form-text">Leave empty for top-level executives.</div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="PayGrade" class="form-label">Pay Grade</label>
+                            <input asp-for="PayGrade" class="form-control" placeholder="e.g. G-05" />
+                            <span asp-validation-for="PayGrade" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="HireDate" class="form-label">Hire Date</label>
+                            <input asp-for="HireDate" class="form-control" type="date" />
+                            <span asp-validation-for="HireDate" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="EmploymentStatus" class="form-label">Employment Status</label>
+                            <input asp-for="EmploymentStatus" class="form-control" placeholder="Full-Time" />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label asp-for="AccountStatus" class="form-label">Account Status</label>
+                            <input asp-for="AccountStatus" class="form-control" placeholder="Active" />
+                        </div>
+
+                         <div class="col-md-4">
+                            <label asp-for="EmploymentProgress" class="form-label">Progress Stage</label>
+                            <input asp-for="EmploymentProgress" class="form-control" placeholder="Onboarding" />
+                        </div>
+
+                         <div class="col-md-4">
+                            <div class="form-check mt-4 pt-1">
+                                <input asp-for="IsActive" class="form-check-input" />
+                                <label asp-for="IsActive" class="form-check-label text-white">Is Active Employee?</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <label asp-for="ContractID" class="form-label"></label>
-                        <input asp-for="ContractID" class="form-control" type="number" />
+                    <h6 class="text-white mb-3 pb-2 border-bottom" style="border-color: var(--neon-border) !important;">
+                        <span style="color: #ffc107">03.</span> Administrative & Emergency
+                    </h6>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label asp-for="EmergencyContactName" class="form-label">Emergency Contact Name</label>
+                            <input asp-for="EmergencyContactName" class="form-control" />
+                            <span asp-validation-for="EmergencyContactName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="EmergencyContactPhone" class="form-label">Contact Phone</label>
+                            <input asp-for="EmergencyContactPhone" class="form-control" />
+                            <span asp-validation-for="EmergencyContactPhone" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="Relationship" class="form-label">Relationship</label>
+                            <input asp-for="Relationship" class="form-control" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="ProfileCompletion" class="form-label">Profile Completion (%)</label>
+                            <input asp-for="ProfileCompletion" class="form-control" type="number" min="0" max="100" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="ContractID" class="form-label">Contract ID</label>
+                            <input asp-for="ContractID" class="form-control" type="number" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="TaxFormID" class="form-label">Tax Form ID</label>
+                            <input asp-for="TaxFormID" class="form-control" type="number" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label asp-for="SalaryTypeID" class="form-label">Salary Type ID</label>
+                            <input asp-for="SalaryTypeID" class="form-control" type="number" />
+                        </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <label asp-for="TaxFormID" class="form-label"></label>
-                        <input asp-for="TaxFormID" class="form-control" type="number" />
+                    <div class="mt-4 d-flex justify-content-end gap-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-neon-cyan px-4">
+                            <i class="bi bi-check-lg me-1"></i> Create Employee
+                        </button>
                     </div>
-
-                    <div class="col-md-3">
-                        <label asp-for="SalaryTypeID" class="form-label"></label>
-                        <input asp-for="SalaryTypeID" class="form-control" type="number" />
-                    </div>
-                </div>
-
-                <div class="mt-4 d-flex gap-2">
-                    <button type="submit" class="btn btn-success">Create Employee</button>
-                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary">Back</a>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>

@@ -1,6 +1,44 @@
 ﻿@{
     ViewData["Title"] = "Privacy Policy";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card">
+            <div class="cms-card-header" style="color: var(--neon-cyan);">
+                <i class="bi bi-shield-check me-2"></i> Privacy & Data Protection
+            </div>
+
+            <div class="cms-card-body">
+                <div class="mb-4 border-bottom pb-3" style="border-color: var(--neon-border) !important;">
+                    <h5 class="text-white mb-3">System Protocol</h5>
+                    <p class="text-muted">
+                        Use this page to detail your site's privacy policy. All data interactions within the HRMS Neon System are monitored and logged for security purposes.
+                    </p>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h6 class="text-white mb-2"><i class="bi bi-database-lock me-2 text-info"></i>Data Retention</h6>
+                        <p class="text-muted small">
+                            Employee records are stored in encrypted formats. Access is restricted to authorized HR personnel and System Administrators only.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-white mb-2"><i class="bi bi-eye-slash me-2 text-danger"></i>Confidentiality</h6>
+                        <p class="text-muted small">
+                            Personal Identification Numbers (National IDs) and salary information are treated as Level 4 Confidential Data.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top" style="border-color: var(--neon-border) !important;">
+                    <small class="text-muted fst-italic">Last updated: @DateTime.Now.ToString("MMMM dd, yyyy")</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

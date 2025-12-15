@@ -1,29 +1,82 @@
 @{
-    ViewData["Title"] = "Flag Irregular Leave Pattern";
+    ViewData["Title"] = "Flag Irregular Pattern";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-<h2>Flag Irregular Leave Pattern</h2>
+<!-- Local Styling for Dark Form Inputs -->
+<style>
+    .form-control {
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--neon-border);
+        color: var(--neon-text-main);
+    }
+    .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        color: #fff;
+    }
+    .form-label {
+        color: var(--neon-text-muted);
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+</style>
 
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger">@TempData["Error"]</div>
-}
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success">@TempData["Success"]</div>
-}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
 
-<form method="post">
-    @Html.AntiForgeryToken()
+        <!-- MASTER WRAPPER: Neon Card -->
+        <div class="cms-card" style="border-color: rgba(255, 193, 7, 0.3);">
+            <div class="cms-card-header text-warning">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Flag Irregular Leave Pattern
+            </div>
 
-    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
-    <input type="hidden" name="employeeId" value="@ViewBag.EmployeeId" />
+            <div class="cms-card-body">
 
-    <div class="mb-3">
-        <label class="form-label">Pattern description</label>
-        <textarea name="patternDescription" class="form-control" maxlength="200" rows="4"
-                  placeholder="Example: 3 Mondays in a row, always right before shift start.">@("")</textarea>
+                <p class="text-muted small mb-4">
+                    Use this form to flag suspicious or irregular leave patterns for review by HR.
+                    <br><strong>Employee ID:</strong> @ViewBag.EmployeeId
+                </p>
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger bg-transparent border-danger text-danger">
+                        <i class="bi bi-x-circle me-2"></i>@TempData["Error"]
+                    </div>
+                }
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success bg-transparent border-success text-success">
+                        <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+                    </div>
+                }
+
+                <form method="post">
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+                    <input type="hidden" name="employeeId" value="@ViewBag.EmployeeId" />
+
+                    <div class="mb-4">
+                        <label class="form-label">Pattern Description</label>
+                        <textarea name="patternDescription" class="form-control" maxlength="200" rows="5"
+                                  placeholder="Describe the pattern (e.g., 'Absent every Monday before a project deadline')...">@("")</textarea>
+                        <div class="form-text text-muted small mt-2">
+                            Max 200 characters. Be objective and specific.
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-controller="Leave" asp-action="Pending" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning text-dark fw-bold shadow-sm">
+                            <i class="bi bi-flag-fill me-2"></i>Flag Pattern
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
     </div>
-
-    <button type="submit" class="btn btn-warning">Flag Pattern</button>
-</form>
+</div>

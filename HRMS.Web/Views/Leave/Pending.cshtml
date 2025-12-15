@@ -1,70 +1,103 @@
 @model List<HRMS.Web.Data.Entities.Query.PendingLeaveRequestRow>
 
-<h2>Pending Leave Requests (Manager @ViewBag.ManagerId)</h2>
-
-@if (Model == null || Model.Count == 0)
-{
-    <div class="alert alert-info">No pending leave requests found.</div>
+@{
+    ViewData["Title"] = "Pending Approvals";
+    // Force CMS layout for dark theme
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
-else
-{
-    <table class="table table-striped align-middle">
-        <thead>
-            <tr>
-                <th>Request ID</th>
-                <th>Employee</th>
-                <th>Leave Type</th>
-                <th>Justification</th>
-                <th>Duration</th>
-                <th>Approval Timing</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var r in Model)
+
+<!-- MASTER WRAPPER: Neon Card -->
+<div class="cms-card">
+    <div class="cms-card-header d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-hourglass-split me-2"></i>Pending Leave Requests (Manager @ViewBag.ManagerId)</span>
+
+        <!-- Optional: Refresh/Filter button could go here -->
+    </div>
+
+    <div class="cms-card-body">
+
+        @if (Model == null || Model.Count == 0)
         {
-            <tr>
-                <td>@r.LeaveRequestID</td>
-                <td>@r.EmployeeName (@r.EmployeeID)</td>
-                <td>@r.LeaveType</td>
-                <td>@r.justification</td>
-                <td>@r.duration</td>
-                <td>@(r.approval_timing?.ToString("yyyy-MM-dd HH:mm") ?? "-")</td>
-
-                <!-- STATUS -->
-                <td>
-                    <span class="badge bg-warning text-dark">@r.status</span>
-                </td>
-
-                <!-- ACTIONS -->
-                <td>
-                    <!-- FLAG -->
-                    <a class="btn btn-sm btn-warning me-1"
-                       href="/Leave/FlagIrregular?managerId=@ViewBag.ManagerId&employeeId=@r.EmployeeID">
-                        Flag
-                    </a>
-
-                    <!-- APPROVE -->
-                    <form asp-action="Approve" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
-                        <input type="hidden" name="leaveRequestId" value="@r.LeaveRequestID" />
-                        <button type="submit" class="btn btn-success btn-sm">
-                            Approve
-                        </button>
-                    </form>
-
-                    <!-- REJECT -->
-                    <a class="btn btn-danger btn-sm ms-1"
-                       asp-action="Reject"
-                       asp-route-managerId="@ViewBag.ManagerId"
-                       asp-route-leaveRequestId="@r.LeaveRequestID">
-                        Reject
-                    </a>
-                </td>
-            </tr>
+            <div class="text-center py-5">
+                <i class="bi bi-check2-all fs-1 text-success d-block mb-3" style="text-shadow: 0 0 10px green;"></i>
+                <p class="text-muted">You're all caught up! No pending requests.</p>
+            </div>
         }
-        </tbody>
-    </table>
-}
+        else
+        {
+            <div class="table-responsive">
+                <!-- THE NEON TABLE CLASS -->
+                <table class="table table-neon align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Employee</th>
+                            <th>Leave Type</th>
+                            <th style="width: 25%;">Justification</th>
+                            <th>Duration</th>
+                            <th>Timing</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var r in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">@r.LeaveRequestID</td>
+                            <td class="fw-bold text-white">
+                                <div>@r.EmployeeName</div>
+                                <div class="small text-muted" style="font-size: 0.75rem;">ID: @r.EmployeeID</div>
+                            </td>
+                            <td class="text-info">@r.LeaveType</td>
+                            <td class="small text-muted fst-italic">
+                                "@r.justification"
+                            </td>
+                            <td>@r.duration</td>
+                            <td class="small text-muted">
+                                @(r.approval_timing?.ToString("MM/dd HH:mm") ?? "-")
+                            </td>
+
+                            <!-- STATUS -->
+                            <td>
+                                <span class="badge bg-warning text-dark shadow-sm">@r.status</span>
+                            </td>
+
+                            <!-- ACTIONS -->
+                            <td class="text-end">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <!-- FLAG -->
+                                    <a class="btn btn-sm btn-outline-warning"
+                                       title="Flag Irregularity"
+                                       href="/Leave/FlagIrregular?managerId=@ViewBag.ManagerId&employeeId=@r.EmployeeID">
+                                        <i class="bi bi-flag-fill"></i>
+                                    </a>
+
+                                    <!-- APPROVE -->
+                                    <form asp-action="Approve" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="managerId" value="@ViewBag.ManagerId" />
+                                        <input type="hidden" name="leaveRequestId" value="@r.LeaveRequestID" />
+                                        <button type="submit" class="btn btn-success btn-sm shadow-sm" title="Approve">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+
+                                    <!-- REJECT -->
+                                    <a class="btn btn-danger btn-sm shadow-sm"
+                                       title="Reject"
+                                       asp-action="Reject"
+                                       asp-route-managerId="@ViewBag.ManagerId"
+                                       asp-route-leaveRequestId="@r.LeaveRequestID">
+                                        <i class="bi bi-x-lg"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
