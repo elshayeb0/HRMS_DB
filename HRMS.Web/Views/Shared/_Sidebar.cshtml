@@ -137,7 +137,7 @@
             </a>
         }
 
-        <!-- MODULE 3: HR ADMIN (Role Gated) -->
+        <!-- MODULE 3: HR ADMIN -->
         @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
         {
             <div class="nav-section-header">
@@ -159,6 +159,36 @@
                 <i class="bi bi-archive me-3"></i> Entitlements
             </a>
         }
+
+        <!-- MODULE 4: MISSION CONTROL (UPDATED) -->
+        <div class="nav-section-header" style="color: #30D158; border-color: #30D158;">
+            TACTICAL OPS <i class="bi bi-crosshair"></i>
+        </div>
+
+        <!-- Employee: My Missions -->
+        <a asp-controller="Mission" asp-action="EmployeeMissions" class="cms-nav-link @IsActive("Mission", "EmployeeMissions")">
+            <i class="bi bi-list-task me-3" style="color: #30D158;"></i> Mission Log
+        </a>
+
+        <!-- Manager: Mission Approvals -->
+        @if (User.IsInRole("LineManager") || User.IsInRole("SystemAdmin"))
+        {
+            <a asp-controller="Mission" asp-action="ManagerMissions" class="cms-nav-link @IsActive("Mission", "ManagerMissions")">
+                <i class="bi bi-check2-square me-3" style="color: #30D158;"></i> Mission Approvals
+            </a>
+        }
+
+        <!-- HR: Assign Mission (Using HRController now) -->
+        @if (User.IsInRole("HRAdmin") || User.IsInRole("SystemAdmin"))
+        {
+            <a asp-controller="HR" asp-action="AssignMission" class="cms-nav-link @IsActive("HR", "AssignMission")">
+                <i class="bi bi-person-plus-fill me-3" style="color: #30D158;"></i> Assign Directive
+            </a>
+            <a asp-controller="Mission" asp-action="AllMissions" class="cms-nav-link @IsActive("Mission", "AllMissions")">
+                <i class="bi bi-globe me-3" style="color: #30D158;"></i> Global Ops
+            </a>
+        }
+
     </div>
 
     <!-- SYSTEM INFO PILLS (Levitating) -->

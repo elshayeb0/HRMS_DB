@@ -1,0 +1,121 @@
+@model IEnumerable<HRMS.Web.Models.Mission.Mission>
+
+@{
+    ViewData["Title"] = "Pending Mission Requests";
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
+}
+
+<div class="cms-card" style="box-shadow: 0 0 30px rgba(48, 209, 88, 0.1); border-left: 4px solid #30D158;">
+    <div class="cms-card-header d-flex justify-content-between align-items-center" style="color: #30D158;">
+        <span><i class="bi bi-shield-check me-2"></i> PENDING MISSION REQUESTS</span>
+        <span class="badge bg-dark border border-success text-success">@Model.Count() PENDING</span>
+    </div>
+
+    <div class="cms-card-body p-0">
+
+        @* --- Display Status Messages --- *@
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success m-3 bg-transparent border-success text-success fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger m-3 bg-transparent border-danger text-danger fade show" role="alert">
+                <i class="bi bi-x-octagon-fill me-2"></i> @TempData["ErrorMessage"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="table-responsive">
+            <table class="table table-neon align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>MISSION ID</th>
+                        <th>OPERATIVE</th>
+                        <th>DESTINATION</th>
+                        <th>TIMELINE</th>
+                        <th>STATUS</th>
+                        <th class="text-end">COMMAND PROTOCOLS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="bi bi-check2-all fs-1 d-block mb-2" style="opacity: 0.3;"></i>
+                                NO PENDING REQUESTS
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr style="transition: background 0.2s;">
+                                <td class="font-monospace small text-muted">#@item.MissionId</td>
+
+                                <!-- Employee Name -->
+                                <td class="fw-bold text-white">
+                                    <i class="bi bi-person-fill me-1 text-muted"></i> @item.EmployeeName
+                                </td>
+
+                                <!-- Destination -->
+                                <td class="text-info fw-bold" style="letter-spacing: 0.5px;">
+                                    <i class="bi bi-geo-alt me-1"></i> @item.Destination
+                                </td>
+
+                                <!-- Timeline -->
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-white small">@item.StartDate.ToShortDateString()</span>
+                                        <span class="text-muted small" style="font-size: 0.65rem;">to @item.EndDate.ToShortDateString()</span>
+                                    </div>
+                                </td>
+
+                                <!-- Status -->
+                                <td>
+                                    <span class="badge" style="background: rgba(252, 238, 10, 0.2); color: #fcee0a; border: 1px solid #fcee0a;">
+                                        @item.Status.ToUpper()
+                                    </span>
+                                </td>
+
+                                <!-- Actions (Direct Forms) -->
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+
+                                        <!-- Approve Action -->
+                                        <form method="post" asp-controller="Mission" asp-action="ApproveMission">
+                                            <input type="hidden" name="missionId" value="@item.MissionId" />
+                                            <!-- Auto-filled remark to satisfy controller -->
+                                            <input type="hidden" name="remarks" value="Approved by Manager" />
+
+                                            <button type="submit" class="btn btn-sm btn-outline-success px-3" title="AUTHORIZE">
+                                                <i class="bi bi-check-lg me-1"></i> APPROVE
+                                            </button>
+                                        </form>
+
+                                        <!-- Reject Action -->
+                                        <form method="post" asp-controller="Mission" asp-action="RejectMission">
+                                            <input type="hidden" name="missionId" value="@item.MissionId" />
+                                            <!-- Auto-filled remark to satisfy controller -->
+                                            <input type="hidden" name="remarks" value="Rejected by Manager" />
+
+                                            <button type="submit" class="btn btn-sm btn-outline-danger px-3" title="DENY">
+                                                <i class="bi bi-x-lg me-1"></i> REJECT
+                                            </button>
+                                        </form>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

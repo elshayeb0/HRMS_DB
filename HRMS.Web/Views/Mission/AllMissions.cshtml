@@ -1,0 +1,109 @@
+@model IEnumerable<HRMS.Web.Models.Mission.Mission>
+@{
+    ViewData["Title"] = "Global Operations";
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-end">
+        <div>
+            <h2 class="text-white fw-bold mb-0" style="text-shadow: 0 0 15px #30D158; font-family: 'Oxanium', sans-serif;">
+                <i class="bi bi-globe me-2" style="color: #30D158;"></i> GLOBAL OPERATIONS LOG
+            </h2>
+            <p class="text-muted small mb-0" style="letter-spacing: 1px;">TOTAL DIRECTIVES: @Model.Count()</p>
+        </div>
+
+        <!-- Filter Tools (Visual Only) -->
+        <div class="d-flex gap-2">
+            <div class="input-group input-group-sm" style="width: 250px;">
+                <span class="input-group-text bg-dark border-secondary text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" class="form-control bg-dark border-secondary text-white" placeholder="Search Operative ID..." />
+            </div>
+            <button class="btn btn-sm btn-outline-success"><i class="bi bi-filter"></i> FILTER</button>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success bg-transparent border-success text-success mb-4">
+        <i class="bi bi-check-all me-2"></i> @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="cms-card" style="box-shadow: 0 0 30px rgba(48, 209, 88, 0.1);">
+    <div class="cms-card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-neon align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>OPERATIVE</th>
+                        <th>SUPERVISOR</th>
+                        <th>DESTINATION</th>
+                        <th>TIMELINE</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var statusColor = item.Status == "Pending" ? "#fcee0a" : (item.Status == "Approved" || item.Status == "Completed" ? "#30D158" : "#FF003C");
+
+                        <tr style="transition: background 0.2s;">
+                            <td class="font-monospace small text-muted">#@item.MissionId</td>
+
+                            <!-- Operative Info -->
+                            <td>
+                                <div class="fw-bold text-white">@item.EmployeeName</div>
+                                <div class="small text-muted" style="font-size: 0.7rem;">ID: @item.EmployeeId</div>
+                            </td>
+
+                            <!-- Manager Info -->
+                            <td>
+                                <div class="text-white small">@item.ManagerName</div>
+                                <div class="small text-muted" style="font-size: 0.7rem;">OFFICER ID: @item.ManagerId</div>
+                            </td>
+
+                            <!-- Destination -->
+                            <td class="text-info fw-bold" style="letter-spacing: 0.5px;">
+                                <i class="bi bi-geo-alt me-1"></i> @item.Destination
+                            </td>
+
+                            <!-- Dates -->
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <span class="text-white small">@item.StartDate.ToString("yyyy-MM-dd")</span>
+                                    <span class="text-muted small" style="font-size: 0.65rem;">to @item.EndDate.ToString("yyyy-MM-dd")</span>
+                                </div>
+                            </td>
+
+                            <!-- Status Badge -->
+                            <td>
+                                <span class="badge text-black fw-bold" style="background: @statusColor; box-shadow: 0 0 10px @statusColor;">
+                                    @item.Status.ToUpper()
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Stats for Admin -->
+<div class="row mt-4 g-3">
+    <div class="col-md-3">
+        <div class="p-3 border border-secondary rounded bg-dark d-flex align-items-center">
+            <h1 class="mb-0 me-3 text-warning">@Model.Count(m => m.Status == "Pending")</h1>
+            <div class="small text-muted lh-1">PENDING<br>REVIEW</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="p-3 border border-secondary rounded bg-dark d-flex align-items-center">
+            <h1 class="mb-0 me-3 text-success">@Model.Count(m => m.Status == "Approved")</h1>
+            <div class="small text-muted lh-1">ACTIVE<br>DEPLOYMENTS</div>
+        </div>
+    </div>
+</div>

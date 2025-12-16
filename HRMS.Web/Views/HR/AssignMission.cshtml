@@ -1,105 +1,211 @@
 @{
-    ViewData["Title"] = "Assign Mission to Employee";
-}
-<h1><i class="fas fa-plane-departure"></i> Assign Mission to Employee</h1>
-<hr />
-
-@* Display Status Messages *@
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" id="successAlert" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
+    ViewData["Title"] = "Assign Mission";
+    Layout = "~/Views/Shared/_LayoutCms.cshtml";
 }
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" id="errorAlert" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
+<style>
+    /* MODAL PHYSICS */
+    .modal-overlay-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-<div class="card">
-    <div class="card-body">
-        <form method="post" asp-controller="HR" asp-action="AssignMission" id="assignMissionForm">
-            <div class="form-group">
-                <label for="employeeId">Select Employee <span class="text-danger">*</span></label>
-                <select class="form-control" id="employeeId" name="employeeId" required>
-                    <option value="">-- Select Employee --</option>
-                    @foreach (var employee in ViewBag.Employees)
-                    {
-                        <option value="@employee.EmployeeId">@employee.FullName</option>
-                    }
-                </select>
+    .tactical-modal {
+        width: 100%;
+        max-width: 700px;
+        background: rgba(10, 15, 20, 0.85);
+        backdrop-filter: blur(30px) saturate(150%);
+        border: 1px solid rgba(48, 209, 88, 0.3);
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.8), 0 0 40px rgba(48, 209, 88, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: modal-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    /* Green Scanline at top */
+    .tactical-modal::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 3px;
+        background: #30D158;
+        box-shadow: 0 0 15px #30D158;
+    }
+
+    .modal-header-tech {
+        padding: 2rem 2.5rem 1rem 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .modal-body-tech {
+        padding: 2rem 2.5rem 2.5rem 2.5rem;
+    }
+
+    /* INPUTS */
+    .tech-label {
+        font-size: 0.7rem;
+        color: #30D158;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: block;
+        text-shadow: 0 0 10px rgba(48, 209, 88, 0.3);
+    }
+
+    .tech-input {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        transition: all 0.3s;
+    }
+
+    .tech-input:focus {
+        background: rgba(0, 0, 0, 0.4);
+        border-color: #30D158;
+        box-shadow: 0 0 15px rgba(48, 209, 88, 0.2);
+        color: #fff;
+    }
+
+    /* BUTTONS */
+    .btn-close-modal {
+        color: rgba(255,255,255,0.5);
+        transition: all 0.3s;
+        font-size: 1.5rem;
+        text-decoration: none;
+    }
+    .btn-close-modal:hover { color: #FF003C; transform: scale(1.1); text-shadow: 0 0 10px #FF003C; }
+
+    .btn-tactical {
+        background: #30D158;
+        color: #000;
+        font-weight: 800;
+        letter-spacing: 2px;
+        border-radius: 50px;
+        padding: 1rem 2rem;
+        border: none;
+        width: 100%;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        box-shadow: 0 0 20px rgba(48, 209, 88, 0.3);
+    }
+    .btn-tactical:hover {
+        background: #fff;
+        box-shadow: 0 0 40px #30D158;
+        transform: translateY(-2px);
+    }
+
+    @@keyframes modal-pop {
+        0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+        100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+</style>
+
+<div class="modal-overlay-container">
+    <div class="tactical-modal">
+
+        <!-- HEADER -->
+        <div class="modal-header-tech">
+            <div>
+                <h3 class="text-white fw-bold mb-0" style="font-family: 'Oxanium';">MISSION DIRECTIVE</h3>
+                <small class="text-muted" style="letter-spacing: 1px;">CLEARANCE: HR_ADMIN</small>
             </div>
-            <div class="form-group">
-                <label for="destination">Destination <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="destination" name="destination" placeholder="e.g., Paris, France" required />
-            </div>
-            <div class="form-row">
-                <div class="form-group col-md-6">
-                    <label for="startDate">Start Date <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" id="startDate" name="startDate" required />
+            <a href="/" class="btn-close-modal" title="Abort Mission"><i class="bi bi-x-lg"></i></a>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body-tech">
+
+            <!-- ALERTS -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success bg-transparent border-success text-success fade show mb-4" id="successAlert" role="alert" style="border-radius: 8px;">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="endDate">End Date <span class="text-danger">*</span></label>
-                    <input type="date" class="form-control" id="endDate" name="endDate" required />
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger bg-transparent border-danger text-danger fade show mb-4" id="errorAlert" role="alert" style="border-radius: 8px;">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
                 </div>
-            </div>
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-check"></i> Assign Mission
-            </button>
-            <a href="/" class="btn btn-secondary">Cancel</a>
-        </form>
+            }
+
+            <form method="post" asp-controller="HR" asp-action="AssignMission" id="assignMissionForm">
+
+                <div class="row g-4">
+                    <!-- OPERATIVE -->
+                    <div class="col-12">
+                        <label for="employeeId" class="tech-label">SELECT OPERATIVE</label>
+                        <select class="form-select tech-input" id="employeeId" name="employeeId" required>
+                            <option value="" class="text-dark">-- Select Personnel --</option>
+                            @if (ViewBag.Employees != null)
+                            {
+                                foreach (var employee in ViewBag.Employees)
+                                {
+                                    <option value="@employee.EmployeeId" class="text-dark">@employee.FullName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+
+                    <!-- DESTINATION -->
+                    <div class="col-12">
+                        <label for="destination" class="tech-label">DESTINATION VECTOR</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-transparent border-0 text-success" style="position:absolute; z-index:10; left:5px; top:8px;"><i class="bi bi-geo-alt-fill"></i></span>
+                            <input type="text" class="form-control tech-input" id="destination" name="destination" placeholder="e.g., Sector 7, Paris Branch" required style="padding-left: 40px;" />
+                        </div>
+                    </div>
+
+                    <!-- DATES -->
+                    <div class="col-md-6">
+                        <label for="startDate" class="tech-label">DEPLOYMENT DATE</label>
+                        <input type="date" class="form-control tech-input" id="startDate" name="startDate" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="endDate" class="tech-label">EXTRACTION DATE</label>
+                        <input type="date" class="form-control tech-input" id="endDate" name="endDate" required />
+                    </div>
+                </div>
+
+                <div class="mt-5">
+                    <button type="submit" class="btn-tactical">
+                        <i class="bi bi-upload me-2"></i> UPLOAD DIRECTIVE
+                    </button>
+                </div>
+
+            </form>
+        </div>
     </div>
 </div>
 
-<script>
-    // Auto-hide success and error messages after specified time
-    document.addEventListener('DOMContentLoaded', function () {
-        const successAlert = document.getElementById('successAlert');
-        const errorAlert = document.getElementById('errorAlert');
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Auto-hide alerts
+            const successAlert = document.getElementById('successAlert');
+            if (successAlert) setTimeout(() => new bootstrap.Alert(successAlert).close(), 4000);
 
-        if (successAlert) {
-            setTimeout(function () {
-                // Use Bootstrap 5 alert close method
-                const alert = new bootstrap.Alert(successAlert);
-                alert.close();
-            }, 4000); // 4 seconds for success
-        }
-
-        if (errorAlert) {
-            setTimeout(function () {
-                // Use Bootstrap 5 alert close method
-                const alert = new bootstrap.Alert(errorAlert);
-                alert.close();
-            }, 8000); // 8 seconds for error (longer so user can read)
-        }
-
-        // Handle manual close button click
-        const closeButtons = document.querySelectorAll('.btn-close');
-        closeButtons.forEach(button => {
-            button.addEventListener('click', function (e) {
-                const alert = this.closest('.alert');
-                if (alert) {
-                    const bootstrapAlert = new bootstrap.Alert(alert);
-                    bootstrapAlert.close();
-                }
-            });
+            const errorAlert = document.getElementById('errorAlert');
+            if (errorAlert) setTimeout(() => new bootstrap.Alert(errorAlert).close(), 8000);
         });
-    });
 
-    // Client-side date validation
-    document.getElementById('assignMissionForm').addEventListener('submit', function (e) {
-        const startDate = new Date(document.getElementById('startDate').value);
-        const endDate = new Date(document.getElementById('endDate').value);
+        // Validation
+        document.getElementById('assignMissionForm').addEventListener('submit', function (e) {
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
 
-        if (endDate < startDate) {
-            e.preventDefault();
-            alert('End date cannot be before the start date. Please select valid dates.');
-            return false;
-        }
-    });
-</script>
+            if (endDate < startDate) {
+                e.preventDefault();
+                alert('MISSION ERROR: Timeline invalid. End date precedes Start date.');
+            }
+        });
+    </script>
+}
